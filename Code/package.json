@@ -1,0 +1,26 @@
+{
+  "name": "aaa_service",
+  "version": "1.0.0",
+  "description": "AAA Service for HA",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "egg-bin dev"
+  },
+  "keywords": [],
+  "author": "APJ",
+  "license": "ISC",
+  "dependencies": {
+    "egg": "^2.27.0",
+    "egg-bin": "^4.14.1",
+    "egg-cors": "^2.2.3",
+    "egg-multipart": "^2.10.3",
+    "egg-sequelize": "^5.2.2",
+    "mysql2": "^2.1.0",
+    "sequelize-fixtures": "^1.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.3.1",
+    "eslint-config-egg": "^8.0.1"
+  }
+}
