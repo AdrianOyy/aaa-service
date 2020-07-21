@@ -3,14 +3,15 @@
 
 module.exports = app => {
   const { router, controller } = app;
+  const prefix = app.config.prefix;
 
   // 中间件
-  const { baseDir, bucket } = app.config.upload;
-  const saveFile = app.middleware.upload({ baseDir, bucket });
+  // const { baseDir, bucket } = app.config.upload;
+  // const saveFile = app.middleware.upload({ baseDir, bucket });
 
-  router.get('/workflow/list', controller.workflow.list);
-  router.post('/workflow/upload', saveFile, controller.workflow.upload);
-  router.get('/syncUser/list', controller.syncUser.list);
-  router.get('/tenants/list', controller.tenants.list);
-  router.get('/tenants/listMapping', controller.tenants.listMapping);
+  // router.get(`${prefix}/workflow/list`, controller.workflow.list);
+  // router.post(`${prefix}/workflow/upload`, saveFile, controller.workflow.upload);
+  router.get(`${prefix}/syncUser/list`, controller.syncUser.list);
+  router.get(`${prefix}/tenants/list`, controller.tenants.list);
+  router.get(`${prefix}/tenants/listMapping`, controller.tenants.listMapping);
 };
