@@ -3,7 +3,7 @@ const path = require('path');
 
 module.exports = appInfo => {
   const config = exports;
-  config.prefix = '/aaa-service';
+  config.prefix = '';
   config.keys = appInfo.name + '_20200702134922';
 
   // ===================================
