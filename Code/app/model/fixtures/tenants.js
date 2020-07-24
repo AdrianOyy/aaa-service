@@ -4,7 +4,8 @@ module.exports = [
     model: 'tenants',
     data: {
       project: 'N3',
-      managerADGroup: 'n3manager',
+      ADGroup: 'n3manager',
+      right: 'RO',
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -13,7 +14,8 @@ module.exports = [
     model: 'tenants',
     data: {
       project: 'SENSE',
-      managerADGroup: 'sensemanager',
+      ADGroup: 'sensemanager',
+      right: 'RW',
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -22,7 +24,8 @@ module.exports = [
     model: 'tenants',
     data: {
       project: 'N3-ProjectA',
-      managerADGroup: 'n3manager',
+      ADGroup: 'n3manager',
+      right: 'RW',
       createdAt: new Date(),
       updatedAt: new Date(),
     },

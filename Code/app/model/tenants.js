@@ -7,7 +7,8 @@ module.exports = app => {
   const tenants = app.model.define('tenants', {
     id: { type: INTEGER, autoIncrement: true, primaryKey: true, cnName: 'ID' },
     project: { type: STRING(128), allowNull: true, cnName: '项目', comment: '项目' },
-    managerADGroup: { type: STRING(128), allowNull: true, cnName: 'AD管理组', comment: 'AD管理组' },
+    ADGroup: { type: STRING(128), allowNull: true, cnName: '所属AD组', comment: '所属AD组' },
+    right: { type: STRING(128), allowNull: true, cnName: '权限', comment: '权限' },
     createdAt: { type: DATE, allowNull: false, cnName: '创建时间', comment: '创建时间' },
     updatedAt: { type: DATE, allowNull: false, cnName: '更新时间', comment: '更新时间' },
   }, {
