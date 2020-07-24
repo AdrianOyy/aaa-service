@@ -16,4 +16,10 @@ module.exports = app => {
   router.get(`${prefix}/syncUser/sync`, controller.syncUser.sync);
   router.get(`${prefix}/tenants/list`, controller.tenants.list);
   router.get(`${prefix}/tenants/listMapping`, controller.tenants.listMapping);
+
+  router.get(`${prefix}/management/list`, controller.management.list);
+  router.post(`${prefix}/management/create`, controller.management.create);
+  router.put(`${prefix}/management/update`, controller.management.update);
+  router.delete(`${prefix}/management/delete`, controller.management.delete);
+  router.delete(`${prefix}/management/deleteMany`, controller.management.deleteMany);
 };

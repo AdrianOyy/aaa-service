@@ -5,7 +5,7 @@ module.exports = app => {
   app.beforeStart(async function() {
     // 同步模型
     const syncModels = [
-      'tenants', 'tenantsMapping', 'syncUser',
+      'tenants', 'tenantsMapping', 'syncUser', 'management',
     ];
     for (const syncModel of syncModels) {
       await app.model.models[syncModel].sync();
@@ -21,6 +21,9 @@ module.exports = app => {
     }
     if (!await model.syncUser.findOne()) {
       await sequelizeFixtures.loadFile(fixturesPath + 'syncUser.js', model);
+    }
+    if (!await model.management.findOne()) {
+      await sequelizeFixtures.loadFile(fixturesPath + 'management.js', model);
     }
   });
 };
