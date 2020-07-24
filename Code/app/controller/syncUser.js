@@ -30,6 +30,18 @@ module.exports = app => {
       ctx.success(result);
     }
 
+    async detail() {
+      const { ctx } = this;
+      const { id } = ctx.query;
+      const result = await ctx.model.models.syncUser.findOne({
+        raw: true,
+        where: {
+          id,
+        },
+      });
+      ctx.success(result);
+    }
+
     async sync() {
       const { ctx } = this;
       const flag = await ctx.service.syncUser.authenticate('qiwei', 'APJ.com123');
