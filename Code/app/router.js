@@ -9,13 +9,14 @@ module.exports = app => {
   // const { baseDir, bucket } = app.config.upload;
   // const saveFile = app.middleware.upload({ baseDir, bucket });
 
-  // router.get(`${prefix}/workflow/list`, controller.workflow.list);
-  // router.post(`${prefix}/workflow/upload`, saveFile, controller.workflow.upload);
   router.get(`${prefix}/syncUser/list`, controller.syncUser.list);
   router.get(`${prefix}/syncUser/detail`, controller.syncUser.detail);
   router.get(`${prefix}/syncUser/sync`, controller.syncUser.sync);
   router.get(`${prefix}/tenants/list`, controller.tenants.list);
-  router.get(`${prefix}/tenants/listMapping`, controller.tenants.listMapping);
+  router.post(`${prefix}/tenants/create`, controller.tenants.create);
+  router.put(`${prefix}/tenants/update`, controller.tenants.update);
+  router.delete(`${prefix}/tenants/delete`, controller.tenants.delete);
+  router.delete(`${prefix}/tenants/deleteMany`, controller.tenants.deleteMany);
 
   router.get(`${prefix}/management/list`, controller.management.list);
   router.post(`${prefix}/management/create`, controller.management.create);
