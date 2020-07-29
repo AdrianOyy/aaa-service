@@ -13,6 +13,7 @@ module.exports = app => {
   router.get(`${prefix}/syncUser/detail`, controller.syncUser.detail);
   router.post(`${prefix}/syncUser/login`, controller.syncUser.login);
   router.get(`${prefix}/tenants/list`, controller.tenants.list);
+  router.get(`${prefix}/tenants/detail`, controller.tenants.detail);
   router.post(`${prefix}/tenants/create`, controller.tenants.create);
   router.put(`${prefix}/tenants/update`, controller.tenants.update);
   router.delete(`${prefix}/tenants/delete`, controller.tenants.delete);

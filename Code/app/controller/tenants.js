@@ -30,6 +30,18 @@ module.exports = app => {
       ctx.success(result);
     }
 
+    async detail() {
+      const { ctx } = this;
+      const { id } = ctx.query;
+      const result = await ctx.model.models.tenants.findOne({
+        raw: true,
+        where: {
+          id,
+        },
+      });
+      ctx.success(result);
+    }
+
     async create() {
       const { ctx } = this;
       const { project, ADGroup, right } = ctx.request.body;
