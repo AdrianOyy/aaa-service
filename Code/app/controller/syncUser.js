@@ -45,8 +45,8 @@ module.exports = app => {
     async login() {
       const { ctx } = this;
       const { username, password } = ctx.request.body;
-      const pass = await ctx.service.decryption.decrypteds(password);
-      const auth = await ctx.service.adService.authenticate(username, pass);
+      // const pass = await ctx.service.decryption.decrypteds(password);
+      const auth = await ctx.service.adService.authenticate(username, password);
       ctx.success(true);
     }
   };
