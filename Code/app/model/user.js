@@ -1,10 +1,10 @@
 'use strict';
 
-// syncUser
+// user
 module.exports = app => {
   const { INTEGER, STRING, DATE } = app.Sequelize;
 
-  const syncUser = app.model.define('syncUser', {
+  const user = app.model.define('user', {
     id: { type: INTEGER, autoIncrement: true, primaryKey: true, cnName: 'ID' },
     corpId: { type: STRING(128), allowNull: true, cnName: 'CORP ID', comment: 'CORP ID' },
     alias: { type: STRING(128), allowNull: true, cnName: 'Alias', comment: 'Alias' },
@@ -24,13 +24,13 @@ module.exports = app => {
     updatedAt: { type: DATE, allowNull: false, cnName: '更新时间', comment: '更新时间' },
   }, {
     paranoid: true,
-    tableName: 'syncUser',
-    tableCnName: 'user-for sync',
+    tableName: 'user',
+    tableCnName: '用户',
   });
 
-  syncUser.associate = function() {
+  user.associate = function() {
     // const ms = app.model.models;
   };
 
-  return syncUser;
+  return user;
 };
