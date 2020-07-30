@@ -42,21 +42,12 @@ module.exports = app => {
       ctx.success(result);
     }
 
-    async sync() {
+    async login() {
       const { ctx } = this;
-      const flag = await ctx.service.syncUser.authenticate('qiwei', 'APJ.com123');
-      console.log('authenticate true', flag === true);
-      // flag = await ctx.service.syncUser.authenticate('qiwei', 'APJ.com123123');
-      // console.log('authenticate false', flag === false);
-      const group = await ctx.service.syncUser.findGroup('IT');
-      console.log('findGroup', group.cn);
-      const groups = await ctx.service.syncUser.findGroups();
-      console.log('findGroups', groups.length);
-      const user = await ctx.service.syncUser.findUser('qiwei');
-      console.log('findUser', user.cn);
-      const users = await ctx.service.syncUser.findUsers();
-      console.log('findUsers', users.length);
-      ctx.success();
+      const { username, password } = ctx.request.body;
+      const pass = await ctx.service.decryption.decrypteds(password);
+      const auth = await ctx.service.adService.authenticate(username, pass);
+      ctx.success(auth);
     }
   };
 };
