@@ -10,10 +10,10 @@ module.exports = app => {
         const res = await ctx.model.models.management.findAndCountAll({
           where: Object.assign(
             {},
-            project ? { project } : undefined,
-            managerADGroup ? { managerADGroup } : undefined,
-            supporter ? { supporter } : undefined,
-            resourcesQuota ? { resourcesQuota } : undefined,
+            project ? { project: { [Op.like]: `%${project}%` } } : undefined,
+            managerADGroup ? { managerADGroup: { [Op.like]: `%${managerADGroup}%` } } : undefined,
+            supporter ? { supporter: { [Op.like]: `%${supporter}%` } } : undefined,
+            resourcesQuota ? { resourcesQuota: { [Op.like]: `%${resourcesQuota}%` } } : undefined,
             startDate ? { createdAt: { [Op.gte]: startDate } } : undefined,
             endDate ? { createdAt: { [Op.lte]: endDate } } : undefined
           ),
