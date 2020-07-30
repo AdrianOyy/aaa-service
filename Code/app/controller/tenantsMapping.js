@@ -49,29 +49,33 @@ module.exports = app => {
       const { ctx } = this;
       const { id } = ctx.query;
       const result = await ctx.model.models.tenant_group_mapping.findOne({
-        raw: true,
         where: {
           id,
         },
         include: [
           {
             attributes: [ 'id', 'name' ],
-            model: ctx.models.tenant,
+            model: ctx.model.models.tenant,
             as: 'tenant',
           },
           {
             attributes: [ 'id', 'name' ],
-            model: ctx.models.ad_group,
+            model: ctx.model.models.ad_group,
             as: 'ad_group',
           },
           {
             attributes: [ 'id', 'value', 'label' ],
-            model: ctx.models.role,
+            model: ctx.model.models.role,
             as: 'role',
           },
         ],
       });
-      ctx.success(result);
+
+      const roles = await ctx.model.models.role.findAll({
+        raw: true,
+        attributes: [ 'id', 'label' ],
+      });
+      ctx.success({ result, roles });
     }
 
     async create() {
