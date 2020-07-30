@@ -8,55 +8,87 @@ module.exports = app => {
       const limit = parseInt(ctx.query.limit) || 10;
       const offset = (parseInt(ctx.query.page || 1) - 1) * limit;
       const { project, prop, order } = ctx.query;
-      const where = { project };
+      const whereProject = {};
+      if (project) {
+        whereProject.name = project;
+      }
 
-      // 过滤无用条件
-      Object.keys(where).forEach(k => {
-        if (where[k] === undefined || where[k] === '' || !where[k]) {
-          delete where[k];
-        }
-      });
-      let Order = [ 'project' ];
+      let Order = [ 'createdAt' ];
       if (order && prop) {
         Order = [[ `${prop}`, `${order}` ]];
       }
       const findAdParams = {
-        where,
         order: Order,
         offset,
         limit,
       };
-      const result = await ctx.model.models.tenants.findAndCountAll(findAdParams);
+      // 关联子表
+      findAdParams.include = [
+        {
+          attributes: [ 'id', 'name' ],
+          model: ctx.model.models.tenant,
+          as: 'tenant',
+          where: whereProject,
+        },
+        {
+          attributes: [ 'id', 'name' ],
+          model: ctx.model.models.ad_group,
+          as: 'ad_group',
+        },
+        {
+          attributes: [ 'id', 'value', 'label' ],
+          model: ctx.model.models.role,
+          as: 'role',
+        },
+      ];
+      const result = await ctx.model.models.tenant_group_mapping.findAndCountAll(findAdParams);
       ctx.success(result);
     }
 
     async detail() {
       const { ctx } = this;
       const { id } = ctx.query;
-      const result = await ctx.model.models.tenants.findOne({
+      const result = await ctx.model.models.tenant_group_mapping.findOne({
         raw: true,
         where: {
           id,
         },
+        include: [
+          {
+            attributes: [ 'id', 'name' ],
+            model: ctx.models.tenant,
+            as: 'tenant',
+          },
+          {
+            attributes: [ 'id', 'name' ],
+            model: ctx.models.ad_group,
+            as: 'ad_group',
+          },
+          {
+            attributes: [ 'id', 'value', 'label' ],
+            model: ctx.models.role,
+            as: 'role',
+          },
+        ],
       });
       ctx.success(result);
     }
 
     async create() {
       const { ctx } = this;
-      const { project, ADGroup, right } = ctx.request.body;
-      if (!project || !ADGroup || !right) {
+      const { tenantId, adGroupId, roleId } = ctx.request.body;
+      if (!tenantId || !adGroupId || !roleId) {
         ctx.error();
       }
       const model = {
-        project,
-        ADGroup,
-        right,
+        tenantId,
+        adGroupId,
+        roleId,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
       try {
-        await ctx.model.models.tenants.create(model);
+        await ctx.model.models.tenant_group_mapping.create(model);
         ctx.success();
       } catch (error) {
         throw { status: 500, message: 'service busy' };
@@ -64,16 +96,16 @@ module.exports = app => {
     }
     async update() {
       const { ctx } = this;
-      const { id, project, ADGroup, right } = ctx.request.body;
-      if (!id || !project || !ADGroup || !right) {
+      const { id, tenantId, adGroupId, roleId } = ctx.request.body;
+      if (!id || !tenantId || !adGroupId || !roleId) {
         ctx.error();
       }
-      const oldModel = await ctx.model.models.tenants.findByPk(id);
+      const oldModel = await ctx.model.models.tenant_group_mapping.findByPk(id);
       if (!oldModel) ctx.error();
       const newModel = {
-        project,
-        ADGroup,
-        right,
+        tenantId,
+        adGroupId,
+        roleId,
         updatedAt: new Date(),
       };
       try {
@@ -83,14 +115,14 @@ module.exports = app => {
         console.log('error==========================error');
         console.log(error);
         console.log('error==========================error');
-        ctx.error('tenants update busy');
+        ctx.error('tenant_group_mapping update busy');
       }
     }
     async delete() {
       const { ctx } = this;
       const { id } = ctx.query;
       if (!id) ctx.error();
-      const entity = await ctx.model.models.tenants.findByPk(id);
+      const entity = await ctx.model.models.tenant_group_mapping.findByPk(id);
       if (!entity) ctx.error;
       try {
         await entity.destroy(id);
@@ -99,7 +131,7 @@ module.exports = app => {
         console.log('error==========================error');
         console.log(error);
         console.log('error==========================error');
-        ctx.error('tenants delete busy');
+        ctx.error('tenant_group_mapping delete busy');
       }
     }
     async deleteMany() {
@@ -108,7 +140,7 @@ module.exports = app => {
       const { idList } = ctx.request.body;
       if (!idList || !idList.length) ctx.error();
       try {
-        await ctx.model.models.tenants.destroy({
+        await ctx.model.models.tenant_group_mapping.destroy({
           where: {
             id: { [Op.in]: idList },
           },
@@ -118,7 +150,7 @@ module.exports = app => {
         console.log('error==========================error');
         console.log(error);
         console.log('error==========================error');
-        ctx.error('tenants deleteMany busy');
+        ctx.error('tenant_group_mapping deleteMany busy');
       }
     }
 

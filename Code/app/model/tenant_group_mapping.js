@@ -18,7 +18,7 @@ module.exports = app => {
 
   tenant_group_mapping.associate = function() {
     const ms = app.model.models;
-    ms.tenant.belongsTo(ms.tenant, { as: 'tenant', foreignKey: 'tenantId', constraint: false });
+    ms.tenant_group_mapping.belongsTo(ms.tenant, { as: 'tenant', foreignKey: 'tenantId', constraint: false });
     ms.tenant_group_mapping.belongsTo(ms.ad_group, { as: 'ad_group', foreignKey: 'ad_groupId', constraint: false });
     ms.tenant_group_mapping.belongsTo(ms.role, { as: 'role', foreignKey: 'roleId', constraint: false });
   };
