@@ -2,8 +2,8 @@
 
 const axios = require('axios');
 
-// const url = 'http://10.231.131.123:3010/';
-const url = 'http://127.0.0.1:7002/';
+const url = 'http://10.231.131.123:3010/';
+// const url = 'http://127.0.0.1:7002/';
 const jwt = require('jsonwebtoken');
 module.exports = app => {
 
