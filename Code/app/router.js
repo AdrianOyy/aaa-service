@@ -13,7 +13,7 @@ module.exports = app => {
   // router.post(`${prefix}/workflow/upload`, saveFile, controller.workflow.upload);
   // router.get(`${prefix}/syncUser/list`, controller.syncUser.list);
   // router.get(`${prefix}/syncUser/detail`, controller.syncUser.detail);
-  // router.get(`${prefix}/syncUser/sync`, controller.syncUser.sync);
+  router.get(`${prefix}/syncUser/login`, controller.syncUser.login);
   // router.get(`${prefix}/tenants/list`, controller.tenants.list);
   // router.get(`${prefix}/tenants/listMapping`, controller.tenants.listMapping);
 
