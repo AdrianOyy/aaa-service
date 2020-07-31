@@ -46,8 +46,8 @@ module.exports = app => {
       const { ctx } = this;
       const { username, password } = ctx.request.body;
       // const pass = await ctx.service.decryption.decrypteds(password);
-      const auth = await ctx.service.adService.authenticate(username, pass);
-      await ctx.service.user.checkUser(auth);
+      const auth = await ctx.service.adService.authenticate(username, password);
+      ctx.service.user.loadUser(auth);
       ctx.success(auth !== null && auth !== false ? auth.token : auth);
     }
   };
