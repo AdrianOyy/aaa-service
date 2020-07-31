@@ -9,31 +9,33 @@ module.exports = app => {
 
   return class extends app.Service {
     async authenticate(username, password) {
-      const auth = await axios.post(url + 'adService/authenticate', { username, password }
+      const axiosResult = await axios.post(url + 'adService/authenticate', { username, password }
       ).then(function(response) {
         return new Promise(resolve => {
           const data = response.data.data;
           const result = {};
           if (data.auth) {
             // result.user = data.user;
-            const username = data.user.sAMAccountName;
+            const user = data.user;
+            const groups = data.groups;
+            result.user = user;
+            result.groups = groups;
             const token = jwt.sign({
-              username,
+              username: user.sAMAccountName,
             }, '1234567abc', { expiresIn: '10m' });
-            console.log('token', token);
             result.token = token;
             resolve(result);
           } else {
-            resolve(null);
+            resolve(false);
           }
         });
       }).catch(function(error) {
         console.log(error);
         return new Promise(resolve => {
-          resolve(false);
+          resolve(null);
         });
       });
-      return auth;
+      return axiosResult;
     }
   };
 };

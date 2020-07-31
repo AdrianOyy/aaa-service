@@ -16,7 +16,7 @@ module.exports = app => {
           delete where[k];
         }
       });
-      let Order = [ 'surname' ];
+      let Order = [ 'surname', 'desc' ];
       if (order && prop) {
         Order = [[ `${prop}`, `${order}` ]];
       }
@@ -26,14 +26,14 @@ module.exports = app => {
         offset,
         limit,
       };
-      const result = await ctx.model.models.syncUser.findAndCountAll(findAdParams);
+      const result = await ctx.model.models.user.findAndCountAll(findAdParams);
       ctx.success(result);
     }
 
     async detail() {
       const { ctx } = this;
       const { id } = ctx.query;
-      const result = await ctx.model.models.syncUser.findOne({
+      const result = await ctx.model.models.user.findOne({
         raw: true,
         where: {
           id,
@@ -45,9 +45,10 @@ module.exports = app => {
     async login() {
       const { ctx } = this;
       const { username, password } = ctx.request.body;
-      // const pass = await ctx.service.decryption.decrypteds(password);
-      const auth = await ctx.service.adService.authenticate(username, password);
-      ctx.success(true);
+      const pass = await ctx.service.decryption.decrypteds(password);
+      const auth = await ctx.service.adService.authenticate(username, pass);
+      await ctx.service.user.checkUser(auth);
+      ctx.success(auth !== null && auth !== false ? auth.token : auth);
     }
   };
 };
