@@ -8,9 +8,21 @@ module.exports = app => {
       if (!auth) {
         return;
       }
+      const ad_groups = await ctx.model.models.ad_group.findAll({
+        raw: true,
+        attributes: [ 'name' ],
+      });
       const user = auth.user;
-      const groups = auth.groups;
-      console.log({ user, groups });
+      const groups = auth.groups.filter(_ => {
+        let flag = false;
+        for (const ad_group of ad_groups) {
+          if (ad_group.name === _.cn) {
+            flag = true;
+            break;
+          }
+        }
+        return flag;
+      });
       let userModel = await ctx.model.models.user.findOne({
         where: {
           email: user.userPrincipalName,
@@ -33,23 +45,30 @@ module.exports = app => {
           createdAt: new Date(),
         });
       }
-      user.id = userModel.dataValues.id;
+      const userId = userModel.dataValues.id;
+      user.id = userId;
+      await ctx.model.models.user_gourp_mapping.destroy({
+        where: {
+          userId,
+        },
+        force: true,
+      });
       for (let index = 0; index < groups.length; index++) {
         const name = groups[index].cn;
-        let ad_group = await ctx.model.models.ad_group.findOne({
+        const ad_group = await ctx.model.models.ad_group.findOne({
           raw: true,
           where: {
             name,
           },
         });
         if (ad_group !== null) {
+          console.log(ad_group);
           groups[index].id = ad_group.id;
-        } else {
-          ad_group = await ctx.model.models.ad_group.create({
-            name,
+          await ctx.model.models.user_gourp_mapping.create({
+            groupId: ad_group.id,
+            userId,
             createdAt: new Date(),
           });
-          groups[index].id = ad_group.id;
         }
       }
       user.groups = groups;
