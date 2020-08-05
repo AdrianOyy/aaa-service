@@ -101,6 +101,7 @@ module.exports = app => {
             id: { [Op.in]: idList },
           },
         });
+        ctx.service.syncActiviti.deleteGroup(idList);
         ctx.success();
       } catch (error) {
         console.log('error==========================error');
