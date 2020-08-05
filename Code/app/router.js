@@ -27,6 +27,11 @@ module.exports = app => {
 
   router.get(`${prefix}/ad_group/list`, controller.adGroup.list);
   router.get(`${prefix}/ad_group/detail`, controller.adGroup.detail);
+  router.post(`${prefix}/ad_group/create`, controller.adGroup.create);
+  router.put(`${prefix}/ad_group/update`, controller.adGroup.update);
+  router.delete(`${prefix}/ad_group/delete`, controller.adGroup.delete);
+  router.delete(`${prefix}/ad_group/deleteMany`, controller.adGroup.deleteMany);
+  router.get(`${prefix}/ad_group/checkName`, controller.adGroup.checkName);
 
   router.get(`${prefix}/assign/list`, controller.assign.list);
   router.get(`${prefix}/assign/detail`, controller.assign.detail);
