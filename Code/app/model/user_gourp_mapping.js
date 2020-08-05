@@ -17,7 +17,7 @@ module.exports = app => {
 
   user_gourp_mapping.associate = function() {
     const ms = app.model.models;
-    ms.user_gourp_mapping.belongsTo(ms.ad_group, { as: 'ad_group', foreignKey: 'gourpId', constraint: false });
+    ms.user_gourp_mapping.belongsTo(ms.ad_group, { as: 'ad_group', foreignKey: 'groupId', constraint: false });
     ms.user_gourp_mapping.belongsTo(ms.user, { as: 'user', foreignKey: 'userId', constraint: false });
   };
 

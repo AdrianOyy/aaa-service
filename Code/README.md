@@ -4,11 +4,12 @@ docker镜像打包
 3 打开FinalShell
 4 进入code所在目录cd /home/aaa-server/aaa-server/
 5 上传docker-aaa-server.zip
-6 解压 zip文件 unzip docker-aaa-server.zip 覆盖现有文件
-7 运行docker build -t aaa-service . (aaa-service 为docker iamges名称，.指当前目录)
-8 docker images 查看所有images
-9 docker run --restart=always --name aaa-service -d -p 3003:7001 aaa-service(3003为对外访问接口，7001为服务接口，-d代表后台运行，去掉可查看显示日志信息)
-10 docker ps -a 查看当前运行镜像
+6 删除zip文件以外的文件
+7 解压 zip文件 unzip docker-aaa-server.zip 覆盖现有文件
+8 运行docker build -t aaa-service . (aaa-service 为docker iamges名称，.指当前目录)
+9 docker images 查看所有images
+10 docker run --restart=always --name aaa-service -d -p 3003:7001 aaa-service(3003为对外访问接口，7001为服务接口，-d代表后台运行，去掉可查看显示日志信息)
+11 docker ps -a 查看当前运行镜像
 
 docker镜像删除（非第一次安装时，请先执行此操作）
 1 docker ps -a 查看当前运行镜像
