@@ -16,7 +16,7 @@ module.exports = app => {
           where: Object.assign(
             {},
             tenantId ? { tenantId } : undefined,
-            groupId ? { groupId } : undefined
+            groupId ? { ad_groupId: groupId } : undefined
           ),
           order: Order,
           offset,
@@ -50,7 +50,7 @@ module.exports = app => {
       if (!oldModel) ctx.error();
       const newModel = {
         tenantId,
-        groupId,
+        ad_groupId: groupId,
         updatedAt: new Date(),
       };
       try {
@@ -71,7 +71,7 @@ module.exports = app => {
       }
       const model = {
         tenantId,
-        groupId,
+        ad_groupId: groupId,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -116,6 +116,19 @@ module.exports = app => {
         console.log('error==========================error');
         ctx.error('service busy');
       }
+    }
+    async checkMapping() {
+      const { ctx } = this;
+      const { Op } = app.Sequelize;
+      const { id, tenantId, groupId } = ctx.query;
+      const count = await ctx.model.modles.tanent_group_mapping.count({
+        where: {
+          id: { [Op.ne]: id },
+          tenantId,
+          ad_groupId: groupId,
+        },
+      });
+      ctx.success(count);
     }
   };
 };

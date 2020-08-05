@@ -47,6 +47,12 @@ module.exports = app => {
       const { ctx } = this;
       const { name } = ctx.request.body;
       if (!name) ctx.error();
+      const existNum = await ctx.model.models.tenant.count({
+        where: {
+          name,
+        },
+      });
+      if (existNum > 0) ctx.error();
       const model = {
         name,
         createdAt: new Date(),
@@ -114,7 +120,7 @@ module.exports = app => {
       const count = await ctx.model.models.tenant.count({
         where: {
           name,
-          id: { [Op.ne]: id }
+          id: { [Op.ne]: id },
         },
       });
       ctx.success(count);

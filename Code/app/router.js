@@ -51,6 +51,10 @@ module.exports = app => {
 
   router.get(`${prefix}/role/list`, controller.role.list);
   router.get(`${prefix}/role/detail`, controller.role.detail);
+  router.put(`${prefix}/role/update`, controller.role.update);
+  router.post(`${prefix}/role/create`, controller.role.create);
+  router.delete(`${prefix}/role/deleteMany`, controller.role.deleteMany);
+  router.get(`${prefix}/role/checkLabel`, controller.role.checkLabel);
 
   router.get(`${prefix}/tenant/list`, controller.tenant.list);
   router.get(`${prefix}/tenant/detail`, controller.tenant.detail);
@@ -65,6 +69,7 @@ module.exports = app => {
   router.put(`${prefix}/tenant_group_mapping/update`, controller.tenantGroupMapping.update);
   router.delete(`${prefix}/tenant_group_mapping/delete`, controller.tenantGroupMapping.delete);
   router.delete(`${prefix}/tenant_group_mapping/deleteMany`, controller.tenantGroupMapping.deleteMany);
+  router.get(`${prefix}/tenant_group_mapping/checkMapping`, controller.tenantGroupMapping.checkMapping);
 
   router.get(`${prefix}/user/list`, controller.user.list);
   router.get(`${prefix}/user/detail`, controller.user.detail);
