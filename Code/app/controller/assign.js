@@ -7,7 +7,7 @@ module.exports = app => {
       const { tanent_group_mapping_id, roleId, prop, order } = ctx.query;
       const limit = parseInt(ctx.query.limit) || 10;
       const offset = (parseInt(ctx.query.page || 1) - 1) * limit;
-      let Order = [ 'tanent_group_mapping_id', 'desc' ];
+      let Order = [[ 'tanent_group_mapping_id', 'DESC' ]];
       if (order && prop) {
         Order = [[ prop, order ]];
       }
@@ -66,7 +66,7 @@ module.exports = app => {
     async create() {
       const { ctx } = this;
       const { tanent_group_mapping_id, roleId } = ctx.request.body;
-      if (tanent_group_mapping_id || roleId) {
+      if (!tanent_group_mapping_id || !roleId) {
         ctx.error();
       }
       const model = {

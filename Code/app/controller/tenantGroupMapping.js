@@ -7,7 +7,7 @@ module.exports = app => {
       const { tenantId, groupId, prop, order } = ctx.query;
       const limit = parseInt(ctx.query.limit) || 10;
       const offset = (parseInt(ctx.query.page || 1) - 1) * limit;
-      let Order = [ 'tenantId', 'desc' ];
+      let Order = [[ 'tenantId', 'DESC' ]];
       if (order && prop) {
         Order = [[ prop, order ]];
       }

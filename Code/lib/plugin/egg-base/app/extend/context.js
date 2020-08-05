@@ -8,8 +8,11 @@ module.exports = {
     };
   },
   error(msg) {
-    msg = msg || 'bad request';
-    throw { status: 400, msg };
+    const message = msg || 'bad request';
+    console.log('message==========================message');
+    console.log(message);
+    console.log('message==========================message');
+    throw { status: 401, message };
   },
   async returnListWithCount(promise) {
     try {

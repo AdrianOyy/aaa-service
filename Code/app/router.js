@@ -54,6 +54,10 @@ module.exports = app => {
 
   router.get(`${prefix}/tenant/list`, controller.tenant.list);
   router.get(`${prefix}/tenant/detail`, controller.tenant.detail);
+  router.put(`${prefix}/tenant/update`, controller.tenant.update);
+  router.post(`${prefix}/tenant/create`, controller.tenant.create);
+  router.delete(`${prefix}/tenant/deleteMany`, controller.tenant.deleteMany);
+  router.get(`${prefix}/tenant/checkName`, controller.tenant.checkName);
 
   router.get(`${prefix}/tenant_group_mapping/list`, controller.tenantGroupMapping.list);
   router.get(`${prefix}/tenant_group_mapping/detail`, controller.tenantGroupMapping.detail);

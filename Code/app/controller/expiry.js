@@ -8,7 +8,7 @@ module.exports = app => {
       const { assignId, userId, expiryDate, prop, order } = ctx.query;
       const limit = parseInt(ctx.query.limit) || 10;
       const offset = (parseInt(ctx.query.page || 1) - 1) * limit;
-      let Order = [ 'assignId', 'desc' ];
+      let Order = [[ 'assignId', 'DESC' ]];
       if (order && prop) {
         Order = [[ prop, order ]];
       }

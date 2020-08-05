@@ -5,10 +5,14 @@ module.exports = app => {
 
     async list() {
       const { ctx } = this;
+      const { Op } = app.Sequelize;
       const limit = parseInt(ctx.query.limit) || 10;
       const offset = (parseInt(ctx.query.page || 1) - 1) * limit;
       const { surname, prop, order } = ctx.query;
-      const where = { surname };
+      const where = Object.assign(
+        {},
+        surname ? { surname: { [Op.like]: `%${surname}%` } } : undefined
+      );
 
       // 过滤无用条件
       Object.keys(where).forEach(k => {
@@ -16,7 +20,7 @@ module.exports = app => {
           delete where[k];
         }
       });
-      let Order = [ 'surname', 'desc' ];
+      let Order = [[ 'surname', 'DESC' ]];
       if (order && prop) {
         Order = [[ `${prop}`, `${order}` ]];
       }

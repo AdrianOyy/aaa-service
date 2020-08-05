@@ -7,7 +7,7 @@ module.exports = app => {
       const { groupId, userId, prop, order } = ctx.query;
       const limit = parseInt(ctx.query.limit) || 10;
       const offset = (parseInt(ctx.query.page || 1) - 1) * limit;
-      let Order = [ 'groupId', 'desc' ];
+      let Order = [[ 'groupId', 'DESC' ]];
       if (order && prop) {
         Order = [[ prop, order ]];
       }

@@ -14,7 +14,7 @@ module.exports = app => {
           delete where[k];
         }
       });
-      let Order = [ 'name', 'desc' ];
+      let Order = [[ 'name', 'DESC' ]];
       if (order && prop) {
         Order = [[ prop, order ]];
       }
