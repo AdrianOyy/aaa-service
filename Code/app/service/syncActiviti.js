@@ -43,8 +43,8 @@ module.exports = app => {
       return auth;
     }
 
-    async saveOrUpdateGroup(group) {
-      const auth = await axios.post(url + 'user/saveOrUpdateGroup', group
+    async saveOrUpdateGroup(group, options) {
+      const auth = await axios.post(url + 'user/saveOrUpdateGroup', group, options
       ).then(function(response) {
         return new Promise(resolve => {
           resolve(response.data);

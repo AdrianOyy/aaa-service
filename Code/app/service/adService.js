@@ -20,6 +20,7 @@ module.exports = app => {
             const groups = data.groups;
             result.user = user;
             result.groups = groups;
+            // console.log(groups);
             const token = jwt.sign({
               username: user.sAMAccountName,
             }, '1234567abc', { expiresIn: '10m' });

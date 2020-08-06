@@ -41,13 +41,15 @@ module.exports = app => {
       const { ctx } = this;
       const { name } = ctx.request.body;
       if (!name) ctx.error();
-      const model = {
+      let group = {
         name,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
       try {
-        await ctx.model.models.ad_group.create(model);
+        group = await ctx.model.models.ad_group.create(group);
+        const token = await ctx.service.jwtUtils.getToken({ username: 'activiti' });
+        ctx.service.syncActiviti.saveOrUpdateGroup({ id: group.dataValues.id, cn: group.name }, { headers: { token } });
         ctx.success();
       } catch (error) {
         throw { status: 500, message: 'service busy' };
