@@ -23,6 +23,16 @@ module.exports = app => {
             startDate ? { createdAt: { [Op.gte]: startDate } } : undefined,
             endDate ? { createdAt: { [Op.lte]: endDate } } : undefined
           ),
+          include: [
+            {
+              model: ctx.model.models.tenant,
+              as: 'tenant',
+            },
+            {
+              model: ctx.model.models.ad_group,
+              as: 'ad_group',
+            },
+          ],
           order: Order,
           offset,
           limit,
@@ -39,23 +49,32 @@ module.exports = app => {
       const { ctx } = this;
       const { id } = ctx.query;
       const result = await ctx.model.models.management.findOne({
-        raw: true,
         where: {
           id,
         },
+        include: [
+          {
+            model: ctx.model.models.tenant,
+            as: 'tenant',
+          },
+          {
+            model: ctx.model.models.ad_group,
+            as: 'ad_group',
+          },
+        ],
       });
       ctx.success(result);
     }
     async update() {
       const { ctx } = this;
       const { id } = ctx.query;
-      const { tenantId, ad_groupId, supporter, resourcesQuota } = ctx.request.body;
-      if (!id || !tenantId || !ad_groupId) ctx.error();
+      const { tenantId, groupId, supporter, resourcesQuota } = ctx.request.body;
+      if (!id || !tenantId || !groupId) ctx.error();
       const oldModel = await ctx.model.models.management.findByPk(id);
       if (!oldModel) ctx.error();
       const newModel = {
         tenantId,
-        ad_groupId,
+        ad_groupId: groupId,
         supporter,
         resourcesQuota,
         updatedAt: new Date(),
@@ -72,13 +91,13 @@ module.exports = app => {
     }
     async create() {
       const { ctx } = this;
-      const { tenantId, ad_groupId, supporter, resourcesQuota } = ctx.request.body;
-      if (!tenantId || !ad_groupId) {
+      const { tenantId, groupId, supporter, resourcesQuota } = ctx.request.body;
+      if (!tenantId || !groupId) {
         ctx.error();
       }
       const model = {
         tenantId,
-        ad_groupId,
+        ad_groupId: groupId,
         supporter,
         resourcesQuota,
         createdAt: new Date(),
@@ -91,6 +110,7 @@ module.exports = app => {
         throw { status: 500, message: 'service busy' };
       }
     }
+
     async delete() {
       const { ctx } = this;
       const { id } = ctx.query;
@@ -107,6 +127,7 @@ module.exports = app => {
         ctx.error('service busy');
       }
     }
+
     async deleteMany() {
       const { ctx } = this;
       const { Op } = app.Sequelize;
@@ -125,6 +146,20 @@ module.exports = app => {
         console.log('error==========================error');
         ctx.error('service busy');
       }
+    }
+
+    async checkExist() {
+      const { ctx } = this;
+      const { Op } = app.Sequelize;
+      const { id, tenantId, groupId } = ctx.query;
+      const count = await ctx.model.models.management.count({
+        where: {
+          id: { [Op.ne]: id },
+          tenantId,
+          ad_groupId: groupId,
+        },
+      });
+      ctx.success(count);
     }
   };
 };
