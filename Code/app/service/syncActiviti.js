@@ -3,8 +3,8 @@
 const axios = require('axios');
 
 // const url = 'http://10.231.131.123:3010/';
-const url = 'http://localhost:8888/';
-// const url = 'http://10.231.131.123:8000/workflow';
+// const url = 'http://localhost:8888/';
+const url = 'http://10.231.131.123:8000/workflow';
 module.exports = app => {
   return class extends app.Service {
     async syncUser() {
