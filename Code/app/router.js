@@ -74,7 +74,7 @@ module.exports = app => {
   router.put(`${prefix}/tenant_group_mapping/update`, controller.tenantGroupMapping.update);
   router.delete(`${prefix}/tenant_group_mapping/delete`, controller.tenantGroupMapping.delete);
   router.delete(`${prefix}/tenant_group_mapping/deleteMany`, controller.tenantGroupMapping.deleteMany);
-  router.get(`${prefix}/tenant_group_mapping/checkMapping`, controller.tenantGroupMapping.checkMapping);
+  router.get(`${prefix}/tenant_group_mapping/checkExist`, controller.tenantGroupMapping.checkExist);
 
   router.get(`${prefix}/user/list`, controller.user.list);
   router.get(`${prefix}/user/detail`, controller.user.detail);

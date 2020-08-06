@@ -4,7 +4,8 @@ module.exports = app => {
   return class extends app.Controller {
     async list() {
       const { ctx } = this;
-      const { tenantId, groupId, prop, order } = ctx.query;
+      const { Op } = app.Sequelize;
+      const { tenantId, groupId, createdAt, updatedAt, prop, order } = ctx.query;
       const limit = parseInt(ctx.query.limit) || 10;
       const offset = (parseInt(ctx.query.page || 1) - 1) * limit;
       let Order = [[ 'tenantId', 'DESC' ]];
@@ -12,12 +13,24 @@ module.exports = app => {
         Order = [[ prop, order ]];
       }
       try {
-        const res = await ctx.model.models.tanent_group_mapping.findAndCountAll({
+        const res = await ctx.model.models.tenant_group_mapping.findAndCountAll({
           where: Object.assign(
             {},
             tenantId ? { tenantId } : undefined,
-            groupId ? { ad_groupId: groupId } : undefined
+            groupId ? { ad_groupId: groupId } : undefined,
+            createdAt ? { createdAt: { [Op.and]: [{ [Op.gte]: new Date(createdAt) }, { [Op.lt]: new Date(new Date(createdAt) - (-8.64e7)) }] } } : undefined,
+            updatedAt ? { updatedAt: { [Op.and]: [{ [Op.gte]: new Date(updatedAt) }, { [Op.lt]: new Date(new Date(updatedAt) - (-8.64e7)) }] } } : undefined
           ),
+          include: [
+            {
+              model: ctx.model.models.tenant,
+              as: 'tenant',
+            },
+            {
+              model: ctx.model.models.ad_group,
+              as: 'ad_group',
+            },
+          ],
           order: Order,
           offset,
           limit,
@@ -33,11 +46,20 @@ module.exports = app => {
     async detail() {
       const { ctx } = this;
       const { id } = ctx.query;
-      const result = await ctx.model.models.tanent_group_mapping.findOne({
-        raw: true,
+      const result = await ctx.model.models.tenant_group_mapping.findOne({
         where: {
           id,
         },
+        include: [
+          {
+            model: ctx.model.models.tenant,
+            as: 'tenant',
+          },
+          {
+            model: ctx.model.models.ad_group,
+            as: 'ad_group',
+          },
+        ],
       });
       ctx.success(result);
     }
@@ -46,7 +68,7 @@ module.exports = app => {
       const { id } = ctx.query;
       const { tenantId, groupId } = ctx.request.body;
       if (!id || !tenantId || !groupId) ctx.error();
-      const oldModel = await ctx.model.models.tanent_group_mapping.findByPk(id);
+      const oldModel = await ctx.model.models.tenant_group_mapping.findByPk(id);
       if (!oldModel) ctx.error();
       const newModel = {
         tenantId,
@@ -76,7 +98,7 @@ module.exports = app => {
         updatedAt: new Date(),
       };
       try {
-        await ctx.model.models.tanent_group_mapping.create(model);
+        await ctx.model.models.tenant_group_mapping.create(model);
         ctx.success();
       } catch (error) {
         throw { status: 500, message: 'service busy' };
@@ -86,7 +108,7 @@ module.exports = app => {
       const { ctx } = this;
       const { id } = ctx.query;
       if (!id) ctx.error();
-      const entity = await ctx.model.models.tanent_group_mapping.findByPk(id);
+      const entity = await ctx.model.models.tenant_group_mapping.findByPk(id);
       if (!entity) ctx.error;
       try {
         await entity.destroy(id);
@@ -104,7 +126,7 @@ module.exports = app => {
       const { idList } = ctx.request.body;
       if (!idList || !idList.length) ctx.error();
       try {
-        await ctx.model.models.tanent_group_mapping.destroy({
+        await ctx.model.models.tenant_group_mapping.destroy({
           where: {
             id: { [Op.in]: idList },
           },
@@ -117,11 +139,11 @@ module.exports = app => {
         ctx.error('service busy');
       }
     }
-    async checkMapping() {
+    async checkExist() {
       const { ctx } = this;
       const { Op } = app.Sequelize;
       const { id, tenantId, groupId } = ctx.query;
-      const count = await ctx.model.modles.tanent_group_mapping.count({
+      const count = await ctx.model.models.tenant_group_mapping.count({
         where: {
           id: { [Op.ne]: id },
           tenantId,
