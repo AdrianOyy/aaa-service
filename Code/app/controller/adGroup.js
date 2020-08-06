@@ -101,7 +101,8 @@ module.exports = app => {
             id: { [Op.in]: idList },
           },
         });
-        ctx.service.syncActiviti.deleteGroup(idList);
+        const token = await ctx.service.jwtUtils.getToken({ username: 'activiti' });
+        ctx.service.syncActiviti.deleteGroup(idList, { token });
         ctx.success();
       } catch (error) {
         console.log('error==========================error');

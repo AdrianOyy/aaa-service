@@ -62,7 +62,6 @@ module.exports = app => {
           },
         });
         if (ad_group !== null) {
-          console.log(ad_group);
           groups[index].id = ad_group.id;
           await ctx.model.models.user_gourp_mapping.create({
             groupId: ad_group.id,
@@ -72,7 +71,7 @@ module.exports = app => {
         }
       }
       user.groups = groups;
-      await ctx.service.syncActiviti.loadUser(user);
+      await ctx.service.syncActiviti.loadUser(user, { headers: { token: auth.token } });
     }
   };
 };
