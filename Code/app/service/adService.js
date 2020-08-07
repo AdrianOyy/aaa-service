@@ -2,28 +2,25 @@
 
 const axios = require('axios');
 
-const url = 'http://10.231.131.123:3010/';
-// const url = 'http://127.0.0.1:7002/';
-const jwt = require('jsonwebtoken');
 module.exports = app => {
 
   return class extends app.Service {
     async authenticate(username, password) {
-      const axiosResult = await axios.post(url + 'adService/authenticate', { username, password }
+      const app = this;
+      const config = app.config.adService;
+      const url = `${config.url}/adService/authenticate`;
+      const axiosResult = await axios.post(url, { username, password }
       ).then(function(response) {
         return new Promise(resolve => {
           const data = response.data.data;
           const result = {};
           if (data.auth) {
-            // result.user = data.user;
             const user = data.user;
             const groups = data.groups;
             result.user = user;
             result.groups = groups;
-            // console.log(groups);
-            const token = jwt.sign({
-              username: user.sAMAccountName,
-            }, '1234567abc', { expiresIn: '1440m' });
+            const options = { content: { username: user.sAMAccountName }, expiresIn: '1440m' };
+            const token = app.service.jwtUtils.getToken(options);
             result.token = token;
             resolve(result);
           } else {

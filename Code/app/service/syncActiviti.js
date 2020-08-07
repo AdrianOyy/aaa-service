@@ -2,25 +2,12 @@
 
 const axios = require('axios');
 
-// const url = 'http://10.231.131.123:3010/';
-// const url = 'http://localhost:8888/';
-const url = 'http://10.231.131.123:8000/workflow';
 module.exports = app => {
   return class extends app.Service {
-    async syncUser() {
-      const auth = await axios.post(url + 'user/createUser', { userId: '2', userName: 'tom2' }
-      ).then(function(response) {
-        console.log(response);
-      }).catch(function(error) {
-        console.log(error);
-      });
-      return auth;
-    }
-
     async loadUser(user, options) {
-      const auth = await axios.post(url + 'user/loadUser', user, options
+      const url = app.config.activiti.url;
+      const auth = await axios.post(url + '/user/loadUser', user, options
       ).then(function(response) {
-        // console.log(response);
         return new Promise(resolve => {
           resolve(response.data);
         });
@@ -31,9 +18,9 @@ module.exports = app => {
     }
 
     async deleteGroup(groupIds, headers) {
-      const auth = await axios.delete(url + 'user/deleteGroup', { data: groupIds, headers }
+      const url = app.config.activiti.url;
+      const auth = await axios.delete(url + '/user/deleteGroup', { data: groupIds, headers }
       ).then(function(response) {
-        // console.log(response);
         return new Promise(resolve => {
           resolve(response.data);
         });
@@ -44,7 +31,8 @@ module.exports = app => {
     }
 
     async saveOrUpdateGroup(group, options) {
-      const auth = await axios.post(url + 'user/saveOrUpdateGroup', group, options
+      const url = app.config.activiti.url;
+      const auth = await axios.post(url + '/user/saveOrUpdateGroup', group, options
       ).then(function(response) {
         return new Promise(resolve => {
           resolve(response.data);

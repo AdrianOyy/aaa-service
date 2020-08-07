@@ -56,6 +56,20 @@ module.exports = appInfo => {
       enable: false,
     },
   };
+  config.adService = {
+    url: 'http://10.231.131.123:3010',
+    // url: 'http://127.0.0.1:7002',
+  };
+
+  config.activiti = {
+    url: 'http://10.231.131.123:8000/workflow',
+    // url: 'http://localhost:8888',
+  };
+
+  config.jwt = {
+    expiresIn: '10m',
+    secret: '1234567abc',
+  };
 
   return config;
 };

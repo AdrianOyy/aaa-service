@@ -4,8 +4,10 @@ const jwt = require('jsonwebtoken');
 module.exports = app => {
 
   return class extends app.Service {
-    async getToken(content) {
-      const token = jwt.sign(content, '1234567abc', { expiresIn: '10m' });
+    getToken(options) {
+      const config = app.config.jwt;
+      const { content, expiresIn } = options;
+      const token = jwt.sign(content, config.secret, { expiresIn: expiresIn ? expiresIn : config.expiresIn });
       return token;
     }
   };

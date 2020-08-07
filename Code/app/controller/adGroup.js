@@ -48,7 +48,8 @@ module.exports = app => {
       };
       try {
         group = await ctx.model.models.ad_group.create(group);
-        const token = await ctx.service.jwtUtils.getToken({ username: 'activiti' });
+        const options = { content: { username: 'activiti' } };
+        const token = ctx.service.jwtUtils.getToken(options);
         ctx.service.syncActiviti.saveOrUpdateGroup({ id: group.dataValues.id, cn: group.name }, { headers: { token } });
         ctx.success();
       } catch (error) {
@@ -103,7 +104,8 @@ module.exports = app => {
             id: { [Op.in]: idList },
           },
         });
-        const token = await ctx.service.jwtUtils.getToken({ username: 'activiti' });
+        const options = { content: { username: 'activiti' } };
+        const token = ctx.service.jwtUtils.getToken(options);
         ctx.service.syncActiviti.deleteGroup(idList, { token });
         ctx.success();
       } catch (error) {
