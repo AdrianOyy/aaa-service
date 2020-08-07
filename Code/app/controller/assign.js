@@ -4,10 +4,11 @@ module.exports = app => {
   return class extends app.Controller {
     async list() {
       const { ctx } = this;
-      const { tanent_group_mapping_id, roleId, prop, order } = ctx.query;
+      const { Op } = app.Sequelize;
+      const { tenantId, groupId, roleId, prop, order, createdAt, updatedAt } = ctx.query;
       const limit = parseInt(ctx.query.limit) || 10;
       const offset = (parseInt(ctx.query.page || 1) - 1) * limit;
-      let Order = [[ 'tanent_group_mapping_id', 'DESC' ]];
+      let Order = [[ 'createdAt', 'DESC' ]];
       if (order && prop) {
         Order = [[ prop, order ]];
       }
@@ -15,12 +16,82 @@ module.exports = app => {
         const res = await ctx.model.models.assign.findAndCountAll({
           where: Object.assign(
             {},
-            tanent_group_mapping_id ? { tanent_group_mapping_id } : undefined,
-            roleId ? { roleId } : undefined
+            roleId ? { roleId } : undefined,
+            createdAt ? { createdAt: { [Op.and]: [{ [Op.gte]: new Date(createdAt) }, { [Op.lt]: new Date(new Date(createdAt) - (-8.64e7)) }] } } : undefined,
+            updatedAt ? { updatedAt: { [Op.and]: [{ [Op.gte]: new Date(updatedAt) }, { [Op.lt]: new Date(new Date(updatedAt) - (-8.64e7)) }] } } : undefined
           ),
+          include: [
+            {
+              model: ctx.model.models.tenant_group_mapping,
+              as: 'tenant_group_mapping',
+              where: Object.assign(
+                {},
+                tenantId ? { tenantId } : undefined,
+                groupId ? { ad_groupId: groupId } : undefined
+              ),
+              include: [
+                {
+                  model: ctx.model.models.tenant,
+                  as: 'tenant',
+                },
+                {
+                  model: ctx.model.models.ad_group,
+                  as: 'ad_group',
+                },
+              ],
+            },
+            {
+              model: ctx.model.models.role,
+              as: 'role',
+            },
+          ],
           order: Order,
           offset,
           limit,
+        });
+        ctx.success(res);
+      } catch (error) {
+        console.log('error==========================error');
+        console.log(error);
+        console.log('error==========================error');
+        ctx.error();
+      }
+    }
+    async handledList() {
+      const { ctx } = this;
+      try {
+        const rawList = await ctx.model.models.assign.findAll({
+          include: [
+            {
+              model: ctx.model.models.tenant_group_mapping,
+              as: 'tenant_group_mapping',
+              include: [
+                {
+                  model: ctx.model.models.tenant,
+                  as: 'tenant',
+                },
+                {
+                  model: ctx.model.models.ad_group,
+                  as: 'ad_group',
+                },
+              ],
+            },
+            {
+              model: ctx.model.models.role,
+              as: 'role',
+            },
+          ],
+        });
+        const res = [];
+        rawList.forEach(el => {
+          const model = {
+            id: el.id,
+            value: el.tenant_group_mapping.tenant.name 
+            +  ' + '
+            + el.tenant_group_mapping.ad_group.name
+            + ' + ' + el.role.label
+          }
+          res.push(model)
         });
         ctx.success(res);
       } catch (error) {
@@ -34,22 +105,40 @@ module.exports = app => {
       const { ctx } = this;
       const { id } = ctx.query;
       const result = await ctx.model.models.assign.findOne({
-        raw: true,
         where: {
           id,
         },
+        include: [
+          {
+            model: ctx.model.models.tenant_group_mapping,
+            as: 'tenant_group_mapping',
+            include: [
+              {
+                model: ctx.model.models.tenant,
+                as: 'tenant',
+              },
+              {
+                model: ctx.model.models.ad_group,
+                as: 'ad_group',
+              },
+            ],
+          },
+          {
+            model: ctx.model.models.role,
+            as: 'role',
+          },
+        ],
       });
       ctx.success(result);
     }
     async update() {
       const { ctx } = this;
       const { id } = ctx.query;
-      const { tanent_group_mapping_id, roleId } = ctx.request.body;
-      if (!id || tanent_group_mapping_id || roleId) ctx.error();
+      const { roleId } = ctx.request.body;
+      if (!id || !roleId) ctx.error();
       const oldModel = await ctx.model.models.assign.findByPk(id);
       if (!oldModel) ctx.error();
       const newModel = {
-        tanent_group_mapping_id,
         roleId,
         updatedAt: new Date(),
       };
@@ -65,12 +154,18 @@ module.exports = app => {
     }
     async create() {
       const { ctx } = this;
-      const { tanent_group_mapping_id, roleId } = ctx.request.body;
-      if (!tanent_group_mapping_id || !roleId) {
+      const { mappingId, roleId } = ctx.request.body;
+      if (!mappingId || !roleId) {
         ctx.error();
       }
+      const count = await ctx.model.models.assign.count({
+        where: {
+          tenant_group_mappingId: mappingId,
+        },
+      });
+      if (count) ctx.error();
       const model = {
-        tanent_group_mapping_id,
+        tenant_group_mappingId: mappingId,
         roleId,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -116,6 +211,18 @@ module.exports = app => {
         console.log('error==========================error');
         ctx.error('service busy');
       }
+    }
+    async checkExist() {
+      const { ctx } = this;
+      const { Op } = app.Sequelize;
+      const { id, mappingId } = ctx.query;
+      const count = await ctx.model.models.assign.count({
+        where: {
+          id: { [Op.ne]: id },
+          tenant_group_mappingId: mappingId,
+        },
+      });
+      ctx.success(count);
     }
   };
 };

@@ -23,7 +23,7 @@ module.exports = app => {
             // console.log(groups);
             const token = jwt.sign({
               username: user.sAMAccountName,
-            }, '1234567abc', { expiresIn: '10m' });
+            }, '1234567abc', { expiresIn: '1440m' });
             result.token = token;
             resolve(result);
           } else {

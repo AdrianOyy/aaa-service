@@ -12,7 +12,7 @@ module.exports = {
     console.log('message==========================message');
     console.log(message);
     console.log('message==========================message');
-    throw { status: 401, message };
+    throw { status: 400, message };
   },
   async returnListWithCount(promise) {
     try {

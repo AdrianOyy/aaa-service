@@ -43,6 +43,26 @@ module.exports = app => {
         ctx.error();
       }
     }
+    async handledList() {
+      const { ctx } = this;
+      const rawList = await ctx.model.models.tenant_group_mapping.findAll({
+        include: [
+          {
+            model: ctx.model.models.tenant,
+            as: 'tenant',
+          },
+          {
+            model: ctx.model.models.ad_group,
+            as: 'ad_group',
+          },
+        ],
+      });
+      const list = [];
+      rawList.forEach(el => {
+        list.push({ id: el.id, name: el.tenant.name + ' + ' + el.ad_group.name });
+      });
+      ctx.success(list);
+    }
     async detail() {
       const { ctx } = this;
       const { id } = ctx.query;

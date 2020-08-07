@@ -5,25 +5,6 @@ module.exports = app => {
   const { router, controller } = app;
   const prefix = app.config.prefix;
 
-  // 中间件
-  // const { baseDir, bucket } = app.config.upload;
-  // const saveFile = app.middleware.upload({ baseDir, bucket });
-
-  // router.get(`${prefix}/workflow/list`, controller.workflow.list);
-  // router.post(`${prefix}/workflow/upload`, saveFile, controller.workflow.upload);
-  // router.get(`${prefix}/syncUser/list`, controller.syncUser.list);
-  // router.get(`${prefix}/syncUser/detail`, controller.syncUser.detail);
-  // router.get(`${prefix}/user/login`, controller.syncUser.login);
-  // router.get(`${prefix}/tenants/list`, controller.tenants.list);
-  // router.get(`${prefix}/tenants/listMapping`, controller.tenants.listMapping);
-
-
-  // router.get(`${prefix}/tenantsMapping/list`, controller.tenantsMapping.list);
-  // router.get(`${prefix}/tenantsMapping/detail`, controller.tenantsMapping.detail);
-  // router.post(`${prefix}/tenantsMapping/create`, controller.tenantsMapping.create);
-  // router.put(`${prefix}/tenantsMapping/update`, controller.tenantsMapping.update);
-  // router.delete(`${prefix}/tenantsMapping/delete`, controller.tenantsMapping.delete);
-  // router.delete(`${prefix}/tenantsMapping/deleteMany`, controller.tenantsMapping.deleteMany);
 
   router.get(`${prefix}/ad_group/list`, controller.adGroup.list);
   router.get(`${prefix}/ad_group/detail`, controller.adGroup.detail);
@@ -39,6 +20,8 @@ module.exports = app => {
   router.put(`${prefix}/assign/update`, controller.assign.update);
   router.delete(`${prefix}/assign/delete`, controller.assign.delete);
   router.delete(`${prefix}/assign/deleteMany`, controller.assign.deleteMany);
+  router.get(`${prefix}/assign/checkExist`, controller.assign.checkExist);
+  router.get(`${prefix}/assign/handledList`, controller.assign.handledList);
 
   router.get(`${prefix}/expiry/list`, controller.expiry.list);
   router.get(`${prefix}/expiry/detail`, controller.expiry.detail);
@@ -46,6 +29,7 @@ module.exports = app => {
   router.put(`${prefix}/expiry/update`, controller.expiry.update);
   router.delete(`${prefix}/expiry/delete`, controller.expiry.delete);
   router.delete(`${prefix}/expiry/deleteMany`, controller.expiry.deleteMany);
+  router.get(`${prefix}/expiry/checkExist`, controller.expiry.checkExist);
 
   router.get(`${prefix}/management/list`, controller.management.list);
   router.get(`${prefix}/management/detail`, controller.management.detail);
@@ -75,6 +59,7 @@ module.exports = app => {
   router.delete(`${prefix}/tenant_group_mapping/delete`, controller.tenantGroupMapping.delete);
   router.delete(`${prefix}/tenant_group_mapping/deleteMany`, controller.tenantGroupMapping.deleteMany);
   router.get(`${prefix}/tenant_group_mapping/checkExist`, controller.tenantGroupMapping.checkExist);
+  router.get(`${prefix}/tenant_group_mapping/handledList`, controller.tenantGroupMapping.handledList);
 
   router.get(`${prefix}/user/list`, controller.user.list);
   router.get(`${prefix}/user/detail`, controller.user.detail);
