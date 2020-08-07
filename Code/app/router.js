@@ -37,6 +37,8 @@ module.exports = app => {
   router.put(`${prefix}/management/update`, controller.management.update);
   router.delete(`${prefix}/management/delete`, controller.management.delete);
   router.delete(`${prefix}/management/deleteMany`, controller.management.deleteMany);
+  router.get(`${prefix}/management/checkExist`, controller.management.checkExist);
+
 
   router.get(`${prefix}/role/list`, controller.role.list);
   router.get(`${prefix}/role/detail`, controller.role.detail);
