@@ -32,7 +32,7 @@ module.exports = app => {
         await userModel.update({
           surname: user.sn,
           givenname: user.givenName,
-          displayName: user.displayName,
+          displayname: user.displayName,
           UACDesc: new Date() + 'update',
           updatedAt: new Date(),
         });
@@ -40,7 +40,7 @@ module.exports = app => {
         userModel = await ctx.model.models.user.create({
           surname: user.sn,
           givenname: user.givenName,
-          displayName: user.displayName,
+          displayname: user.displayName,
           email: user.userPrincipalName,
           createdAt: new Date(),
         });
