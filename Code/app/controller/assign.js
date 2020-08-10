@@ -86,12 +86,12 @@ module.exports = app => {
         rawList.forEach(el => {
           const model = {
             id: el.id,
-            value: el.tenant_group_mapping.tenant.name 
-            +  ' + '
-            + el.tenant_group_mapping.ad_group.name
-            + ' + ' + el.role.label
-          }
-          res.push(model)
+            value: el.tenant_group_mapping && el.tenant_group_mapping.tenant ? el.tenant_group_mapping.tenant.name : '--'
+            + ' + '
+            + el.tenant_group_mapping && el.tenant_group_mapping.ad_group ? el.tenant_group_mapping.ad_group.name : '--'
+            + ' + ' + el.role ? el.role.label : '--',
+          };
+          res.push(model);
         });
         ctx.success(res);
       } catch (error) {

@@ -59,7 +59,7 @@ module.exports = app => {
       });
       const list = [];
       rawList.forEach(el => {
-        list.push({ id: el.id, name: el.tenant.name + ' + ' + el.ad_group.name });
+        list.push({ id: el.id, name: (el.tenant ? el.tenant.name : '--') + ' + ' + (el.ad_group ? el.ad_group.name : '--') });
       });
       ctx.success(list);
     }
@@ -121,6 +121,9 @@ module.exports = app => {
         await ctx.model.models.tenant_group_mapping.create(model);
         ctx.success();
       } catch (error) {
+        console.log('error==========================error');
+        console.log(error);
+        console.log('error==========================error');
         throw { status: 500, message: 'service busy' };
       }
     }
