@@ -7,7 +7,12 @@ module.exports = app => {
     getToken(options) {
       const config = app.config.jwt;
       const { content, expiresIn } = options;
-      const token = jwt.sign(content, config.secret, { expiresIn: expiresIn ? expiresIn : config.expiresIn });
+      const payLoad = Object.assign(
+        content,
+        { key: config.key }
+      );
+      console.log(payLoad);
+      const token = jwt.sign(payLoad, config.secret, { expiresIn: expiresIn ? expiresIn : config.expiresIn });
       return token;
     }
   };
