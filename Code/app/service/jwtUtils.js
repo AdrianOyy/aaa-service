@@ -9,9 +9,8 @@ module.exports = app => {
       const { content, expiresIn } = options;
       const payLoad = Object.assign(
         content,
-        { key: config.key }
+        { iss: config.iss }
       );
-      console.log(payLoad);
       const token = jwt.sign(payLoad, config.secret, { expiresIn: expiresIn ? expiresIn : config.expiresIn });
       return token;
     }

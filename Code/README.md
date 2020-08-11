@@ -2,7 +2,7 @@ docker镜像打包
 1 进入code所在目录
 2 将app、config、lib、.eslintrc.js、app.js、Dockerfile、package.json、package-lock.json添加到压缩文件docker-aaa-server.zip
 3 打开FinalShell
-4 进入code所在目录cd /home/aaa-server/aaa-server/
+4 进入code所在目录cd /home/aaa-server/
 5 上传docker-aaa-server.zip
 6 删除zip文件以外的文件
 7 解压 zip文件 unzip docker-aaa-server.zip 覆盖现有文件
