@@ -69,16 +69,20 @@ module.exports = app => {
                 {
                   model: ctx.model.models.tenant,
                   as: 'tenant',
+                  required: true,
                 },
                 {
                   model: ctx.model.models.ad_group,
                   as: 'ad_group',
+                  required: true,
                 },
               ],
+              required: true,
             },
             {
               model: ctx.model.models.role,
               as: 'role',
+              required: true,
             },
           ],
         });
@@ -86,10 +90,11 @@ module.exports = app => {
         rawList.forEach(el => {
           const model = {
             id: el.id,
-            value: el.tenant_group_mapping && el.tenant_group_mapping.tenant ? el.tenant_group_mapping.tenant.name : '--'
-            + ' + '
-            + el.tenant_group_mapping && el.tenant_group_mapping.ad_group ? el.tenant_group_mapping.ad_group.name : '--'
-            + ' + ' + el.role ? el.role.label : '--',
+            value: el.tenant_group_mapping.tenant.name
+              + ' + '
+              + el.tenant_group_mapping.ad_group.name
+              + ' + '
+              + el.role.label,
           };
           res.push(model);
         });
