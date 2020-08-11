@@ -69,7 +69,7 @@ module.exports = appInfo => {
   config.jwt = {
     expiresIn: '10m',
     secret: '1234567abc',
-    key: 'SENSEPLATFORM',
+    iss: 'SENSEPLATFORM',
   };
 
   return config;
