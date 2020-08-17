@@ -14,6 +14,9 @@ module.exports = app => {
   router.delete(`${prefix}/ad_group/deleteMany`, controller.adGroup.deleteMany);
   router.get(`${prefix}/ad_group/checkName`, controller.adGroup.checkName);
 
+  router.get(`${prefix}/vm_location/detail`, controller.vmLocation.detail);
+  router.post(`${prefix}/vm_location/create`, controller.vmLocation.create);
+
   router.get(`${prefix}/assign/list`, controller.assign.list);
   router.get(`${prefix}/assign/detail`, controller.assign.detail);
   router.post(`${prefix}/assign/create`, controller.assign.create);
