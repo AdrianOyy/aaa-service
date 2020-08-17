@@ -47,7 +47,7 @@ module.exports = app => {
       }
       const userId = userModel.dataValues.id;
       user.id = userId;
-      await ctx.model.models.user_gourp_mapping.destroy({
+      await ctx.model.models.user_group_mapping.destroy({
         where: {
           userId,
         },
@@ -63,7 +63,7 @@ module.exports = app => {
         });
         if (ad_group !== null) {
           groups[index].id = ad_group.id;
-          await ctx.model.models.user_gourp_mapping.create({
+          await ctx.model.models.user_group_mapping.create({
             groupId: ad_group.id,
             userId,
             createdAt: new Date(),

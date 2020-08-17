@@ -6,7 +6,7 @@ module.exports = app => {
     // 同步模型
     const syncModels = [
       'ad_group', 'role', 'tenant', 'user', 'user_gourp_mapping',
-      'tenant_group_mapping', 'assign', 'expiry', 'management', 'vm_location',
+      'tenant_group_mapping', 'assign', 'expiry', 'tenant_quota_mapping', 'vm_location',
     ];
     for (const syncModel of syncModels) {
       await app.model.models[syncModel].sync();

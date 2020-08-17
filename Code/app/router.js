@@ -34,13 +34,15 @@ module.exports = app => {
   router.delete(`${prefix}/expiry/deleteMany`, controller.expiry.deleteMany);
   router.get(`${prefix}/expiry/checkExist`, controller.expiry.checkExist);
 
-  router.get(`${prefix}/management/list`, controller.management.list);
-  router.get(`${prefix}/management/detail`, controller.management.detail);
-  router.post(`${prefix}/management/create`, controller.management.create);
-  router.put(`${prefix}/management/update`, controller.management.update);
-  router.delete(`${prefix}/management/delete`, controller.management.delete);
-  router.delete(`${prefix}/management/deleteMany`, controller.management.deleteMany);
-  router.get(`${prefix}/management/checkExist`, controller.management.checkExist);
+  router.get(`${prefix}/tenant_quota_mapping/list`, controller.tenantQuotaMapping.list);
+  router.get(`${prefix}/tenant_quota_mapping/detail`, controller.tenantQuotaMapping.detail);
+  router.post(`${prefix}/tenant_quota_mapping/create`, controller.tenantQuotaMapping.create);
+  router.put(`${prefix}/tenant_quota_mapping/update`, controller.tenantQuotaMapping.update);
+  router.delete(`${prefix}/tenant_quota_mapping/delete`, controller.tenantQuotaMapping.delete);
+  router.delete(`${prefix}/tenant_quota_mapping/deleteMany`, controller.tenantQuotaMapping.deleteMany);
+  router.get(`${prefix}/tenant_quota_mapping/checkTypeExist`, controller.tenantQuotaMapping.checkTypeExist);
+  router.get(`${prefix}/tenant_quota_mapping/checkYearExist`, controller.tenantQuotaMapping.checkYearExist);
+  router.get(`${prefix}/tenant_quota_mapping/checkRequest`, controller.tenantQuotaMapping.checkRequest);
 
 
   router.get(`${prefix}/role/list`, controller.role.list);
@@ -55,7 +57,7 @@ module.exports = app => {
   router.put(`${prefix}/tenant/update`, controller.tenant.update);
   router.post(`${prefix}/tenant/create`, controller.tenant.create);
   router.delete(`${prefix}/tenant/deleteMany`, controller.tenant.deleteMany);
-  router.get(`${prefix}/tenant/checkName`, controller.tenant.checkName);
+  router.get(`${prefix}/tenant/checkExist`, controller.tenant.checkExist);
 
   router.get(`${prefix}/tenant_group_mapping/list`, controller.tenantGroupMapping.list);
   router.get(`${prefix}/tenant_group_mapping/detail`, controller.tenantGroupMapping.detail);
@@ -70,10 +72,10 @@ module.exports = app => {
   router.get(`${prefix}/user/detail`, controller.user.detail);
   router.post(`${prefix}/user/login`, controller.user.login);
 
-  router.get(`${prefix}/user_gourp_mapping/list`, controller.userGourpMapping.list);
-  router.get(`${prefix}/user_gourp_mapping/detail`, controller.userGourpMapping.detail);
-  router.post(`${prefix}/user_gourp_mapping/create`, controller.userGourpMapping.create);
-  router.put(`${prefix}/user_gourp_mapping/update`, controller.userGourpMapping.update);
-  router.delete(`${prefix}/user_gourp_mapping/delete`, controller.userGourpMapping.delete);
-  router.delete(`${prefix}/user_gourp_mapping/deleteMany`, controller.userGourpMapping.deleteMany);
+  router.get(`${prefix}/user_group_mapping/list`, controller.userGourpMapping.list);
+  router.get(`${prefix}/user_group_mapping/detail`, controller.userGourpMapping.detail);
+  router.post(`${prefix}/user_group_mapping/create`, controller.userGourpMapping.create);
+  router.put(`${prefix}/user_group_mapping/update`, controller.userGourpMapping.update);
+  router.delete(`${prefix}/user_group_mapping/delete`, controller.userGourpMapping.delete);
+  router.delete(`${prefix}/user_group_mapping/deleteMany`, controller.userGourpMapping.deleteMany);
 };

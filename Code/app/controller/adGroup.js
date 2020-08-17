@@ -26,6 +26,7 @@ module.exports = app => {
       const result = await ctx.model.models.ad_group.findAndCountAll(findAdParams);
       ctx.success(result);
     }
+
     async detail() {
       const { ctx } = this;
       const { id } = ctx.query;
@@ -37,6 +38,7 @@ module.exports = app => {
       });
       ctx.success(result);
     }
+
     async create() {
       const { ctx } = this;
       const { name } = ctx.request.body;
@@ -56,6 +58,7 @@ module.exports = app => {
         throw { status: 500, message: 'service busy' };
       }
     }
+
     async update() {
       const { ctx } = this;
       const { id } = ctx.query;
@@ -77,6 +80,7 @@ module.exports = app => {
         ctx.error('service busy');
       }
     }
+
     async delete() {
       const { ctx } = this;
       const { id } = ctx.query;
@@ -93,6 +97,7 @@ module.exports = app => {
         ctx.error('service busy');
       }
     }
+
     async deleteMany() {
       const { ctx } = this;
       const { Op } = app.Sequelize;
@@ -115,6 +120,7 @@ module.exports = app => {
         ctx.error('service busy');
       }
     }
+
     async checkName() {
       const { ctx } = this;
       const { Op } = app.Sequelize;
