@@ -6,6 +6,9 @@ module.exports = app => {
       const { ctx } = this;
       const { Op } = app.Sequelize;
       const { name, code, manager_group_id, supporter_group_id,
+        project_code, project_name, justification,
+        budget_type, project_owner, contact_person,
+        project_estimation, methodology_text,
         createdAt, updatedAt, prop, order } = ctx.query;
       const limit = parseInt(ctx.query.limit) || 10;
       const offset = (parseInt(ctx.query.page || 1) - 1) * limit;
@@ -21,6 +24,14 @@ module.exports = app => {
             code ? { code: { [Op.like]: `%${code}%` } } : undefined,
             manager_group_id ? { manager_group_id } : undefined,
             supporter_group_id ? { supporter_group_id } : undefined,
+            project_code ? { project_code } : undefined,
+            project_name ? { project_name } : project_name,
+            justification ? { justification } : justification,
+            budget_type ? { budget_type } : budget_type,
+            project_owner ? { project_owner } : project_owner,
+            contact_person ? { contact_person } : contact_person,
+            project_estimation ? { project_estimation } : project_estimation,
+            methodology_text ? { methodology_text } : methodology_text,
             createdAt ? { createdAt: { [Op.and]: [{ [Op.gte]: new Date(createdAt) }, { [Op.lt]: new Date(new Date(createdAt) - (-8.64e7)) }] } } : undefined,
             updatedAt ? { updatedAt: { [Op.and]: [{ [Op.gte]: new Date(updatedAt) }, { [Op.lt]: new Date(new Date(updatedAt) - (-8.64e7)) }] } } : undefined
           ),
@@ -74,8 +85,15 @@ module.exports = app => {
 
     async create() {
       const { ctx } = this;
-      const { name, code, manager_group_id, supporter_group_id } = ctx.request.body;
-      if (!name || !code || !manager_group_id || !supporter_group_id) ctx.error();
+      const {
+        name, code, manager_group_id, supporter_group_id,
+        project_code, project_name, justification, budget_type,
+        project_owner, contact_person, project_estimation,
+        methodology_text } = ctx.request.body;
+      if (!name || !code || !manager_group_id || !supporter_group_id ||
+        !project_code || !project_name || !justification || !budget_type ||
+        !project_owner || !contact_person || !project_estimation ||
+        !methodology_text) ctx.error();
       const existNum = await ctx.model.models.tenant.count({
         where: {
           code,
@@ -87,6 +105,14 @@ module.exports = app => {
         code,
         manager_group_id,
         supporter_group_id,
+        project_code,
+        project_name,
+        justification,
+        budget_type,
+        project_owner,
+        contact_person,
+        project_estimation,
+        methodology_text,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -104,14 +130,29 @@ module.exports = app => {
     async update() {
       const { ctx } = this;
       const { id } = ctx.query;
-      const { name, manager_group_id, supporter_group_id } = ctx.request.body;
-      if (!id || !name || !manager_group_id || !supporter_group_id) ctx.error();
+      const {
+        name, manager_group_id, supporter_group_id,
+        project_code, project_name, justification, budget_type,
+        project_owner, contact_person, project_estimation,
+        methodology_text } = ctx.request.body;
+      if (!id || !name || !manager_group_id || !supporter_group_id ||
+        !project_code || !project_name || !justification || !budget_type ||
+        !project_owner || !contact_person || !project_estimation ||
+        !methodology_text) ctx.error();
       const oldModel = await ctx.model.models.tenant.findByPk(id);
       if (!oldModel) ctx.error();
       const newModel = {
         name,
         manager_group_id,
         supporter_group_id,
+        project_code,
+        project_name,
+        justification,
+        budget_type,
+        project_owner,
+        contact_person,
+        project_estimation,
+        methodology_text,
         updatedAt: new Date(),
       };
       try {
