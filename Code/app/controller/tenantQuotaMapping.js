@@ -1,36 +1,32 @@
 'use strict';
 
+
 module.exports = app => {
   return class extends app.Controller {
     async list() {
       const { ctx } = this;
       const { Op } = app.Sequelize;
-      const { tenantId, ad_groupId, supporter, resourcesQuota, startDate, endDate, prop, order } = ctx.query;
+      const { tenantId, type, year, createdAt, updatedAt, prop, order } = ctx.query;
       const limit = parseInt(ctx.query.limit) || 10;
       const offset = (parseInt(ctx.query.page || 1) - 1) * limit;
-      let Order = [[ 'tenantId', 'DESC' ]];
+      let Order = [[ 'createdAt', 'DESC' ]];
       if (order && prop) {
         Order = [[ prop, order ]];
       }
       try {
-        const res = await ctx.model.models.management.findAndCountAll({
+        const res = await ctx.model.models.tenant_quota_mapping.findAndCountAll({
           where: Object.assign(
             {},
             tenantId ? { tenantId } : undefined,
-            ad_groupId ? { ad_groupId } : undefined,
-            supporter ? { supporter: { [Op.like]: `%${supporter}%` } } : undefined,
-            resourcesQuota ? { resourcesQuota: { [Op.like]: `%${resourcesQuota}%` } } : undefined,
-            startDate ? { createdAt: { [Op.gte]: startDate } } : undefined,
-            endDate ? { createdAt: { [Op.lte]: endDate } } : undefined
+            type ? { type: { [Op.like]: `%${type}%` } } : undefined,
+            year ? { year } : undefined,
+            createdAt ? { createdAt: { [Op.and]: [{ [Op.gte]: new Date(createdAt) }, { [Op.lt]: new Date(new Date(createdAt) - (-8.64e7)) }] } } : undefined,
+            updatedAt ? { updatedAt: { [Op.and]: [{ [Op.gte]: new Date(updatedAt) }, { [Op.lt]: new Date(new Date(updatedAt) - (-8.64e7)) }] } } : undefined
           ),
           include: [
             {
               model: ctx.model.models.tenant,
               as: 'tenant',
-            },
-            {
-              model: ctx.model.models.ad_group,
-              as: 'ad_group',
             },
           ],
           order: Order,
@@ -45,10 +41,11 @@ module.exports = app => {
         ctx.error();
       }
     }
+
     async detail() {
       const { ctx } = this;
       const { id } = ctx.query;
-      const result = await ctx.model.models.management.findOne({
+      const result = await ctx.model.models.tenant_quota_mapping.findOne({
         where: {
           id,
         },
@@ -57,26 +54,22 @@ module.exports = app => {
             model: ctx.model.models.tenant,
             as: 'tenant',
           },
-          {
-            model: ctx.model.models.ad_group,
-            as: 'ad_group',
-          },
         ],
       });
       ctx.success(result);
     }
+
     async update() {
       const { ctx } = this;
       const { id } = ctx.query;
-      const { tenantId, groupId, supporter, resourcesQuota } = ctx.request.body;
-      if (!id || !tenantId || !groupId) ctx.error();
-      const oldModel = await ctx.model.models.management.findByPk(id);
+      const { type, quota, year } = ctx.request.body;
+      if (!id || !type || !quota || !year) ctx.error();
+      const oldModel = await ctx.model.models.tenant_quota_mapping.findByPk(id);
       if (!oldModel) ctx.error();
       const newModel = {
-        tenantId,
-        ad_groupId: groupId,
-        supporter,
-        resourcesQuota,
+        type,
+        quota,
+        year: new Date(year).getFullYear(),
         updatedAt: new Date(),
       };
       try {
@@ -89,22 +82,21 @@ module.exports = app => {
         ctx.error('service busy');
       }
     }
+
     async create() {
       const { ctx } = this;
-      const { tenantId, groupId, supporter, resourcesQuota } = ctx.request.body;
-      if (!tenantId || !groupId) {
-        ctx.error();
-      }
+      const { tenantId, type, quota, year } = ctx.request.body;
+      if (!tenantId || !type || !quota || !year) ctx.error();
       const model = {
         tenantId,
-        ad_groupId: groupId,
-        supporter,
-        resourcesQuota,
+        type,
+        quota,
+        year: new Date(year).getFullYear(),
         createdAt: new Date(),
         updatedAt: new Date(),
       };
       try {
-        await ctx.model.models.management.create(model);
+        await ctx.model.models.tenant_quota_mapping.create(model);
         ctx.success();
       } catch (error) {
         throw { status: 500, message: 'service busy' };
@@ -115,7 +107,7 @@ module.exports = app => {
       const { ctx } = this;
       const { id } = ctx.query;
       if (!id) ctx.error();
-      const entity = await ctx.model.models.management.findByPk(id);
+      const entity = await ctx.model.models.tenant_quota_mapping.findByPk(id);
       if (!entity) ctx.error;
       try {
         await entity.destroy(id);
@@ -134,7 +126,7 @@ module.exports = app => {
       const { idList } = ctx.request.body;
       if (!idList || !idList.length) ctx.error();
       try {
-        await ctx.model.models.management.destroy({
+        await ctx.model.models.tenant_quota_mapping.destroy({
           where: {
             id: { [Op.in]: idList },
           },
@@ -148,18 +140,52 @@ module.exports = app => {
       }
     }
 
-    async checkExist() {
+    async checkTypeExist() {
       const { ctx } = this;
       const { Op } = app.Sequelize;
-      const { id, tenantId, groupId } = ctx.query;
-      const count = await ctx.model.models.management.count({
+      const { id, tenantId, type } = ctx.query;
+      const count = await ctx.model.models.tenant_quota_mapping.count({
         where: {
           id: { [Op.ne]: id },
           tenantId,
-          ad_groupId: groupId,
+          type,
         },
       });
       ctx.success(count);
+    }
+
+    async checkYearExist() {
+      const { ctx } = this;
+      const { Op } = app.Sequelize;
+      const { id, tenantId, year } = ctx.query;
+      const count = await ctx.model.models.tenant_quota_mapping.count({
+        where: {
+          id: { [Op.ne]: id },
+          tenantId,
+          year: new Date(year).getFullYear(),
+        },
+      });
+      ctx.success(count);
+    }
+
+    async checkRequest() {
+      const { ctx } = this;
+      const { tenantId, type, quota } = ctx.query;
+      if (!tenantId || !type || !quota) ctx.error();
+      let res = true;
+      const mappingList = await ctx.model.models.tenant_quota_mapping.findAll({
+        where: {
+          tenantId,
+          year: new Date().getFullYear(),
+        },
+      });
+      if (!mappingList || !mappingList.length) res = false;
+      else {
+        mappingList.forEach(el => {
+          if (el.type === type && el.quota < quota) res = false;
+        });
+      }
+      ctx.success({ pass: res });
     }
   };
 };
