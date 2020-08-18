@@ -5,7 +5,7 @@ module.exports = app => {
   app.beforeStart(async function() {
     // 同步模型
     const syncModels = [
-      'ad_group', 'role', 'tenant', 'user', 'user_gourp_mapping',
+      'ad_group', 'role', 'tenant', 'user', 'user_group_mapping',
       'tenant_group_mapping', 'assign', 'expiry', 'tenant_quota_mapping', 'vm_location',
     ];
     for (const syncModel of syncModels) {
