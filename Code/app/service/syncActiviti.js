@@ -42,6 +42,19 @@ module.exports = app => {
       });
       return auth;
     }
+
+    async startProcess(data, options) {
+      const url = app.config.activiti.url;
+      const auth = await axios.post(url + '/process/startProcess', data, options
+      ).then(function(response) {
+        return new Promise(resolve => {
+          resolve(response.data);
+        });
+      }).catch(function(error) {
+        console.log(error);
+      });
+      return auth;
+    }
   };
 };
 
