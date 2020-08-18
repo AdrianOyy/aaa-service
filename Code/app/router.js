@@ -78,4 +78,6 @@ module.exports = app => {
   router.put(`${prefix}/user_group_mapping/update`, controller.userGourpMapping.update);
   router.delete(`${prefix}/user_group_mapping/delete`, controller.userGourpMapping.delete);
   router.delete(`${prefix}/user_group_mapping/deleteMany`, controller.userGourpMapping.deleteMany);
+
+  router.get(`${prefix}/resource_request_history/verifyQuota`, controller.resourceRequestHistory.verifyQuota);
 };
