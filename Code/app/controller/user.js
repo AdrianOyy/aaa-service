@@ -50,8 +50,9 @@ module.exports = app => {
       const { ctx } = this;
       const { username, password } = ctx.request.body;
       const auth = await ctx.service.adService.authenticate(username, password);
-      ctx.service.user.loadUser(auth);
-      ctx.success(auth !== null && auth !== false ? auth.token : auth);
+      const user = await ctx.service.user.loadUser(auth);
+      auth.user = user;
+      ctx.success(auth);
     }
   };
 };

@@ -35,7 +35,7 @@ module.exports = app => {
           processDefinitionId,
           variables: {
             vm_id: vm.id,
-            manager_group_id: tenant.manager_group_id,
+            manager_group_id: [ tenant.manager_group_id.toString() ],
           },
           startUser,
         };
