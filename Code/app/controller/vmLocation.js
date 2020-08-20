@@ -25,7 +25,7 @@ module.exports = app => {
       };
       try {
         vm = await ctx.model.models.vm_location.create(vm);
-        const tenant = await ctx.model.models.vm_location.findOne({
+        const tenant = await ctx.model.models.tenant.findOne({
           raw: true,
           where: {
             code,
@@ -42,6 +42,9 @@ module.exports = app => {
         await ctx.service.syncActiviti.startProcess(data, { headers: ctx.headers });
         ctx.success('success');
       } catch (error) {
+        console.log('error==========================error');
+        console.log(error);
+        console.log('error==========================error');
         throw { status: 500, message: 'service busy' };
       }
     }

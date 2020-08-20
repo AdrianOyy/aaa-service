@@ -12,10 +12,10 @@ module.exports = appInfo => {
   config.sequelize = {
     dialect: 'mysql', // support: mysql, mariadb, postgres, mssql
     database: 'aaa_service',
-    host: '10.231.131.123',
+    host: '127.0.0.1',
     port: '3306',
-    username: 'admin',
-    password: 'APJ@com123',
+    username: 'root',
+    password: '1314840wwW',
     logging: false,
     define: {
       freezeTableName: false,
@@ -62,8 +62,8 @@ module.exports = appInfo => {
   };
 
   config.activiti = {
-    url: 'http://10.231.131.123:8000/workflow',
-    // url: 'http://localhost:8888',
+    // url: 'http://10.231.131.123:3004/workflow',
+    url: 'http://localhost:8888',
   };
 
   config.jwt = {

@@ -80,4 +80,7 @@ module.exports = app => {
   router.delete(`${prefix}/user_group_mapping/deleteMany`, controller.userGourpMapping.deleteMany);
 
   router.get(`${prefix}/resource_request_history/verifyQuota`, controller.resourceRequestHistory.verifyQuota);
+
+  router.post(`${prefix}/dynamicForm/create`, controller.dynamicForm.create);
+  router.get(`${prefix}/dynamicForm/test`, controller.dynamicForm.test);
 };
