@@ -7,6 +7,7 @@ module.exports = app => {
     const syncModels = [
       'ad_group', 'role', 'tenant', 'user', 'user_group_mapping', 'resource_request_history',
       'tenant_group_mapping', 'assign', 'expiry', 'tenant_quota_mapping', 'vm_location',
+      'vm_cluster', 'vm_master', 'vm_guest',
     ];
     for (const syncModel of syncModels) {
       await app.model.models[syncModel].sync();
