@@ -81,6 +81,15 @@ module.exports = app => {
 
   router.get(`${prefix}/resource_request_history/verifyQuota`, controller.resourceRequestHistory.verifyQuota);
 
+  router.get(`${prefix}/vm/listApplicationType`, controller.vm.listApplicationType);
+  router.get(`${prefix}/vm/listCDC`, controller.vm.listCDC);
+  router.get(`${prefix}/vm/listClusterApplicationType`, controller.vm.listClusterApplicationType);
+  router.get(`${prefix}/vm/listPlatform`, controller.vm.listPlatform);
+  router.get(`${prefix}/vm/listPlatformApplicationType`, controller.vm.listPlatformApplicationType);
+  router.get(`${prefix}/vm/listType`, controller.vm.listType);
+  router.get(`${prefix}/vm/listTypeZoneCDC`, controller.vm.listTypeZoneCDC);
+  router.get(`${prefix}/vm/listZone`, controller.vm.listZone);
+
   router.post(`${prefix}/dynamicForm/create`, controller.dynamicForm.create);
   router.get(`${prefix}/dynamicForm/test`, controller.dynamicForm.test);
 };
