@@ -91,5 +91,7 @@ module.exports = app => {
   router.get(`${prefix}/vm/listZone`, controller.vm.listZone);
 
   router.post(`${prefix}/dynamicForm/create`, controller.dynamicForm.create);
+  router.post(`${prefix}/dynamicForm/save`, controller.dynamicForm.save);
   router.get(`${prefix}/dynamicForm/test`, controller.dynamicForm.test);
+  router.get(`${prefix}/dynamicForm/getDynamicForm`, controller.dynamicForm.getDynamicForm);
 };
