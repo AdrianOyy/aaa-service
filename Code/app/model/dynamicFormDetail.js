@@ -13,6 +13,9 @@ module.exports = app => {
     foreignTable: { type: STRING, allowNull: true, cnName: '关联表表名', comment: '关联表表名' },
     foreignKey: { type: STRING, allowNull: true, cnName: '关联字段', comment: '关联字段' },
     foreignDisplayKey: { type: STRING, allowNull: true, cnName: '显示字段', comment: '显示字段' },
+    required: { type: BOOLEAN, allowNull: false, cnName: '必填字段', comment: '必填时段' },
+    readable: { type: BOOLEAN, allowNull: false, cnName: '可读字段', comment: '可读时段' },
+    writable: { type: BOOLEAN, allowNull: false, cnName: '可写字段', comment: '可写时段' },
     createdAt: { type: DATE, allowNull: true, cnName: '创建时间', comment: '创建时间' },
     updatedAt: { type: DATE, allowNull: true, cnName: '更新时间', comment: '更新时间' },
   }, {

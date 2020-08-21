@@ -19,7 +19,7 @@ module.exports = app => {
         }
         fieldList += `\`${el.id}\` ${fieldType},`;
       });
-      fieldList += 'UNIQUE(pid)';
+      fieldList += '`createdAt` datetime, `updatedAt` datetime, `deletedAt` datetime, `createBy` int, `updateBy` int, UNIQUE(pid)';
       const basicFormSQL = `CREATE TABLE ${formKey} (${fieldList})`;
       return basicFormSQL;
     }
@@ -43,7 +43,7 @@ module.exports = app => {
           }
           fieldList += `\`${key}\` ${fieldType},`;
         }
-        fieldList += `FOREIGN KEY(pid) REFERENCES ${parentFormKey}(pid) on delete cascade on update cascade`;
+        fieldList += `\`createdAt\` datetime, \`updatedAt\` datetime, \`deletedAt\` datetime, \`createBy\` int, \`updateBy\` int,FOREIGN KEY(pid) REFERENCES ${parentFormKey}(pid) on delete cascade on update cascade`;
         const childTableSQL = `CREATE TABLE ${el.id} (${fieldList})`;
         childTableSQLList.push(childTableSQL);
       });
@@ -51,63 +51,111 @@ module.exports = app => {
     }
 
     async getBasicDynamicFormDetailData(dynamicFormId, list) {
-      const dataList = [];
-      list.forEach(el => {
-        const fieldName = el.id;
-        const fieldType = el.type;
-        let inputType = 'text';
-        let foreignTable = null;
-        let foreignKey = null;
-        let foreignDisplayKey = null;
-        let showOnRequest = true;
-
-        if (el.name) {
-          if (el.name[el.name.length - 1] === '!') {
-            showOnRequest = false;
-          }
-          const paramsList = el.name.split('#');
-          if (paramsList.length > 2) return false;
-          if (paramsList.length === 2) {
-            let inputParams = paramsList[1].trim();
-            if (inputParams[inputParams.length - 1] === '!') {
-              showOnRequest = false;
-              inputParams = inputParams.slice(0, -1);
-            }
-            inputType = inputParams.trim();
-          }
-          let foreign = paramsList[0].trim();
-          if (foreign[0] === '$' && foreign[1] === '{' && foreign[foreign.length - 1] === '}') {
-            foreign = foreign.slice(2, -1);
-            const foreignList = foreign.split('|');
-            foreignTable = foreignList[0].split('.')[0].trim();
-            foreignKey = foreignList[0].split('.')[1].trim();
-            if (foreignList.length > 1) {
-              foreignDisplayKey = foreignList[1].trim();
-            } else {
-              foreignDisplayKey = foreignKey;
-            }
-          }
-        }
-
-        const model = {
-          dynamicFormId,
-          fieldName,
-          fieldType,
-          inputType,
-          foreignTable,
-          foreignKey,
-          foreignDisplayKey,
-          showOnRequest,
-        };
-        dataList.push(model);
-      });
-
+      const dataList = getForeign(list, dynamicFormId);
       return dataList;
     }
 
-    async getChildDynamicFormDetailData(list) {
-
+    async getChildDynamicFormDetailData(childTableList, childDynamicFormList) {
+      const childList = [];
+      for (let i = 0; i < childTableList.length; i++) {
+        for (let j = 0; j < childDynamicFormList.length; j++) {
+          if (childDynamicFormList[j].formKey === childTableList[i].id) {
+            const model = {
+              id: childTableList[i].id,
+              name: childTableList[i].name,
+              type: childTableList[i].type,
+              readable: childTableList[i].readable,
+              writable: childTableList[i].writable,
+              required: childTableList[i].required,
+              childTable: childTableList[i].childTable,
+              formProperty: childTableList[i].formProperty,
+              dynamicFormId: childDynamicFormList[j].id,
+            };
+            childList.push(model);
+            break;
+          }
+        }
+      }
+      const list = [];
+      for (let i = 0; i < childList.length; i++) {
+        const el = childList[i];
+        for (const key in el.childTable) {
+          const model = {
+            id: key,
+            dynamicFormId: el.dynamicFormId,
+            name: el.childTable[key],
+            type: 'string',
+            readable: el.readable,
+            writable: el.writable,
+            required: el.required,
+          };
+          list.push(model);
+        }
+      }
+      const dataList = getForeign(list);
+      return dataList;
     }
 
   };
 };
+
+function getForeign(list, dId) {
+  const dataList = [];
+  list.forEach(el => {
+    const dynamicFormId = dId ? dId : el.dynamicFormId;
+    const fieldName = el.id;
+    const fieldType = el.type;
+    const readable = el.readable;
+    const writable = el.writable;
+    const required = el.required;
+    let inputType = 'text';
+    let foreignTable = null;
+    let foreignKey = null;
+    let foreignDisplayKey = null;
+    let showOnRequest = true;
+
+    if (el.name) {
+      if (el.name[el.name.length - 1] === '!') {
+        showOnRequest = false;
+      }
+      const paramsList = el.name.split('#');
+      if (paramsList.length > 2) return false;
+      if (paramsList.length === 2) {
+        let inputParams = paramsList[1].trim();
+        if (inputParams[inputParams.length - 1] === '!') {
+          showOnRequest = false;
+          inputParams = inputParams.slice(0, -1);
+        }
+        inputType = inputParams.trim();
+      }
+      let foreign = paramsList[0].trim();
+      if (foreign[0] === '$' && foreign[1] === '{' && foreign[foreign.length - 1] === '}') {
+        foreign = foreign.slice(2, -1);
+        const foreignList = foreign.split('|');
+        foreignTable = foreignList[0].split('.')[0].trim();
+        foreignKey = foreignList[0].split('.')[1].trim();
+        if (foreignList.length > 1) {
+          foreignDisplayKey = foreignList[1].trim();
+        } else {
+          foreignDisplayKey = foreignKey;
+        }
+      }
+    }
+
+    const model = {
+      dynamicFormId,
+      fieldName,
+      fieldType,
+      inputType,
+      foreignTable,
+      foreignKey,
+      foreignDisplayKey,
+      showOnRequest,
+      readable,
+      writable,
+      required,
+    };
+    dataList.push(model);
+  });
+  return dataList;
+}
