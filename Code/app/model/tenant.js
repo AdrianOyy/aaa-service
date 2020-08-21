@@ -9,8 +9,6 @@ module.exports = app => {
     code: { type: STRING(256), allowNull: false, cnName: '代号', comment: '代号', unique: true },
     manager_group_id: { type: INTEGER, allowNull: false, cnName: '管理组Id', comment: '管理组Id' },
     supporter_group_id: { type: INTEGER, allowNull: false, cnName: '代理组Id', comment: '代理组Id' },
-    project_code: { type: STRING(256), allowNull: false, cnName: '项目Code', comment: '项目Code' },
-    project_name: { type: STRING(256), allowNull: false, cnName: '项目名称', comment: '项目名称' },
     justification: { type: STRING(256), allowNull: false, cnName: '理由', comment: '理由' },
     budget_type: { type: STRING(256), allowNull: false, cnName: '预算类型', comment: '预算类型' },
     project_owner: { type: STRING(256), allowNull: false, cnName: '项目所属人', comment: '项目所属人' },

@@ -6,9 +6,8 @@ module.exports = app => {
       const { ctx } = this;
       const { Op } = app.Sequelize;
       const { name, code, manager_group_id, supporter_group_id,
-        project_code, project_name, justification,
-        budget_type, project_owner, contact_person,
-        project_estimation, methodology_text,
+        justification, budget_type, project_owner,
+        contact_person, project_estimation, methodology_text,
         createdAt, updatedAt, prop, order } = ctx.query;
       const limit = parseInt(ctx.query.limit) || 10;
       const offset = (parseInt(ctx.query.page || 1) - 1) * limit;
@@ -24,8 +23,6 @@ module.exports = app => {
             code ? { code: { [Op.like]: `%${code}%` } } : undefined,
             manager_group_id ? { manager_group_id } : undefined,
             supporter_group_id ? { supporter_group_id } : undefined,
-            project_code ? { project_code } : undefined,
-            project_name ? { project_name } : project_name,
             justification ? { justification } : justification,
             budget_type ? { budget_type } : budget_type,
             project_owner ? { project_owner } : project_owner,
@@ -87,12 +84,12 @@ module.exports = app => {
       const { ctx } = this;
       const {
         name, code, manager_group_id, supporter_group_id,
-        project_code, project_name, justification, budget_type,
-        project_owner, contact_person, project_estimation,
+        justification, budget_type, project_owner,
+        contact_person, project_estimation,
         methodology_text } = ctx.request.body;
       if (!name || !code || !manager_group_id || !supporter_group_id ||
-        !project_code || !project_name || !justification || !budget_type ||
-        !project_owner || !contact_person || !project_estimation ||
+        !justification || !budget_type || !project_owner ||
+        !contact_person || !project_estimation ||
         !methodology_text) ctx.error();
       const existNum = await ctx.model.models.tenant.count({
         where: {
@@ -105,8 +102,6 @@ module.exports = app => {
         code,
         manager_group_id,
         supporter_group_id,
-        project_code,
-        project_name,
         justification,
         budget_type,
         project_owner,
@@ -132,11 +127,11 @@ module.exports = app => {
       const { id } = ctx.query;
       const {
         name, manager_group_id, supporter_group_id,
-        project_code, project_name, justification, budget_type,
+        justification, budget_type,
         project_owner, contact_person, project_estimation,
         methodology_text } = ctx.request.body;
       if (!id || !name || !manager_group_id || !supporter_group_id ||
-        !project_code || !project_name || !justification || !budget_type ||
+        !justification || !budget_type ||
         !project_owner || !contact_person || !project_estimation ||
         !methodology_text) ctx.error();
       const oldModel = await ctx.model.models.tenant.findByPk(id);
@@ -145,8 +140,6 @@ module.exports = app => {
         name,
         manager_group_id,
         supporter_group_id,
-        project_code,
-        project_name,
         justification,
         budget_type,
         project_owner,
