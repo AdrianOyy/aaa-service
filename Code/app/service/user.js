@@ -71,7 +71,7 @@ module.exports = app => {
         }
       }
       user.groups = groups;
-      await ctx.service.syncActiviti.loadUser(user, { headers: { token: auth.token } });
+      await ctx.service.syncActiviti.loadUser(user, { headers: { Authorization: 'Bearer ' + auth.token } });
       return user;
     }
   };

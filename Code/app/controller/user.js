@@ -50,9 +50,21 @@ module.exports = app => {
       const { ctx } = this;
       const { username, password } = ctx.request.body;
       const auth = await ctx.service.adService.authenticate(username, password);
-      const user = await ctx.service.user.loadUser(auth);
-      auth.user = user;
-      ctx.success(auth);
+      if (auth) {
+        const user = await ctx.service.user.loadUser(auth);
+        if (user) {
+          const groupList = [];
+          // const userGroup = await ctx.model.models.user_group_mapping.findAll({ where: { userId: user.id } });
+          for (const ug of user.groups) {
+            groupList.push(ug.id.toString());
+          }
+          user.groupList = groupList;
+          auth.user = user;
+        }
+        ctx.success(auth);
+      } else {
+        ctx.success(auth);
+      }
     }
   };
 };
