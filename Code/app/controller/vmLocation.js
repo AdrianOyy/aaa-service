@@ -42,6 +42,9 @@ module.exports = app => {
         await ctx.service.syncActiviti.startProcess(data, { headers: ctx.headers });
         ctx.success('success');
       } catch (error) {
+        console.log('error==========================error');
+        console.log(error);
+        console.log('error==========================error');
         throw { status: 500, message: 'service busy' };
       }
     }
