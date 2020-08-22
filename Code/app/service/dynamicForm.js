@@ -20,14 +20,14 @@ module.exports = app => {
         fieldList += `\`${el.id}\` ${fieldType},`;
       });
       fieldList += '`createdAt` datetime, `updatedAt` datetime, `deletedAt` datetime, `createBy` int, `updateBy` int, UNIQUE(pid)';
-      const basicFormSQL = `CREATE TABLE ${formKey} (${fieldList})`;
+      const basicFormSQL = `CREATE TABLE IF NOT EXISTS ${formKey} (${fieldList})`;
       return basicFormSQL;
     }
 
     async getChildTableSQLList(parentFormKey, list) {
       const childTableSQLList = [];
       list.forEach(el => {
-        let fieldList = '`id` int unsigned not null auto_increment primary key, `pid` int, `parentId` int,';
+        let fieldList = '`id` int unsigned not null auto_increment primary key, `pid` int, `parentId` int unsigned,';
         for (const key in el.childTable) {
           let fieldType = '';
           switch (el.childTable[key]) {
@@ -44,7 +44,7 @@ module.exports = app => {
           fieldList += `\`${key}\` ${fieldType},`;
         }
         fieldList += `\`createdAt\` datetime, \`updatedAt\` datetime, \`deletedAt\` datetime, \`createBy\` int, \`updateBy\` int,FOREIGN KEY(parentId) REFERENCES ${parentFormKey}(id) on delete cascade on update cascade`;
-        const childTableSQL = `CREATE TABLE ${el.id} (${fieldList})`;
+        const childTableSQL = `CREATE TABLE IF NOT EXISTS ${el.id} (${fieldList})`;
         childTableSQLList.push(childTableSQL);
       });
       return childTableSQLList;
