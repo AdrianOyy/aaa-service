@@ -65,7 +65,7 @@ module.exports = app => {
       const detailList = [];
       for (const formDetail of dynamicFormDetail) {
         const form = {};
-        form.id = formDetail.id;
+        form.id = formDetail.fieldName;
         form.label = formDetail.fieldName;
         form.fileType = formDetail.fileType;
         form.type = formDetail.inputType;
@@ -96,7 +96,7 @@ module.exports = app => {
         const sonFormDetail = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: sonForm.id } });
         for (const sonDetail of sonFormDetail) {
           const form = {};
-          form.id = sonDetail.id;
+          form.id = sonDetail.fieldName;
           form.label = sonDetail.fieldName;
           form.fileType = sonDetail.fileType;
           form.type = sonDetail.inputType;
@@ -176,6 +176,9 @@ module.exports = app => {
       };
       // // 启动流程
       const datas = await ctx.service.syncActiviti.startProcess(activitiData, { headers: ctx.headers });
+      console.log('datas ================= datas');
+      console.log(datas);
+      console.log('datas ================= datas');
       // 保存pid
       const updateSql = `UPDATE ${dynamicForm.formKey} SET pid = ${datas.data} where id = ${parentsId}`;
       await app.model.query(updateSql);

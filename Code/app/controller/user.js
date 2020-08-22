@@ -59,10 +59,9 @@ module.exports = app => {
             groupList.push(ug.id.toString());
           }
           user.groupList = groupList;
-          user.groups = user.groups;
+          user.groups = auth.groups;
           auth.user = user;
         }
-        console.log(auth);
         ctx.success(auth);
       } else {
         ctx.success(auth);

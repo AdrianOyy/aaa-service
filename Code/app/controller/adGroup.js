@@ -52,7 +52,7 @@ module.exports = app => {
         group = await ctx.model.models.ad_group.create(group);
         const options = { content: { username: 'activiti' } };
         const token = ctx.service.jwtUtils.getToken(options);
-        ctx.service.syncActiviti.saveOrUpdateGroup({ id: group.dataValues.id, cn: group.name }, { headers: { token } });
+        ctx.service.syncActiviti.saveOrUpdateGroup({ id: group.dataValues.id, cn: group.name }, { headers: { Authorization: 'Bearer ' + token } });
         ctx.success();
       } catch (error) {
         throw { status: 500, message: 'service busy' };
