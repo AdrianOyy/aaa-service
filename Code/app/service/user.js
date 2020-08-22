@@ -74,5 +74,13 @@ module.exports = app => {
       await ctx.service.syncActiviti.loadUser(user, { headers: { Authorization: 'Bearer ' + auth.token } });
       return user;
     }
+
+    async getTenants(userId) {
+      const { ctx } = this;
+      const { Op } = app.Sequelize;
+      const where = { id: { [Op.in]: app.Sequelize.literal(`(select tenantId from tenant_group_mapping where ad_groupId in ( select groupId from user_group_mapping where userId = ${userId}))`) } };
+      const tenants = await ctx.model.models.tenant.findAll({ where });
+      return tenants;
+    }
   };
 };
