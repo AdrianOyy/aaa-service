@@ -153,18 +153,21 @@ module.exports = app => {
       for (let i = 0; i < childTable.length; i++) {
         const el = childTable[i].dataValues;
         const childSQL = `SELECT * FROM ${el.formKey} where ${el.formKey}.pid = ${basicTable.pid};`;
-        const [[ child ]] = await app.model.query(childSQL);
-        if (child) {
-          for (let i = 0; i < el.dynamicFormDetail.length; i++) {
-            const it = el.dynamicFormDetail[i];
-            if (it.foreignTable && it.foreignKey) {
-              const SQL = `SELECT * FROM ${it.foreignTable} where ${it.foreignTable}.${it.foreignKey} = ${child[it.fieldName]}`;
-              const [[ basicForeign ]] = await app.model.query(SQL);
-              child[it.fieldName] = basicForeign;
+        const [ childList ] = await app.model.query(childSQL);
+        for (let j = 0; j < childList.length; j++) {
+          const child = childList[j];
+          if (child) {
+            for (let i = 0; i < el.dynamicFormDetail.length; i++) {
+              const it = el.dynamicFormDetail[i].dataValues;
+              if (it.foreignTable && it.foreignKey) {
+                const SQL = `SELECT * FROM ${it.foreignTable} where ${it.foreignTable}.${it.foreignKey} = ${child[it.fieldName]}`;
+                const [[ basicForeign ]] = await app.model.query(SQL);
+                child[it.fieldName] = basicForeign;
+              }
             }
           }
         }
-        basicTable[el.formKey.toString()] = child;
+        basicTable[el.formKey.toString()] = childList;
       }
       return basicTable;
     }
