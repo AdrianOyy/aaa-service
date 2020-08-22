@@ -86,44 +86,94 @@ module.exports = app => {
         }
         detailList.push(form);
       }
-      ctx.success({ dynamicForm, detailList });
+      // 获取子流程
+      const sonFormList = [];
+      const sonDetailList = [];
+      const sonForm = await ctx.model.models.dynamicForm.findOne({ where: { parentId: dynamicForm.id } });
+      if (sonForm) {
+        const sonFormDetail = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: sonForm.id } });
+        for (const sonDetail of sonFormDetail) {
+          const form = {};
+          form.id = sonDetail.id;
+          form.label = sonDetail.fieldName;
+          form.fileType = sonDetail.fileType;
+          form.type = sonDetail.inputType;
+          form.showOnRequest = sonDetail.showOnRequest;
+          form.foreignTable = sonDetail.foreignTable;
+          form.foreignDisplayKey = sonDetail.foreignDisplayKey;
+          form.foreignKey = sonDetail.foreignKey;
+          form.readOnly = false;
+          form.value = '';
+          if (sonDetail.inputType === 'select') {
+            if (sonDetail.foreignTable === 'tenant') {
+              const itemList = await ctx.service.user.getTenants(userId);
+              form.itemList = itemList;
+            } else {
+              const itemList = await ctx.model.models[sonDetail.foreignTable].findAll({});
+              form.itemList = itemList;
+            }
+          }
+          sonFormList.push(form);
+        }
+      }
+      ctx.success({ dynamicForm, detailList, sonForm, sonFormList, sonDetailList });
     }
 
     async save() {
       const { ctx } = this;
-      const { dynamicForm, processDefinitionId, startUser, formFieldList } = ctx.request.body;
-      let parents = {};
-      let tenantId = null;
+      const { dynamicForm, processDefinitionId, startUser, formFieldList, sonForm, sonFormList, sonDetailList } = ctx.request.body;
+      let parentsId = 0;
+      let tenantCode = null;
       if (formFieldList.length > 0) {
         const parentForm = {};
         for (const formfile of formFieldList) {
           parentForm[formfile.label] = formfile.value;
           if (formfile.foreignTable === 'tenant') {
-            tenantId = formfile.value;
+            tenantCode = formfile.value;
           }
         }
         console.log(dynamicForm.formKey);
-        parents = await ctx.model.models[dynamicForm.formKey].create(parentForm);
+        // parents = await ctx.model.models[dynamicForm.formKey].create(parentForm);
+        const insertSql = await ctx.service.dynamicForm.getInsertSQL(dynamicForm, parentForm);
+        console.log(insertSql);
+        const parents = await app.model.query(insertSql);
+        parentsId = parents[0];
+      }
+      // 保存子流程
+      if (sonDetailList.length > 0) {
+        for (const sonDetail of sonDetailList) {
+          const sonFormDetail = {
+            parentId: parentsId,
+          };
+          for (const sonField of sonFormList) {
+            sonFormDetail[sonField.label] = sonDetail[sonField.label];
+          }
+          const insertSql = await ctx.service.dynamicForm.getInsertSQL(sonForm, sonFormDetail);
+          console.log(insertSql);
+          await app.model.query(insertSql);
+        }
       }
       const tenant = await ctx.model.models.tenant.findOne({
         raw: true,
         where: {
-          id: tenantId,
+          code: tenantCode,
         },
       });
       const activitiData = {
         processDefinitionId,
         variables: {
-          formId: parents.id,
+          formId: parentsId,
           formKey: dynamicForm.formKey,
           manager_group_id: [ tenant.manager_group_id.toString() ],
         },
         startUser,
       };
-      // 启动流程
+      // // 启动流程
       const datas = await ctx.service.syncActiviti.startProcess(activitiData, { headers: ctx.headers });
-      console.log(datas);
-      // 保存制定id
+      // 保存pid
+      const updateSql = `UPDATE ${dynamicForm.formKey} SET pid = ${datas.data} where id = ${parentsId}`;
+      await app.model.query(updateSql);
+      const updateSql2 = `UPDATE ${sonForm.formKey} SET pid = ${datas.data} where parentId = ${parentsId}`;
       ctx.success('success');
     }
 

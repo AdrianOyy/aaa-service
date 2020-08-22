@@ -27,7 +27,7 @@ module.exports = app => {
     async getChildTableSQLList(parentFormKey, list) {
       const childTableSQLList = [];
       list.forEach(el => {
-        let fieldList = '`id` int unsigned not null auto_increment primary key, `pid` int,';
+        let fieldList = '`id` int unsigned not null auto_increment primary key, `pid` int, `parentId` int,';
         for (const key in el.childTable) {
           let fieldType = '';
           switch (el.childTable[key]) {
@@ -43,7 +43,7 @@ module.exports = app => {
           }
           fieldList += `\`${key}\` ${fieldType},`;
         }
-        fieldList += `\`createdAt\` datetime, \`updatedAt\` datetime, \`deletedAt\` datetime, \`createBy\` int, \`updateBy\` int,FOREIGN KEY(pid) REFERENCES ${parentFormKey}(pid) on delete cascade on update cascade`;
+        fieldList += `\`createdAt\` datetime, \`updatedAt\` datetime, \`deletedAt\` datetime, \`createBy\` int, \`updateBy\` int,FOREIGN KEY(parentId) REFERENCES ${parentFormKey}(id) on delete cascade on update cascade`;
         const childTableSQL = `CREATE TABLE ${el.id} (${fieldList})`;
         childTableSQLList.push(childTableSQL);
       });
@@ -94,6 +94,19 @@ module.exports = app => {
       }
       const dataList = getForeign(list);
       return dataList;
+    }
+
+    async getInsertSQL(dynmaic, filelist) {
+      let fieldType = '';
+      let fieldValue = '';
+      for (const key in filelist) {
+        fieldType += `\`${key}\`,`;
+        fieldValue += `${filelist[key]},`;
+      }
+      fieldType += '\`createdAt\`,\`updatedAt\`';
+      fieldValue += '\'2020-08-21\',\'2020-08-21\'';
+      const basicFormSQL = `INSERT INTO ${dynmaic.formKey}(${fieldType}) VALUES (${fieldValue})`;
+      return basicFormSQL;
     }
 
   };
