@@ -123,6 +123,90 @@ module.exports = app => {
       ctx.success({ dynamicForm, detailList, sonForm, sonFormList, sonDetailList });
     }
 
+    async getDynamicFormDetail() {
+      const { ctx } = this;
+      const { deploymentId, userId, formId } = ctx.request.query;
+      const dynamicForm = await ctx.model.models.dynamicForm.findOne({ where: { deploymentId } });
+      const res = await ctx.service.dynamicForm.getDetailByKey(dynamicForm.formKey, formId);
+      // console.log(res);
+      const dynamicFormDetail = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: dynamicForm.id } });
+      const detailList = [];
+      for (const formDetail of dynamicFormDetail) {
+        const form = {};
+        form.id = formDetail.id;
+        form.label = formDetail.fieldName;
+        form.fileType = formDetail.fileType;
+        form.type = formDetail.inputType;
+        form.showOnRequest = formDetail.showOnRequest;
+        form.foreignTable = formDetail.foreignTable;
+        form.foreignDisplayKey = formDetail.foreignDisplayKey;
+        form.foreignKey = formDetail.foreignKey;
+        form.labelField = formDetail.foreignDisplayKey;
+        form.valueField = formDetail.foreignKey;
+        form.readOnly = false;
+        if (formDetail.inputType === 'select') {
+          if (formDetail.foreignTable === 'tenant') {
+            const itemList = await ctx.service.user.getTenants(userId);
+            form.itemList = itemList;
+          } else {
+            const itemList = await ctx.model.models[formDetail.foreignTable].findAll({});
+            form.itemList = itemList;
+          }
+          form.value = res[formDetail.fieldName][formDetail.foreignKey];
+        } else {
+          form.value = res[formDetail.fieldName];
+        }
+        detailList.push(form);
+      }
+      // 获取子流程
+      const sonFormList = [];
+      const sonDetailList = [];
+      const sonForm = await ctx.model.models.dynamicForm.findOne({ where: { parentId: dynamicForm.id } });
+      if (sonForm) {
+        const resdetail = res[sonForm.formKey];
+        const sonFormDetail = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: sonForm.id } });
+        for (const sonDetail of sonFormDetail) {
+          const form = {};
+          form.id = sonDetail.id;
+          form.label = sonDetail.fieldName;
+          form.fileType = sonDetail.fileType;
+          form.type = sonDetail.inputType;
+          form.showOnRequest = sonDetail.showOnRequest;
+          form.foreignTable = sonDetail.foreignTable;
+          form.foreignDisplayKey = sonDetail.foreignDisplayKey;
+          form.foreignKey = sonDetail.foreignKey;
+          form.labelField = sonDetail.foreignDisplayKey;
+          form.valueField = sonDetail.foreignKey;
+          form.readOnly = false;
+          form.value = '';
+          if (sonDetail.inputType === 'select') {
+            if (sonDetail.foreignTable === 'tenant') {
+              const itemList = await ctx.service.user.getTenants(userId);
+              form.itemList = itemList;
+            } else {
+              const itemList = await ctx.model.models[sonDetail.foreignTable].findAll({});
+              form.itemList = itemList;
+            }
+          }
+          sonFormList.push(form);
+        }
+        for (const resd of resdetail) {
+          const p = {};
+          for (const sonDetail of sonFormDetail) {
+            if (sonDetail.inputType === 'select') {
+              console.log(resd);
+              console.log(resd[sonDetail.fieldName]);
+              p[sonDetail.fieldName] = resd[sonDetail.fieldName].id;
+            } else {
+              p[sonDetail.fieldName] = resd[sonDetail.fieldName];
+            }
+          }
+          sonDetailList.push(p);
+        }
+      }
+      ctx.success({ dynamicForm, detailList, sonForm, sonFormList, sonDetailList });
+    }
+
     async save() {
       const { ctx } = this;
       const { dynamicForm, processDefinitionId, startUser, formFieldList, sonForm, sonFormList, sonDetailList } = ctx.request.body;
