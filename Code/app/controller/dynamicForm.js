@@ -124,12 +124,14 @@ module.exports = app => {
       const { dynamicForm, processDefinitionId, startUser, formFieldList, sonForm, sonFormList, sonDetailList } = ctx.request.body;
       let parentsId = 0;
       let tenantCode = null;
+      let tenantKey = null;
       if (formFieldList.length > 0) {
         const parentForm = {};
         for (const formfile of formFieldList) {
           parentForm[formfile.label] = formfile.value;
           if (formfile.foreignTable === 'tenant') {
             tenantCode = formfile.value;
+            tenantKey = formfile.foreignKey;
           }
         }
         console.log(dynamicForm.formKey);
@@ -156,7 +158,7 @@ module.exports = app => {
       const tenant = await ctx.model.models.tenant.findOne({
         raw: true,
         where: {
-          code: tenantCode,
+          [tenantKey]: tenantCode,
         },
       });
       const activitiData = {
@@ -174,6 +176,7 @@ module.exports = app => {
       const updateSql = `UPDATE ${dynamicForm.formKey} SET pid = ${datas.data} where id = ${parentsId}`;
       await app.model.query(updateSql);
       const updateSql2 = `UPDATE ${sonForm.formKey} SET pid = ${datas.data} where parentId = ${parentsId}`;
+      await app.model.query(updateSql2);
       ctx.success('success');
     }
 

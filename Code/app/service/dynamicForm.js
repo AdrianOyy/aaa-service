@@ -101,7 +101,7 @@ module.exports = app => {
       let fieldValue = '';
       for (const key in filelist) {
         fieldType += `\`${key}\`,`;
-        fieldValue += `${filelist[key]},`;
+        fieldValue += `\'${filelist[key]}\',`;
       }
       fieldType += '\`createdAt\`,\`updatedAt\`';
       fieldValue += '\'2020-08-21\',\'2020-08-21\'';
