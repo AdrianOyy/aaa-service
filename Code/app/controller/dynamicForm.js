@@ -182,7 +182,7 @@ module.exports = app => {
       const body = {
         formKey: 'VMALLOCATION',
         deploymentId: '67501',
-        list: '[{"id":"Tenant","name":"${tenant.code | name}#list","type":"string","readable":true,"writable":true,"required":true,"formProperty":null,"childTable":null},{"id":"Text","name":"text#text","type":"string","readable":true,"writable":true,"required":false,"formProperty":null,"childTable":null},{"id":"vmList","name":null,"type":"enum","readable":true,"writable":true,"required":false,"formProperty":null,"childTable":{"CPU":"string","Type":"${type.id | name}#list"}}]',
+        list: '[{"id":"Tenant","name":"${tenant.id | name}#list","type":"string","readable":true,"writable":true,"required":true,"formProperty":null,"childTable":null},{"id":"Text","name":"text#text","type":"string","readable":true,"writable":true,"required":false,"formProperty":null,"childTable":null},{"id":"vmList","name":null,"type":"enum","readable":true,"writable":true,"required":false,"formProperty":null,"childTable":{"CPU":"string","Group":"${ad_group.id | name}#list"}}]',
       };
       const { formKey, deploymentId, list } = body;
       const basicFormFieldList = [];
@@ -234,6 +234,15 @@ module.exports = app => {
       } catch (error) {
         ctx.error(error);
       }
+    }
+
+    async getDetailByKey() {
+      const { ctx } = this;
+      const { formKey, formId } = ctx.query;
+      if (!formKey || !formId) ctx.error();
+      const res = await ctx.service.dynamicForm.getDetailByKey(formKey, formId);
+      if (!res) ctx.error();
+      else ctx.success(res);
     }
   };
 };

@@ -109,6 +109,65 @@ module.exports = app => {
       return basicFormSQL;
     }
 
+    // 根据动态父表表名和数据表父表 id 获取数据
+    async getDetailByKey(formKey, formId) {
+      const { ctx } = this;
+
+      // 基础数据
+      const dynamicForm = await ctx.model.models.dynamicForm.findOne({
+        where: {
+          formKey,
+        },
+        include: [
+          {
+            model: ctx.model.models.dynamicForm,
+            as: 'childTable',
+            include: {
+              model: ctx.model.models.dynamicFormDetail,
+              as: 'dynamicFormDetail',
+            },
+          },
+          {
+            model: ctx.model.models.dynamicFormDetail,
+            as: 'dynamicFormDetail',
+          },
+        ],
+      });
+      if (!dynamicForm) return false;
+
+      // 父表
+      const basicSQL = `SELECT * FROM ${dynamicForm.formKey} where ${dynamicForm.formKey}.id = ${formId};`;
+      const [[ basicTable ]] = await app.model.query(basicSQL);
+      if (!basicTable) return {};
+      for (let i = 0; i < dynamicForm.dynamicFormDetail.length; i++) {
+        const el = dynamicForm.dynamicFormDetail[i].dataValues;
+        if (el.foreignTable && el.foreignKey) {
+          const SQL = `SELECT * FROM ${el.foreignTable} where ${el.foreignTable}.${el.foreignKey} = ${basicTable[el.fieldName]}`;
+          const [[ basicForeign ]] = await app.model.query(SQL);
+          basicTable[el.fieldName] = basicForeign;
+        }
+      }
+
+      // 子表
+      const { childTable } = dynamicForm;
+      for (let i = 0; i < childTable.length; i++) {
+        const el = childTable[i].dataValues;
+        const childSQL = `SELECT * FROM ${el.formKey} where ${el.formKey}.pid = ${basicTable.pid};`;
+        const [[ child ]] = await app.model.query(childSQL);
+        if (child) {
+          for (let i = 0; i < el.dynamicFormDetail.length; i++) {
+            const it = el.dynamicFormDetail[i];
+            if (it.foreignTable && it.foreignKey) {
+              const SQL = `SELECT * FROM ${it.foreignTable} where ${it.foreignTable}.${it.foreignKey} = ${child[it.fieldName]}`;
+              const [[ basicForeign ]] = await app.model.query(SQL);
+              child[it.fieldName] = basicForeign;
+            }
+          }
+        }
+        basicTable[el.formKey.toString()] = child;
+      }
+      return basicTable;
+    }
   };
 };
 

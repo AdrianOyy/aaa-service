@@ -18,6 +18,7 @@ module.exports = app => {
 
   dynamicForm.associate = function() {
     const ms = app.model.models;
+    ms.dynamicForm.hasMany(ms.dynamicForm, { as: 'childTable', foreignKey: 'parentId', constraints: false });
     ms.dynamicForm.hasMany(ms.dynamicFormDetail, { as: 'dynamicFormDetail', foreignKey: 'dynamicFormId', constraint: false });
   };
 
