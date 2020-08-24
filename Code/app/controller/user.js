@@ -55,8 +55,12 @@ module.exports = app => {
         if (user) {
           const groupList = [];
           // const userGroup = await ctx.model.models.user_group_mapping.findAll({ where: { userId: user.id } });
-          for (const ug of user.groups) {
-            groupList.push(ug.id.toString());
+          for (const ug of auth.groups) {
+            if (ug.id) {
+              groupList.push(ug.id.toString());
+            } else {
+              groupList.push('0');
+            }
           }
           user.groupList = groupList;
           user.groups = auth.groups;
