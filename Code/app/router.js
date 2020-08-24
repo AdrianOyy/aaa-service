@@ -95,5 +95,6 @@ module.exports = app => {
   router.get(`${prefix}/dynamicForm/test`, controller.dynamicForm.test);
   router.get(`${prefix}/dynamicForm/getDetailByKey`, controller.dynamicForm.getDetailByKey);
   router.get(`${prefix}/dynamicForm/getDynamicForm`, controller.dynamicForm.getDynamicForm);
+  router.get(`${prefix}/dynamicForm/verifApplicationType`, controller.dynamicForm.verifApplicationType);
   router.get(`${prefix}/dynamicForm/getDynamicFormDetail`, controller.dynamicForm.getDynamicFormDetail);
 };

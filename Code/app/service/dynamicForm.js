@@ -121,6 +121,30 @@ module.exports = app => {
       return basicFormSQL;
     }
 
+    async getApplicationType(formKey, formId) {
+      const { ctx } = this;
+
+      // 基础数据
+      const dynamicForm = await ctx.model.models.dynamicForm.findOne({
+        where: {
+          formKey,
+        },
+      });
+      if (dynamicForm) {
+        const sonForm = await ctx.model.models.dynamicForm.findOne({ where: { parentId: dynamicForm.id } });
+        if (sonForm) {
+          const SQL = `SELECT * FROM ${sonForm.formKey} where applicationType = 'MSSQL' and parentId = ${formId}`;
+          const [[ basicForeign ]] = await app.model.query(SQL);
+          if (basicForeign) {
+            return true;
+          }
+          return false;
+
+        }
+      }
+      return false;
+    }
+
     // 根据动态父表表名和数据表父表 id 获取数据
     async getDetailByKey(formKey, formId) {
       const { ctx } = this;

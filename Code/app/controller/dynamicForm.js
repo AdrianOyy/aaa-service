@@ -63,7 +63,7 @@ module.exports = app => {
       const { ctx } = this;
       const { deploymentId, userId } = ctx.request.query;
       const dynamicForm = await ctx.model.models.dynamicForm.findOne({ where: { deploymentId } });
-      if (!dynamicForm) ctx.error()
+      if (!dynamicForm) ctx.error();
       const dynamicFormDetail = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: dynamicForm.id } });
       const detailList = [];
       for (const formDetail of dynamicFormDetail) {
@@ -147,6 +147,7 @@ module.exports = app => {
         form.labelField = formDetail.foreignDisplayKey;
         form.valueField = formDetail.foreignKey;
         form.readOnly = false;
+        form.disable = true;
         if (formDetail.inputType === 'select') {
           if (formDetail.foreignTable === 'tenant') {
             const itemList = await ctx.service.user.getTenants(userId);
@@ -337,6 +338,17 @@ module.exports = app => {
       const res = await ctx.service.dynamicForm.getDetailByKey(formKey, formId);
       if (!res) ctx.error();
       else ctx.success(res);
+    }
+
+    async verifApplicationType() {
+      const { ctx } = this;
+      try {
+        const { formKey, formId } = ctx.query;
+        const res = await ctx.service.dynamicForm.getApplicationType(formKey, formId);
+        ctx.success(res);
+      } catch (error) {
+        ctx.error(error);
+      }
     }
   };
 };
