@@ -6,6 +6,7 @@ module.exports = app => {
   const dynamicForm = app.model.define('dynamicForm', {
     id: { type: INTEGER, autoIncrement: true, primaryKey: true, cnName: 'ID' },
     deploymentId: { type: INTEGER, allowNull: true, cnName: '流程部署id', comment: '流程部署id' },
+    workflowName: { type: STRING, allowNull: false, cnName: '流程名称', comment: '流程名称' },
     formKey: { type: STRING, allowNull: false, cnName: '动态表名', comment: '动态表名', unique: true },
     parentId: { type: STRING, allowNull: true, cnName: '父表id', comment: '父表id' },
     createdAt: { type: DATE, allowNull: true, cnName: '创建时间', comment: '创建时间' },

@@ -4,7 +4,7 @@ module.exports = app => {
   return class extends app.Controller {
     async create() {
       const { ctx } = this;
-      const { formKey, deploymentId, list } = ctx.request.body;
+      const { formKey, deploymentId, list, workflowName } = ctx.request.body;
       const basicFormFieldList = [];
       const childTableList = [];
       JSON.parse(list)
@@ -21,6 +21,7 @@ module.exports = app => {
       const basicDynamicForm = await ctx.model.models.dynamicForm.create({
         deploymentId,
         formKey,
+        workflowName,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -30,6 +31,7 @@ module.exports = app => {
         const model = {
           parentId: basicDynamicForm.id,
           formKey: el.id,
+          workflowName,
           createdAt: new Date(),
           updatedAt: new Date(),
         };
@@ -61,6 +63,7 @@ module.exports = app => {
       const { ctx } = this;
       const { deploymentId, userId } = ctx.request.query;
       const dynamicForm = await ctx.model.models.dynamicForm.findOne({ where: { deploymentId } });
+      if (!dynamicForm) ctx.error()
       const dynamicFormDetail = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: dynamicForm.id } });
       const detailList = [];
       for (const formDetail of dynamicFormDetail) {
@@ -196,7 +199,7 @@ module.exports = app => {
             if (sonDetail.inputType === 'select') {
               console.log(resd);
               console.log(resd[sonDetail.fieldName]);
-              p[sonDetail.fieldName] = resd[sonDetail.fieldName].id;
+              p[sonDetail.fieldName] = resd[sonDetail.fieldName] ? resd[sonDetail.fieldName].id : null;
             } else {
               p[sonDetail.fieldName] = resd[sonDetail.fieldName];
             }
@@ -260,9 +263,6 @@ module.exports = app => {
       };
       // // 启动流程
       const datas = await ctx.service.syncActiviti.startProcess(activitiData, { headers: ctx.headers });
-      console.log('datas ================= datas');
-      console.log(datas);
-      console.log('datas ================= datas');
       // 保存pid
       const updateSql = `UPDATE ${dynamicForm.formKey} SET pid = ${datas.data} where id = ${parentsId}`;
       await app.model.query(updateSql);

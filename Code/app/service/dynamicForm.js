@@ -13,8 +13,14 @@ module.exports = app => {
           case 'boolean':
             fieldType = 'tinyint';
             break;
-          default:
+          case 'long':
             fieldType = 'int';
+            break;
+          case 'date':
+            fieldType = 'datetime';
+            break;
+          default:
+            fieldType = 'varchar(255)';
             break;
         }
         fieldList += `\`${el.id}\` ${fieldType},`;
@@ -37,8 +43,14 @@ module.exports = app => {
             case 'boolean':
               fieldType = 'tinyint';
               break;
-            default:
+            case 'long':
               fieldType = 'int';
+              break;
+            case 'date':
+              fieldType = 'datetime';
+              break;
+            default:
+              fieldType = 'varchar(255)';
               break;
           }
           fieldList += `\`${key}\` ${fieldType},`;
@@ -101,7 +113,7 @@ module.exports = app => {
       let fieldValue = '';
       for (const key in filelist) {
         fieldType += `\`${key}\`,`;
-        fieldValue += `\'${filelist[key]}\',`;
+        fieldValue += filelist[key] === '' ? 'null,' : `\'${filelist[key]}\',`;
       }
       fieldType += '\`createdAt\`,\`updatedAt\`';
       fieldValue += '\'2020-08-21\',\'2020-08-21\'';
@@ -190,7 +202,7 @@ function getForeign(list, dId) {
     let showOnRequest = true;
 
     if (el.name) {
-      if (el.name[el.name.length - 1] === '!') {
+      if (el.name.trim()[el.name.length - 1] === '!') {
         showOnRequest = false;
       }
       const paramsList = el.name.split('#');
