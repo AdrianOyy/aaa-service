@@ -104,4 +104,8 @@ module.exports = app => {
   router.post(`${prefix}/platform/create`, controller.platform.create);
   router.delete(`${prefix}/platform/deleteMany`, controller.platform.deleteMany);
   router.get(`${prefix}/platform/checkName`, controller.platform.checkName);
+
+  router.get(`${prefix}/hostname/getReferenceList`, controller.hostname.getReferenceList);
+  router.get(`${prefix}/hostname/getHostNameLastCharList`, controller.hostname.getHostNameLastCharList);
+  router.get(`${prefix}/hostname/generateHostname`, controller.hostname.generateHostname);
 };

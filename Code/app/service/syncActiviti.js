@@ -6,27 +6,29 @@ module.exports = app => {
   return class extends app.Service {
     async loadUser(user, options) {
       const url = app.config.activiti.url;
-      const auth = await axios.post(url + '/user/loadUser', user, options
-      ).then(function(response) {
-        return new Promise(resolve => {
-          resolve(response.data);
+      const auth = await axios
+        .post(url + '/user/loadUser', user, options)
+        .then(function(response) {
+          return new Promise(resolve => {
+            resolve(response.data);
+          });
+        }).catch(function(error) {
+          console.log(error);
         });
-      }).catch(function(error) {
-        console.log(error);
-      });
       return auth;
     }
 
     async deleteGroup(groupIds, headers) {
       const url = app.config.activiti.url;
-      const auth = await axios.delete(url + '/user/deleteGroup', { data: groupIds, headers }
-      ).then(function(response) {
-        return new Promise(resolve => {
-          resolve(response.data);
+      const auth = await axios
+        .delete(url + '/user/deleteGroup', { data: groupIds, headers })
+        .then(function(response) {
+          return new Promise(resolve => {
+            resolve(response.data);
+          });
+        }).catch(function(error) {
+          console.log(error);
         });
-      }).catch(function(error) {
-        console.log(error);
-      });
       return auth;
     }
 
