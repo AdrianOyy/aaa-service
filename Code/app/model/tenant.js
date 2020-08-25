@@ -9,6 +9,7 @@ module.exports = app => {
     code: { type: STRING(256), allowNull: false, cnName: '代号', comment: '代号', unique: true },
     manager_group_id: { type: INTEGER, allowNull: false, cnName: '管理组Id', comment: '管理组Id' },
     supporter_group_id: { type: INTEGER, allowNull: false, cnName: '代理组Id', comment: '代理组Id' },
+    group_id: { type: INTEGER, allowNull: false, cnName: '组Id', comment: '组Id' },
     justification: { type: STRING(256), allowNull: false, cnName: '理由', comment: '理由' },
     budget_type: { type: STRING(256), allowNull: false, cnName: '预算类型', comment: '预算类型' },
     project_owner: { type: STRING(256), allowNull: false, cnName: '项目所属人', comment: '项目所属人' },
@@ -27,6 +28,7 @@ module.exports = app => {
     const ms = app.model.models;
     tenant.belongsTo(ms.ad_group, { as: 'manager_group', foreignKey: 'manager_group_id', constraint: false });
     tenant.belongsTo(ms.ad_group, { as: 'supporter_group', foreignKey: 'supporter_group_id', constraint: false });
+    tenant.belongsTo(ms.group, { as: 'group', foreignKey: 'group_id', constraint: false });
     tenant.hasMany(ms.tenant_quota_mapping, { as: 'quota', foreignKey: 'tenantId', constraints: false });
     tenant.hasMany(ms.tenant_hostname_reference, { as: 'reference', foreignKey: 'tenantCode', sourceKey: 'code' });
   };

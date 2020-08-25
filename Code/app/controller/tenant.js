@@ -5,7 +5,7 @@ module.exports = app => {
     async list() {
       const { ctx } = this;
       const { Op } = app.Sequelize;
-      const { name, code, manager_group_id, supporter_group_id,
+      const { name, code, manager_group_id, supporter_group_id, group_id,
         justification, budget_type, project_owner,
         contact_person, project_estimation, methodology_text,
         createdAt, updatedAt, prop, order } = ctx.query;
@@ -23,6 +23,7 @@ module.exports = app => {
             code ? { code: { [Op.like]: `%${code}%` } } : undefined,
             manager_group_id ? { manager_group_id } : undefined,
             supporter_group_id ? { supporter_group_id } : undefined,
+            group_id ? { group_id } : undefined,
             justification ? { justification } : justification,
             budget_type ? { budget_type } : budget_type,
             project_owner ? { project_owner } : project_owner,
@@ -75,6 +76,11 @@ module.exports = app => {
             as: 'supporter_group',
             required: true,
           },
+          {
+            model: ctx.model.models.group,
+            as: 'group',
+            required: true,
+          },
         ],
       });
       ctx.success(result);
@@ -83,11 +89,11 @@ module.exports = app => {
     async create() {
       const { ctx } = this;
       const {
-        name, code, manager_group_id, supporter_group_id,
+        name, code, manager_group_id, supporter_group_id, group_id,
         justification, budget_type, project_owner,
         contact_person, project_estimation,
         methodology_text } = ctx.request.body;
-      if (!name || !code || !manager_group_id || !supporter_group_id ||
+      if (!name || !code || !manager_group_id || !supporter_group_id || !group_id ||
         !justification || !budget_type || !project_owner ||
         !contact_person || !project_estimation ||
         !methodology_text) ctx.error();
@@ -102,6 +108,7 @@ module.exports = app => {
         code,
         manager_group_id,
         supporter_group_id,
+        group_id,
         justification,
         budget_type,
         project_owner,
@@ -126,11 +133,11 @@ module.exports = app => {
       const { ctx } = this;
       const { id } = ctx.query;
       const {
-        name, manager_group_id, supporter_group_id,
+        name, manager_group_id, supporter_group_id, group_id,
         justification, budget_type,
         project_owner, contact_person, project_estimation,
         methodology_text } = ctx.request.body;
-      if (!id || !name || !manager_group_id || !supporter_group_id ||
+      if (!id || !name || !manager_group_id || !supporter_group_id || !group_id ||
         !justification || !budget_type ||
         !project_owner || !contact_person || !project_estimation ||
         !methodology_text) ctx.error();
@@ -140,6 +147,7 @@ module.exports = app => {
         name,
         manager_group_id,
         supporter_group_id,
+        group_id,
         justification,
         budget_type,
         project_owner,
