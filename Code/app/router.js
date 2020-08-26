@@ -14,6 +14,8 @@ module.exports = app => {
   router.delete(`${prefix}/ad_group/deleteMany`, controller.adGroup.deleteMany);
   router.get(`${prefix}/ad_group/checkName`, controller.adGroup.checkName);
 
+  router.get(`${prefix}/group/list`, controller.group.list);
+
   router.get(`${prefix}/vm_location/detail`, controller.vmLocation.detail);
   router.post(`${prefix}/vm_location/create`, controller.vmLocation.create);
 
@@ -104,6 +106,15 @@ module.exports = app => {
   router.post(`${prefix}/platform/create`, controller.platform.create);
   router.delete(`${prefix}/platform/deleteMany`, controller.platform.deleteMany);
   router.get(`${prefix}/platform/checkName`, controller.platform.checkName);
+
+  router.get(`${prefix}/vmCluster/list`, controller.vmCluster.list);
+
+  router.get(`${prefix}/vmGuest/list`, controller.vmGuest.list);
+  router.get(`${prefix}/vmGuest/detail`, controller.vmGuest.detail);
+  router.put(`${prefix}/vmGuest/update`, controller.vmGuest.update);
+  router.post(`${prefix}/vmGuest/create`, controller.vmGuest.create);
+  router.delete(`${prefix}/vmGuest/deleteMany`, controller.vmGuest.deleteMany);
+  router.get(`${prefix}/vmGuest/checkSerialNumber`, controller.vmGuest.checkSerialNumber);
 
   router.get(`${prefix}/hostname/getReferenceList`, controller.hostname.getReferenceList);
   router.get(`${prefix}/hostname/getHostNameLastCharList`, controller.hostname.getHostNameLastCharList);
