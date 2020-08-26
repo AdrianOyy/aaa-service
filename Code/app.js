@@ -12,7 +12,7 @@ module.exports = app => {
       'vm_platform', 'vm_type', 'vm_cluster_applicationType',
       'vm_platform_applicationType', 'vm_type_zone_cdc',
       'resource_request_history', 'dynamicForm', 'dynamicFormDetail',
-      'tenant_hostname_reference',
+      'tenant_hostname_reference', 'ip_assignment',
     ];
     for (const syncModel of syncModels) {
       await app.model.models[syncModel].sync();

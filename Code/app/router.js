@@ -95,7 +95,7 @@ module.exports = app => {
   router.get(`${prefix}/dynamicForm/test`, controller.dynamicForm.test);
   router.get(`${prefix}/dynamicForm/getDetailByKey`, controller.dynamicForm.getDetailByKey);
   router.get(`${prefix}/dynamicForm/getDynamicForm`, controller.dynamicForm.getDynamicForm);
-  router.get(`${prefix}/dynamicForm/verifApplicationType`, controller.dynamicForm.verifApplicationType);
+  router.get(`${prefix}/dynamicForm/verifyApplicationType`, controller.dynamicForm.verifyApplicationType);
   router.get(`${prefix}/dynamicForm/getDynamicFormDetail`, controller.dynamicForm.getDynamicFormDetail);
 
   router.get(`${prefix}/platform/list`, controller.platform.list);
@@ -108,4 +108,14 @@ module.exports = app => {
   router.get(`${prefix}/hostname/getReferenceList`, controller.hostname.getReferenceList);
   router.get(`${prefix}/hostname/getHostNameLastCharList`, controller.hostname.getHostNameLastCharList);
   router.get(`${prefix}/hostname/generateHostname`, controller.hostname.generateHostname);
+
+  router.get(`${prefix}/ipAssign/list`, controller.ipAssign.list);
+  router.get(`${prefix}/ipAssign/detail`, controller.ipAssign.detail);
+  router.put(`${prefix}/ipAssign/update`, controller.ipAssign.update);
+  router.post(`${prefix}/ipAssign/create`, controller.ipAssign.create);
+  router.get(`${prefix}/ipAssign/getClosestIP`, controller.ipAssign.getClosestIP);
+  router.delete(`${prefix}/ipAssign/deleteMany`, controller.ipAssign.deleteMany);
+  router.get(`${prefix}/ipAssign/checkIpExist`, controller.ipAssign.checkIpExist);
+
+  router.get(`${prefix}/dc/list`, controller.dc.list);
 };
