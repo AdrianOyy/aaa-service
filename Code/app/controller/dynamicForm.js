@@ -227,10 +227,10 @@ module.exports = app => {
             tenantKey = formfile.foreignKey;
           }
         }
-        console.log(dynamicForm.formKey);
+        // console.log(dynamicForm.formKey);
         // parents = await ctx.model.models[dynamicForm.formKey].create(parentForm);
         const insertSql = await ctx.service.dynamicForm.getInsertSQL(dynamicForm, parentForm);
-        console.log(insertSql);
+        // console.log(insertSql);
         const parents = await app.model.query(insertSql);
         parentsId = parents[0];
       }
@@ -249,7 +249,7 @@ module.exports = app => {
 
           }
           const insertSql = await ctx.service.dynamicForm.getInsertSQL(sonForm, sonFormDetail);
-          console.log(insertSql);
+          // console.log(insertSql);
           await app.model.query(insertSql);
         }
       }
@@ -259,7 +259,7 @@ module.exports = app => {
           [tenantKey]: tenantCode,
         },
       });
-      console.log(tenant);
+      // console.log(tenant);
       const activitiData = {
         processDefinitionId,
         variables: {

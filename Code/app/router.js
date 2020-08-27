@@ -130,4 +130,6 @@ module.exports = app => {
   router.get(`${prefix}/ipAssign/checkIpExist`, controller.ipAssign.checkIpExist);
 
   router.get(`${prefix}/dc/list`, controller.dc.list);
+
+  router.post(`${prefix}/test`, controller.vm.preDefine);
 };
