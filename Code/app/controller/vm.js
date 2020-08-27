@@ -140,5 +140,20 @@ module.exports = app => {
       }
       return vmlist;
     }
+
+    async preDefine() {
+      const { ctx } = this;
+      const { formKey, formId } = ctx.request.body;
+      const dynamicForm = await ctx.service.dynamicForm.getDetailByKey(formKey, formId);
+      // TODO generate hostname
+
+      // TODO define vm type
+
+      // TODO switch vm type to define vm cluster with different route
+
+      // TODO assign IP (delay function, verify IP  in this tern)
+
+      // TODO return a map includes result and message to workflow service
+    }
   };
 };
