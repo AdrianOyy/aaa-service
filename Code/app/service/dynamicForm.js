@@ -133,16 +133,15 @@ module.exports = app => {
       if (dynamicForm) {
         const sonForm = await ctx.model.models.dynamicForm.findOne({ where: { parentId: dynamicForm.id } });
         if (sonForm) {
-          const SQL = `SELECT * FROM ${sonForm.formKey} where applicationType = 'MSSQL' and parentId = ${formId}`;
-          const [[ basicForeign ]] = await app.model.query(SQL);
+          const SQL = `SELECT * FROM ${sonForm.formKey} where parentId = ${formId}`;
+          const [ basicForeign ] = await app.model.query(SQL);
           if (basicForeign) {
-            return true;
+            return basicForeign;
           }
-          return false;
-
+          return null;
         }
       }
-      return false;
+      return null;
     }
 
     async getDynamicForm(params) {
