@@ -143,9 +143,17 @@ module.exports = app => {
 
     async preDefine() {
       const { ctx } = this;
+      let pass = true;
+      let message = '';
       const { formKey, formId } = ctx.request.body;
       const dynamicForm = await ctx.service.dynamicForm.getDetailByKey(formKey, formId);
-      const { vmList } = dynamicForm;
+      const { childFormKey, childTable } = dynamicForm;
+      console.log('childFormKey ================= childFormKey');
+      console.log(childFormKey);
+      console.log('childFormKey ================= childFormKey');
+      console.log('childTable ================= childTable');
+      console.log(childTable);
+      console.log('childTable ================= childTable');
 
       // TODO generate hostname
 
@@ -156,10 +164,10 @@ module.exports = app => {
       console.log(vmList);
       // TODO assign IP (delay function, verify IP  in this tern)
 
-      // TODO save new VM list
+      // TODO save new VM list(childTable)
 
       // TODO return a map includes result and message to workflow service
-      ctx.success({ pass: true, message: '' });
+      ctx.success({ pass, message });
     }
   };
 };
