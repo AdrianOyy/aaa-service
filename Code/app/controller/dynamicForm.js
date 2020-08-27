@@ -295,13 +295,7 @@ module.exports = app => {
     async test() {
       const { ctx } = this;
       const { deploymentId } = ctx.query;
-      console.log('deploymentId ================= deploymentId');
-      console.log(deploymentId);
-      console.log('deploymentId ================= deploymentId');
-      const dynamicForm = await ctx.service.dynamicForm.getDynamicForm({ deploymentId });
-      console.log('dynamicForm ================= dynamicForm');
-      console.log(dynamicForm);
-      console.log('dynamicForm ================= dynamicForm');
+      const dynamicForm = await ctx.service.dynamicForm.getDynamicFormWithForeignTable(deploymentId);
       ctx.success(dynamicForm ? dynamicForm : {});
     }
 

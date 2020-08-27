@@ -15,7 +15,8 @@ module.exports = app => {
   });
 
   ad_group.associate = function() {
-    // const ms = app.model.models;
+    const ms = app.model.models;
+    ad_group.hasMany(ms.tenant_group_mapping, { as: 'tenantGroupMapping', foreignKey: 'ad_groupId', constraint: false });
   };
 
   return ad_group;

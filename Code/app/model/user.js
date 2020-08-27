@@ -29,7 +29,8 @@ module.exports = app => {
   });
 
   user.associate = function() {
-    // const ms = app.model.models;
+    const ms = app.model.models;
+    ms.user.hasMany(ms.user_group_mapping, { as: 'userGroupMapping', foreignKey: 'userId', constraint: false });
   };
 
   return user;

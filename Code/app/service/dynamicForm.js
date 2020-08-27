@@ -63,7 +63,7 @@ module.exports = app => {
     }
 
     async getBasicDynamicFormDetailData(dynamicFormId, list) {
-      const dataList = getForeign(list, dynamicFormId);
+      const dataList = addForeign(list, dynamicFormId);
       return dataList;
     }
 
@@ -104,7 +104,7 @@ module.exports = app => {
           list.push(model);
         }
       }
-      const dataList = getForeign(list);
+      const dataList = addForeign(list);
       return dataList;
     }
 
@@ -170,6 +170,41 @@ module.exports = app => {
       return dynamicForm;
     }
 
+    async getDynamicFormWithForeignTable(deploymentId) {
+      const dynamicForm = await this.getDynamicForm({ deploymentId });
+      const { workflowName, formKey, dynamicFormDetail, childTable } = dynamicForm;
+
+      // 父表渲染表
+      const parentFormDetail = [];
+      for (let i = 0; i < dynamicFormDetail.length; i++) {
+        let foreignList = null;
+        const el = dynamicFormDetail[i];
+        if (el.foreignTable !== null) {
+          foreignList = await this.getForeignData(el.foreignTable);
+        }
+        parentFormDetail.push(Object.assign(el.dataValues, { foreignList }));
+      }
+
+      // 子表渲染表
+      const childFormDetail = [];
+      for (let i = 0; i < childTable[0].dynamicFormDetail.length; i++) {
+        let foreignList = null;
+        const el = childTable[0].dynamicFormDetail[i];
+        if (el.foreignTable !== null) {
+          foreignList = await this.getForeignData(el.foreignTable);
+        }
+        childFormDetail.push(Object.assign(el.dataValues, { foreignList }));
+      }
+
+      return {
+        workflowName,
+        formKey,
+        parentFormDetail,
+        childFormDetail,
+      };
+
+    }
+
     // 根据动态父表表名和数据表父表 id 获取数据
     async getDetailByKey(formKey, formId) {
 
@@ -213,10 +248,25 @@ module.exports = app => {
       }
       return basicTable;
     }
+
+    // 根据不同的外键关联表名来获取对应的数据列表
+    async getForeignData(tableName) {
+      const { ctx } = this;
+      let foreignList = null;
+      switch (tableName) {
+        case 'tenant':
+          foreignList = await ctx.service.tenant.getUserTenantList(ctx.authUser.id);
+          break;
+        default:
+          foreignList = (await app.model.query(`SELECT * FROM ${tableName}`))[0];
+      }
+      return foreignList;
+    }
   };
 };
 
-function getForeign(list, dId) {
+// 给动态渲染表添加关联表信息
+function addForeign(list, dId) {
   const dataList = [];
   list.forEach(el => {
     const dynamicFormId = dId ? dId : el.dynamicFormId;
@@ -276,3 +326,4 @@ function getForeign(list, dId) {
   });
   return dataList;
 }
+

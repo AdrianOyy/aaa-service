@@ -66,6 +66,14 @@ module.exports = appInfo => {
     url: 'http://localhost:8888',
   };
 
+  // ===================================
+  //             中间件 设置
+  // ===================================
+  config.middleware = [ 'auth' ];
+  config.auth = {
+    ignore: [ '/user/login' ],
+  };
+
   config.jwt = {
     expiresIn: '10m',
     secret: '1234567abc',

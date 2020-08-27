@@ -29,7 +29,7 @@ module.exports = app => {
      *
      * @param {string} appType VM application type, like 'IIS'
      * @param {string} reference Table tenant_hostname_reference column reference
-     * @returns {Object} hostname last char list
+     * @return {Object} hostname last char list
      */
     async getLastCharList(appType, reference) {
       const { ctx } = this;
