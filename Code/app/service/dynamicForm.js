@@ -174,32 +174,37 @@ module.exports = app => {
     async getDynamicFormWithForeignTable(deploymentId) {
       const dynamicForm = await this.getDynamicForm({ deploymentId });
       const { workflowName, formKey, dynamicFormDetail, childTable } = dynamicForm;
-
+      // console.log(childTable[0].formKey);
+      let childFormKey = '';
       // 父表渲染表
       const parentFormDetail = [];
       for (let i = 0; i < dynamicFormDetail.length; i++) {
-        let foreignList = null;
+        let itemList = null;
         const el = dynamicFormDetail[i];
         if (el.foreignTable !== null) {
-          foreignList = await this.getForeignData(el.foreignTable);
+          itemList = await this.getForeignData(el.foreignTable);
         }
-        parentFormDetail.push(Object.assign(el.dataValues, { foreignList }));
+        parentFormDetail.push(Object.assign(el.dataValues, { itemList, label: el.fieldName, type: el.inputType, labelField: el.foreignDisplayKey, valueField: el.foreignDisplayKey }));
       }
 
       // 子表渲染表
       const childFormDetail = [];
-      for (let i = 0; i < childTable[0].dynamicFormDetail.length; i++) {
-        let foreignList = null;
-        const el = childTable[0].dynamicFormDetail[i];
-        if (el.foreignTable !== null) {
-          foreignList = await this.getForeignData(el.foreignTable);
+      if (childTable.length > 0) {
+        childFormKey = childTable[0].formKey;
+        for (let i = 0; i < childTable[0].dynamicFormDetail.length; i++) {
+          let itemList = null;
+          const el = childTable[0].dynamicFormDetail[i];
+          if (el.foreignTable !== null) {
+            itemList = await this.getForeignData(el.foreignTable);
+          }
+          childFormDetail.push(Object.assign(el.dataValues, { itemList, label: el.fieldName, type: el.inputType, labelField: el.foreignDisplayKey, valueField: el.foreignDisplayKey }));
         }
-        childFormDetail.push(Object.assign(el.dataValues, { foreignList }));
       }
 
       return {
         workflowName,
         formKey,
+        childFormKey,
         parentFormDetail,
         childFormDetail,
       };
