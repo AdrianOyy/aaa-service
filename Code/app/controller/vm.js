@@ -116,7 +116,7 @@ module.exports = app => {
       const inCluster = [];
       for (const vm of vmlist) {
         const cluster = [];
-        if (vm.zoomId && vm.applicationType) {
+        if (vm.network_zone && vm.application_type) {
           // 根据applicationType 获取 Cluster
           const typeClusters = await ctx.model.models.vm_cluster_applicationType.findAll({ where: { applicationTypeId: vm.application_type } });
           // console.log(appCluster);
