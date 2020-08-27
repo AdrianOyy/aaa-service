@@ -3,7 +3,7 @@
 module.exports = app => {
   const { INTEGER, STRING, DATE } = app.Sequelize;
 
-  const vm_cluster_dc_mapping = app.model.define('vm_cluster_applicationType', {
+  const vm_cluster_dc_mapping = app.model.define('vm_cluster_dc_mapping', {
     id: { type: INTEGER, autoIncrement: true, primaryKey: true, cnName: 'ID' },
     clusterId: { type: STRING(256), allowNull: true, cnName: 'VM Cluster Name', comment: 'VM Cluster Name' },
     clusterName: { type: STRING(256), allowNull: true, cnName: 'VM Cluster Name', comment: 'VM Cluster Name' },
