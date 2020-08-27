@@ -78,7 +78,8 @@ module.exports = app => {
         form.foreignKey = formDetail.foreignKey;
         form.labelField = formDetail.foreignDisplayKey;
         form.valueField = formDetail.foreignKey;
-        form.readOnly = false;
+        form.readOnly = !formDetail.writable;
+        form.disabled = true;
         form.value = '';
         if (formDetail.inputType === 'select') {
           if (formDetail.foreignTable === 'tenant') {
@@ -96,13 +97,13 @@ module.exports = app => {
       const sonDetailList = [];
       const sonForm = await ctx.model.models.dynamicForm.findOne({ where: { parentId: dynamicForm.id } });
       if (sonForm) {
-        const sonFormDetail = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: sonForm.id } });
+        const sonFormDetail = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: sonForm.id, readable: true } });
         for (const sonDetail of sonFormDetail) {
           const form = {};
           form.id = sonDetail.fieldName;
           form.label = sonDetail.fieldName;
           form.fileType = sonDetail.fileType;
-          form.type = sonDetail.inputType;
+          form.type = sonDetail.inputType === 'long' ? 'number' : sonDetail.inputType;
           form.showOnRequest = sonDetail.showOnRequest;
           form.foreignTable = sonDetail.foreignTable;
           form.foreignDisplayKey = sonDetail.foreignDisplayKey;
@@ -240,7 +241,12 @@ module.exports = app => {
             parentId: parentsId,
           };
           for (const sonField of sonFormList) {
-            sonFormDetail[sonField.label] = sonDetail[sonField.label];
+            if (sonField.type === 'select') {
+              sonFormDetail[sonField.label] = sonDetail[sonField.label + '_svalue'];
+            } else {
+              sonFormDetail[sonField.label] = sonDetail[sonField.label];
+            }
+
           }
           const insertSql = await ctx.service.dynamicForm.getInsertSQL(sonForm, sonFormDetail);
           console.log(insertSql);
@@ -253,6 +259,7 @@ module.exports = app => {
           [tenantKey]: tenantCode,
         },
       });
+      console.log(tenant);
       const activitiData = {
         processDefinitionId,
         variables: {
@@ -277,6 +284,8 @@ module.exports = app => {
       const { formKey, formId } = ctx.query;
       if (!formKey || !formId) ctx.error();
       const res = await ctx.service.dynamicForm.getDetailByKey(formKey, formId);
+      console.log('==========================1');
+      console.log(res);
       if (!res) ctx.error();
       else ctx.success(res);
     }

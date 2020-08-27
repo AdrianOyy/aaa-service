@@ -68,6 +68,8 @@ module.exports = app => {
     }
 
     async getChildDynamicFormDetailData(childTableList, childDynamicFormList) {
+      console.log(childTableList);
+      console.log(childDynamicFormList);
       const childList = [];
       for (let i = 0; i < childTableList.length; i++) {
         for (let j = 0; j < childDynamicFormList.length; j++) {
@@ -179,7 +181,9 @@ module.exports = app => {
 
       // 父表数据表
       const basicSQL = `SELECT * FROM ${dynamicForm.formKey} where ${dynamicForm.formKey}.id = ${formId};`;
+      console.log(basicSQL);
       const [[ basicTable ]] = await app.model.query(basicSQL);
+      console.log(basicTable);
       if (!basicTable) return {};
       for (let i = 0; i < dynamicForm.dynamicFormDetail.length; i++) {
         const el = dynamicForm.dynamicFormDetail[i].dataValues;
@@ -194,7 +198,7 @@ module.exports = app => {
       const { childTable } = dynamicForm;
       for (let i = 0; i < childTable.length; i++) {
         const el = childTable[i].dataValues;
-        const childSQL = `SELECT * FROM ${el.formKey} where ${el.formKey}.pid = ${basicTable.pid};`;
+        const childSQL = `SELECT * FROM ${el.formKey} where ${el.formKey}.parentId = ${basicTable.id};`;
         const [ childList ] = await app.model.query(childSQL);
         for (let j = 0; j < childList.length; j++) {
           const child = childList[j];
