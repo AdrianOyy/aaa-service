@@ -145,6 +145,8 @@ module.exports = app => {
       const { ctx } = this;
       const { formKey, formId } = ctx.request.body;
       const dynamicForm = await ctx.service.dynamicForm.getDetailByKey(formKey, formId);
+      const { vmList } = dynamicForm;
+
       // TODO generate hostname
 
       // TODO define vm type
@@ -153,7 +155,10 @@ module.exports = app => {
 
       // TODO assign IP (delay function, verify IP  in this tern)
 
+      // TODO save new VM list
+
       // TODO return a map includes result and message to workflow service
+      ctx.success({ pass: true, message: '' });
     }
   };
 };

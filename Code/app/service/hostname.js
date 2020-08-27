@@ -55,5 +55,36 @@ module.exports = app => {
       const res = [ ...new Set([ ...new Set(lastCharList) ].filter(x => !new Set(alreadyUsedCharList).has(x))) ];
       return res;
     }
+
+    /**
+     * @param {string} tenantId
+     * @param {string} applicationType
+     * @param {number} requestNum
+     * @return {string[]} hostname hostname
+     */
+    async generateHostname(tenantId, applicationType, requestNum) {
+      const referenceList = await this.getReferenceList(tenantId);
+      if (!referenceList) return false;
+      const hostNameList = [];
+      let flag = false;
+      for (let i = 0; i < referenceList.length; i++) {
+        const lastCharList = await this.getLastCharList(applicationType, referenceList[i]);
+        for (let j = 0; j < lastCharList.length; j++) {
+          const hostName = `WCDC${applicationType}${referenceList[i].windows_vm_hostname_reference}${lastCharList[j]}`;
+          hostNameList.push(hostName);
+          if (hostNameList.length === requestNum) {
+            flag = true;
+            break;
+          }
+        }
+        if (flag) {
+          break;
+        }
+      }
+      if (hostNameList.length < requestNum) {
+        return false;
+      }
+      return hostNameList;
+    }
   };
 };
