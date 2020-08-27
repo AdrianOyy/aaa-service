@@ -145,15 +145,13 @@ module.exports = app => {
       return false;
     }
 
-    // 根据动态父表表名和数据表父表 id 获取数据
-    async getDetailByKey(formKey, formId) {
+    async getDynamicForm(params) {
       const { ctx } = this;
-
+      const { formKey, deploymentId } = params;
+      if (!formKey && !deploymentId) return false;
       // 基础数据
       const dynamicForm = await ctx.model.models.dynamicForm.findOne({
-        where: {
-          formKey,
-        },
+        where: formKey ? { formKey } : { deploymentId },
         include: [
           {
             model: ctx.model.models.dynamicForm,
@@ -169,9 +167,17 @@ module.exports = app => {
           },
         ],
       });
+      return dynamicForm;
+    }
+
+    // 根据动态父表表名和数据表父表 id 获取数据
+    async getDetailByKey(formKey, formId) {
+
+      // 基础数据
+      const dynamicForm = await this.getDynamicForm({ formKey });
       if (!dynamicForm) return false;
 
-      // 父表
+      // 父表数据表
       const basicSQL = `SELECT * FROM ${dynamicForm.formKey} where ${dynamicForm.formKey}.id = ${formId};`;
       const [[ basicTable ]] = await app.model.query(basicSQL);
       if (!basicTable) return {};
@@ -184,7 +190,7 @@ module.exports = app => {
         }
       }
 
-      // 子表
+      // 子表数据表
       const { childTable } = dynamicForm;
       for (let i = 0; i < childTable.length; i++) {
         const el = childTable[i].dataValues;

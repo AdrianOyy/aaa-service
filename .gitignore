@@ -866,6 +866,8 @@ fastlane/readme.md
 # Version control
 vcs.xml
 
+.idea/
+
 # lint
 lint/intermediates/
 lint/generated/
