@@ -134,12 +134,11 @@ module.exports = app => {
         const sonForm = await ctx.model.models.dynamicForm.findOne({ where: { parentId: dynamicForm.id } });
         if (sonForm) {
           const SQL = `SELECT * FROM ${sonForm.formKey} where parentId = ${formId}`;
-          const [[ basicForeign ]] = await app.model.query(SQL);
+          const [ basicForeign ] = await app.model.query(SQL);
           if (basicForeign) {
             return basicForeign;
           }
           return null;
-
         }
       }
       return null;
