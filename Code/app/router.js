@@ -106,6 +106,7 @@ module.exports = app => {
   router.post(`${prefix}/platform/create`, controller.platform.create);
   router.delete(`${prefix}/platform/deleteMany`, controller.platform.deleteMany);
   router.get(`${prefix}/platform/checkName`, controller.platform.checkName);
+  router.get(`${prefix}/platform/listType`, controller.platform.listType);
 
   router.get(`${prefix}/vmCluster/list`, controller.vmCluster.list);
 

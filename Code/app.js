@@ -9,7 +9,7 @@ module.exports = app => {
       'tenant_group_mapping', 'assign', 'expiry', 'tenant_quota_mapping', 'vm_location',
       'vm_cluster', 'vm_master', 'vm_guest',
       'vm_applicationType', 'vm_cdc', 'vm_zone',
-      'vm_platform', 'vm_type', 'vm_cluster_applicationType',
+      'vm_platform_type', 'vm_platform', 'vm_type', 'vm_cluster_applicationType',
       'vm_platform_applicationType', 'vm_type_zone_cdc',
       'resource_request_history', 'dynamicForm', 'dynamicFormDetail', 'vm_cluster_dc_mapping',
       'tenant_hostname_reference', 'ip_assignment',
@@ -22,6 +22,9 @@ module.exports = app => {
     const fixturesPath = 'app/model/fixtures/';
     if (!await model.group.findOne()) {
       await sequelizeFixtures.loadFile(fixturesPath + 'group.js', model);
+    }
+    if (!await model.vm_platform_type.findOne()) {
+      await sequelizeFixtures.loadFile(fixturesPath + 'vm_platform_type.js', model);
     }
   });
 };
