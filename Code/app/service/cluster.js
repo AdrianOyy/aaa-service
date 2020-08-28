@@ -16,15 +16,15 @@ module.exports = app => {
           msg.FreeMemory = setDiskByMb(msg['Free Memory']);
           if (inClusters.length > 0) {
             for (const inCluster of inClusters) {
-              msg['Number of CPU'] = msg['Number of CPU'] - inCluster.CPU_request_number;
-              msg.FreeMemory = msg.FreeMemory - inCluster.RAM_request_number * 1024;
+              msg['Number of CPU'] = msg['Number of CPU'] - inCluster.cpu_request_number;
+              msg.FreeMemory = msg.FreeMemory - inCluster.ram_request_number * 1024;
               msg.diskfee = msg.diskfee - inCluster.data_storage_request_number * 1024;
             }
           }
-          if ((msg['Number of CPU'] * 2 * 0.8) < vm.CPU_request_number) {
+          if ((msg['Number of CPU'] * 2 * 0.8) < vm.cpu_request_number) {
             continue;
           }
-          if (msg.FreeMemory * 0.8 < vm.RAM_request_number * 1024) {
+          if (msg.FreeMemory * 0.8 < vm.ram_request_number * 1024) {
             continue;
           }
           let diskfee = 0;
@@ -66,13 +66,13 @@ module.exports = app => {
       try {
         for (const vm of vmlist) {
           const cluster = [];
-          if (vm.vm_zone && vm.vm_applicationType) {
+          if (vm.network_zone && vm.application_type) {
             // 根据applicationType 获取 Cluster
-            const typeClusters = await ctx.model.models.vm_cluster_applicationType.findAll({ where: { applicationTypeId: vm.vm_applicationType.id } });
+            const typeClusters = await ctx.model.models.vm_cluster_applicationType.findAll({ where: { applicationTypeId: vm.application_type.id } });
             // console.log(appCluster);
             // 根据 typeId 和 zoomId 获取 dc，根据dc获取 Cluster
             const dcClusters = await ctx.model.models.vm_cluster_dc_mapping.findAll({
-              where: { cdcid: { [Op.in]: app.Sequelize.literal(`(select cdcid from vm_type_zone_cdc where typeId = ${vm.vm_type.id} and zoneId = ${vm.vm_zone.id})`) } },
+              where: { cdcid: { [Op.in]: app.Sequelize.literal(`(select cdcid from vm_type_zone_cdc where typeId = ${vm.environment_type.id} and zoneId = ${vm.network_zone.id})`) } },
             });
             for (const typeCluster of typeClusters) {
               cluster.push(typeCluster.cluster);
