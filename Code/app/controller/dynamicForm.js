@@ -132,7 +132,6 @@ module.exports = app => {
       const { deploymentId, userId, formId } = ctx.request.query;
       const dynamicForm = await ctx.model.models.dynamicForm.findOne({ where: { deploymentId } });
       const res = await ctx.service.dynamicForm.getDetailByKey(dynamicForm.formKey, formId);
-      // console.log(res);
       const dynamicFormDetail = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: dynamicForm.id } });
       const detailList = [];
       for (const formDetail of dynamicFormDetail) {
@@ -168,7 +167,7 @@ module.exports = app => {
       const sonDetailList = [];
       const sonForm = await ctx.model.models.dynamicForm.findOne({ where: { parentId: dynamicForm.id } });
       if (sonForm) {
-        const resdetail = res[sonForm.formKey];
+        const resdetail = res.childTable;
         const sonFormDetail = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: sonForm.id } });
         for (const sonDetail of sonFormDetail) {
           const form = {};
@@ -189,6 +188,7 @@ module.exports = app => {
               const itemList = await ctx.service.user.getTenants(userId);
               form.itemList = itemList;
             } else {
+              console.log(sonDetail.foreignTable);
               const itemList = await ctx.model.models[sonDetail.foreignTable].findAll({});
               form.itemList = itemList;
             }
@@ -214,13 +214,14 @@ module.exports = app => {
 
     async save() {
       const { ctx } = this;
-      const { dynamicForm, processDefinitionId, startUser, formFieldList, sonForm, sonFormList, sonDetailList } = ctx.request.body;
+      const { formKey, processDefinitionId, startUser, formFieldList, childFormKey, sonFormList, sonDetailList } = ctx.request.body;
       let parentsId = 0;
       let tenantCode = null;
       let tenantKey = null;
       if (formFieldList.length > 0) {
         const parentForm = {};
         for (const formfile of formFieldList) {
+          console.log(formfile);
           parentForm[formfile.label] = formfile.value;
           if (formfile.foreignTable === 'tenant') {
             tenantCode = formfile.value;
@@ -229,7 +230,7 @@ module.exports = app => {
         }
         // console.log(dynamicForm.formKey);
         // parents = await ctx.model.models[dynamicForm.formKey].create(parentForm);
-        const insertSql = await ctx.service.dynamicForm.getInsertSQL(dynamicForm, parentForm);
+        const insertSql = await ctx.service.dynamicForm.getInsertSQL(formKey, parentForm);
         // console.log(insertSql);
         const parents = await app.model.query(insertSql);
         parentsId = parents[0];
@@ -248,7 +249,7 @@ module.exports = app => {
             }
 
           }
-          const insertSql = await ctx.service.dynamicForm.getInsertSQL(sonForm, sonFormDetail);
+          const insertSql = await ctx.service.dynamicForm.getInsertSQL(childFormKey, sonFormDetail);
           // console.log(insertSql);
           await app.model.query(insertSql);
         }
@@ -259,12 +260,12 @@ module.exports = app => {
           [tenantKey]: tenantCode,
         },
       });
-      // console.log(tenant);
+      console.log(tenant);
       const activitiData = {
         processDefinitionId,
         variables: {
           formId: parentsId,
-          formKey: dynamicForm.formKey,
+          formKey,
           manager_group_id: [ tenant.manager_group_id.toString() ],
         },
         startUser,
@@ -272,9 +273,9 @@ module.exports = app => {
       // // 启动流程
       const datas = await ctx.service.syncActiviti.startProcess(activitiData, { headers: ctx.headers });
       // 保存pid
-      const updateSql = `UPDATE ${dynamicForm.formKey} SET pid = ${datas.data} where id = ${parentsId}`;
+      const updateSql = `UPDATE ${formKey} SET pid = ${datas.data} where id = ${parentsId}`;
       await app.model.query(updateSql);
-      const updateSql2 = `UPDATE ${sonForm.formKey} SET pid = ${datas.data} where parentId = ${parentsId}`;
+      const updateSql2 = `UPDATE ${childFormKey} SET pid = ${datas.data} where parentId = ${parentsId}`;
       await app.model.query(updateSql2);
       ctx.success('success');
     }

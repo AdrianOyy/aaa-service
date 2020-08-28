@@ -109,6 +109,7 @@ module.exports = app => {
     }
 
     async getInsertSQL(dynmaic, filelist) {
+      console.log(dynmaic);
       let fieldType = '';
       let fieldValue = '';
       for (const key in filelist) {
@@ -117,7 +118,7 @@ module.exports = app => {
       }
       fieldType += '\`createdAt\`,\`updatedAt\`';
       fieldValue += '\'2020-08-21\',\'2020-08-21\'';
-      const basicFormSQL = `INSERT INTO ${dynmaic.formKey}(${fieldType}) VALUES (${fieldValue})`;
+      const basicFormSQL = `INSERT INTO ${dynmaic}(${fieldType}) VALUES (${fieldValue})`;
       return basicFormSQL;
     }
 
@@ -182,7 +183,7 @@ module.exports = app => {
         if (el.foreignTable !== null) {
           itemList = await this.getForeignData(el.foreignTable);
         }
-        parentFormDetail.push(Object.assign(el.dataValues, { itemList, label: el.fieldName, type: el.inputType, labelField: el.foreignDisplayKey, valueField: el.foreignDisplayKey }));
+        parentFormDetail.push(Object.assign(el.dataValues, { itemList, label: el.fieldName, type: el.inputType, labelField: el.foreignDisplayKey, valueField: el.foreignKey }));
       }
 
       // 子表渲染表
@@ -195,7 +196,7 @@ module.exports = app => {
           if (el.foreignTable !== null) {
             itemList = await this.getForeignData(el.foreignTable);
           }
-          childFormDetail.push(Object.assign(el.dataValues, { itemList, label: el.fieldName, type: el.inputType, labelField: el.foreignDisplayKey, valueField: el.foreignDisplayKey }));
+          childFormDetail.push(Object.assign(el.dataValues, { itemList, label: el.fieldName, type: el.inputType, labelField: el.foreignDisplayKey, valueField: el.foreignKey }));
         }
       }
 
