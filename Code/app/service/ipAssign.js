@@ -32,6 +32,29 @@ module.exports = app => {
       }
       return closestList;
     }
+
+    async assign(DC, requestNum) {
+      const { ctx } = this;
+      const { Op } = app.Sequelize;
+      const IPList = await ctx.model.models.ip_assignment.findAll({
+        where: {
+          DC,
+          hostname: { [Op.is]: null },
+        },
+        attributes: [ 'id', 'IP' ],
+        order: [[ 'IP', 'ASC' ]],
+      });
+      if (IPList.length < requestNum) {
+        return false;
+      } else if (IPList.length === parseInt(requestNum)) {
+        return IPList;
+      } else if (parseInt(requestNum) === 1) {
+        return [ IPList[0] ];
+      }
+      const closestList = await this.getClosest(IPList, parseInt(requestNum));
+      if (!closestList) return false;
+      return closestList;
+    }
   };
 };
 

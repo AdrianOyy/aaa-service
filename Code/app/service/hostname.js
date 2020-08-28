@@ -86,5 +86,32 @@ module.exports = app => {
       }
       return hostNameList;
     }
+
+    /**
+     * @param {Object[]} vmList VM list
+     * @return {Promise<Object[]>} typeCountList
+     */
+    async countByType(vmList) {
+      const map = new Map();
+      vmList.forEach(el => {
+        if (el.applicationType) {
+          const name = el.applicationType.name ? el.applicationType.name : '';
+          if (!map.get(name)) {
+            map.set(name, 1);
+          } else {
+            map.set(name, map.get(name) + 1);
+          }
+        }
+      });
+      const res = [];
+      for (const [ k, v ] of map) {
+        const model = {
+          applicationType: k,
+          requestNum: v,
+        };
+        res.push(model);
+      }
+      return res;
+    }
   };
 };
