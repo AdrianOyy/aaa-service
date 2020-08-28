@@ -106,7 +106,13 @@ module.exports = app => {
           list.push(model);
         }
       }
+      console.log('data ================= data');
+      console.log(list);
+      console.log('data ================= data');
       const dataList = addForeign(list);
+      console.log('dataList ================= dataList');
+      console.log(dataList);
+      console.log('dataList ================= dataList');
       return dataList;
     }
 
@@ -225,7 +231,7 @@ module.exports = app => {
       for (let i = 0; i < dynamicForm.dynamicFormDetail.length; i++) {
         const el = dynamicForm.dynamicFormDetail[i].dataValues;
         if (el.foreignTable && el.foreignKey) {
-          const SQL = `SELECT * FROM ${el.foreignTable} where ${el.foreignTable}.${el.foreignKey} = ${basicTable[el.fieldName]}`;
+          const SQL = `SELECT * FROM \`${el.foreignTable}\` where ${el.foreignTable}.${el.foreignKey} = ${basicTable[el.fieldName]}`;
           const [[ basicForeign ]] = await app.model.query(SQL);
           basicTable[el.fieldName] = basicForeign;
         }
@@ -243,7 +249,7 @@ module.exports = app => {
           for (let i = 0; i < el.dynamicFormDetail.length; i++) {
             const it = el.dynamicFormDetail[i].dataValues;
             if (it.foreignTable && it.foreignKey) {
-              const SQL = `SELECT * FROM ${it.foreignTable} where ${it.foreignTable}.${it.foreignKey} = ${child[it.fieldName]}`;
+              const SQL = `SELECT * FROM \`${it.foreignTable}\` where ${it.foreignTable}.${it.foreignKey} = ${child[it.fieldName]}`;
               const [[ basicForeign ]] = await app.model.query(SQL);
               child[it.fieldName] = basicForeign;
             }
@@ -260,10 +266,11 @@ module.exports = app => {
       let foreignList = null;
       switch (tableName) {
         case 'tenant':
-          foreignList = await ctx.service.tenant.getUserTenantList(ctx.authUser.id);
+          foreignList = await ctx.service.tenant.getUserTenantList(1);
+          // foreignList = await ctx.service.tenant.getUserTenantList(ctx.authUser.id);
           break;
         default:
-          foreignList = (await app.model.query(`SELECT * FROM ${tableName}`))[0];
+          foreignList = (await app.model.query(`SELECT * FROM \`${tableName}\``))[0];
       }
       return foreignList;
     }

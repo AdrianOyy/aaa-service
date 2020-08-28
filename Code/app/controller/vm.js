@@ -147,15 +147,29 @@ module.exports = app => {
       const message = '';
       const { formKey, formId } = ctx.request.body;
       const dynamicForm = await ctx.service.dynamicForm.getDetailByKey(formKey, formId);
-      const { childFormKey, childTable } = dynamicForm;
-      console.log('childFormKey ================= childFormKey');
-      console.log(childFormKey);
-      console.log('childFormKey ================= childFormKey');
-      console.log('childTable ================= childTable');
-      console.log(childTable);
-      console.log('childTable ================= childTable');
+      const { childFormKey, childTable, Tenant } = dynamicForm;
+      const tenantId = Tenant.id;
+      const tenantName = Tenant.name;
 
       // TODO generate hostname
+      const typeCountList = await ctx.service.hostname.countByType(childTable);
+      const hostnameMap = new Map();
+      for (let i = 0; i < typeCountList.length; i++) {
+        const list = await ctx.service.hostname.generateHostname(tenantId, typeCountList[i].applicationType, typeCountList[i].requestNum);
+        if (!list) {
+          pass = false;
+          message += `Tenant \`${tenantName}\` with Application type \`${typeCountList[i].applicationType}\` hostname is not enough\n`;
+        }
+        hostnameMap.set(typeCountList[i].applicationType, list);
+      }
+
+      childTable.forEach(el => {
+        if (el.applicationType && el.applicationType.name) {
+          const list = hostnameMap.get(el.applicationType.name);
+          el.hostname = list[0];
+          hostnameMap.set(el.applicationType.name, list.slice(1));
+        }
+      });
 
       // TODO define vm type
 
@@ -165,6 +179,20 @@ module.exports = app => {
       // TODO assign IP (delay function, verify IP  in this tern)
 
       // TODO save new VM list(childTable)
+      for (let i = 0; i < childTable.length; i++) {
+        const el = childTable[i];
+        const columnList = `hostname = \"${el.hostname}\"`;
+        try {
+          const updateSQL = `UPDATE \`${childFormKey}\` SET ${columnList} WHERE \`${childFormKey}\`.id = ${el.id}`;
+          await app.model.query(updateSQL);
+        } catch (e) {
+          console.log('e ================= e');
+          console.log(e);
+          console.log('e ================= e');
+          message = 'System busy';
+          pass = false;
+        }
+      }
 
       // TODO return a map includes result and message to workflow service
       ctx.success({ pass, message });
