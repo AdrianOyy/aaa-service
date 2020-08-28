@@ -12,7 +12,7 @@ module.exports = app => {
         if (msg) {
           msg.cluser = clusterList[0];
           msg.diskfee = 0;
-          const inClusters = inList.filter(t => t.VM_Cluster === msg.name);
+          const inClusters = inList.filter(t => t.vm_cluster === msg.name);
           msg.FreeMemory = setDiskByMb(msg['Free Memory']);
           if (inClusters.length > 0) {
             for (const inCluster of inClusters) {
@@ -66,13 +66,13 @@ module.exports = app => {
       try {
         for (const vm of vmlist) {
           const cluster = [];
-          if (vm.network_zone && vm.application_type) {
+          if (vm.vm_zone && vm.vm_applicationType) {
             // 根据applicationType 获取 Cluster
-            const typeClusters = await ctx.model.models.vm_cluster_applicationType.findAll({ where: { applicationTypeId: vm.application_type.id } });
+            const typeClusters = await ctx.model.models.vm_cluster_applicationType.findAll({ where: { applicationTypeId: vm.vm_applicationType.id } });
             // console.log(appCluster);
             // 根据 typeId 和 zoomId 获取 dc，根据dc获取 Cluster
             const dcClusters = await ctx.model.models.vm_cluster_dc_mapping.findAll({
-              where: { cdcid: { [Op.in]: app.Sequelize.literal(`(select cdcid from vm_type_zone_cdc where typeId = ${vm.environment_type.id} and zoneId = ${vm.network_zone.id})`) } },
+              where: { cdcid: { [Op.in]: app.Sequelize.literal(`(select cdcid from vm_type_zone_cdc where typeId = ${vm.vm_type.id} and zoneId = ${vm.vm_zone.id})`) } },
             });
             for (const typeCluster of typeClusters) {
               cluster.push(typeCluster.cluster);
@@ -85,7 +85,7 @@ module.exports = app => {
             if (cluster) {
               const clusterName = await this.getInCluserList(cluster, vm, inCluster, data);
               // 保存名称
-              vm.VM_Cluster = clusterName;
+              vm.vm_cluster = clusterName;
               inCluster.push(vm);
             } else {
               data.pass = false;
@@ -113,6 +113,11 @@ module.exports = app => {
       const [[ basicList ]] = await app.model.query(SQL);
       return basicList;
     }
+
+    // async checkVmCluserList(vmList) {
+    //   const { ctx } = this;
+    //
+    // }
 
     async getMsg(name) {
       const msg =
