@@ -174,8 +174,11 @@ module.exports = app => {
       // TODO define vm type
 
       // TODO switch vm type to define vm cluster with different route
-      // await ctx.service.cluser.getClusterList(childTable);
-      // console.log(childTable);
+      const data = await ctx.service.cluster.getClusterList(childTable);
+      if (!data.pass) {
+        pass = false;
+        message += data.message;
+      }
       // TODO assign IP (delay function, verify IP  in this tern)
 
       // TODO save new VM list(childTable)
