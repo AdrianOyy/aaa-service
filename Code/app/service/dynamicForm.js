@@ -68,8 +68,6 @@ module.exports = app => {
     }
 
     async getChildDynamicFormDetailData(childTableList, childDynamicFormList) {
-      console.log(childTableList);
-      console.log(childDynamicFormList);
       const childList = [];
       for (let i = 0; i < childTableList.length; i++) {
         for (let j = 0; j < childDynamicFormList.length; j++) {
@@ -106,13 +104,7 @@ module.exports = app => {
           list.push(model);
         }
       }
-      console.log('data ================= data');
-      console.log(list);
-      console.log('data ================= data');
       const dataList = addForeign(list);
-      console.log('dataList ================= dataList');
-      console.log(dataList);
-      console.log('dataList ================= dataList');
       return dataList;
     }
 
@@ -121,7 +113,7 @@ module.exports = app => {
       let fieldValue = '';
       for (const key in filelist) {
         fieldType += `\`${key}\`,`;
-        fieldValue += filelist[key] === '' ? 'null,' : `\'${filelist[key]}\',`;
+        fieldValue += !filelist[key] ? 'null,' : `\'${filelist[key]}\',`;
       }
       fieldType += '\`createdAt\`,\`updatedAt\`';
       fieldValue += '\'2020-08-21\',\'2020-08-21\'';
@@ -281,7 +273,8 @@ function addForeign(list, dId) {
   const dataList = [];
   list.forEach(el => {
     const dynamicFormId = dId ? dId : el.dynamicFormId;
-    const fieldName = el.id;
+    let fieldName = el.id.toLowerCase().replace('/\s+/', '_');
+    const fieldDisplayName = el.id;
     const fieldType = el.type;
     const readable = el.readable;
     const writable = el.writable;
@@ -293,9 +286,6 @@ function addForeign(list, dId) {
     let showOnRequest = true;
 
     if (el.name) {
-      if (el.name.trim()[el.name.length - 1] === '!') {
-        showOnRequest = false;
-      }
       const paramsList = el.name.split('#');
       if (paramsList.length > 2) return false;
       if (paramsList.length === 2) {
@@ -311,6 +301,7 @@ function addForeign(list, dId) {
         foreign = foreign.slice(2, -1);
         const foreignList = foreign.split('|');
         foreignTable = foreignList[0].split('.')[0].trim();
+        fieldName = foreignTable;
         foreignKey = foreignList[0].split('.')[1].trim();
         if (foreignList.length > 1) {
           foreignDisplayKey = foreignList[1].trim();
@@ -323,6 +314,7 @@ function addForeign(list, dId) {
     const model = {
       dynamicFormId,
       fieldName,
+      fieldDisplayName,
       fieldType,
       inputType,
       foreignTable,

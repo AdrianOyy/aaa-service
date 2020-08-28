@@ -196,5 +196,10 @@ module.exports = app => {
       // TODO return a map includes result and message to workflow service
       ctx.success({ pass, message });
     }
+
+    async check() {
+      const { formKey, formId, dynamicForm } = ctx.request.body;
+
+    }
   };
 };
