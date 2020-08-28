@@ -143,19 +143,19 @@ module.exports = app => {
 
     async preDefine() {
       const { ctx } = this;
-      const pass = true;
-      const message = '';
+      let pass = true;
+      let message = '';
       const { formKey, formId } = ctx.request.body;
       const dynamicForm = await ctx.service.dynamicForm.getDetailByKey(formKey, formId);
-      const { childFormKey, childTable, Tenant } = dynamicForm;
-      const tenantId = Tenant.id;
-      const tenantName = Tenant.name;
+      const { childFormKey, childTable, tenant } = dynamicForm;
+      const tenantId = tenant.id;
+      const tenantName = tenant.name;
 
       // TODO generate hostname
       const typeCountList = await ctx.service.hostname.countByType(childTable);
       const hostnameMap = new Map();
       for (let i = 0; i < typeCountList.length; i++) {
-        const list = await ctx.service.hostname.generateHostname(tenantId, typeCountList[i].applicationType, typeCountList[i].requestNum);
+        const list = await ctx.service.hostname.generateHostname(tenantId, typeCountList[i].applicationType.name, typeCountList[i].requestNum);
         if (!list) {
           pass = false;
           message += `Tenant \`${tenantName}\` with Application type \`${typeCountList[i].applicationType}\` hostname is not enough\n`;
@@ -164,7 +164,7 @@ module.exports = app => {
       }
 
       childTable.forEach(el => {
-        if (el.applicationType && el.applicationType.name) {
+        if (el.application_type && el.applicationType.name) {
           const list = hostnameMap.get(el.applicationType.name);
           el.hostname = list[0];
           hostnameMap.set(el.applicationType.name, list.slice(1));
@@ -199,6 +199,7 @@ module.exports = app => {
     }
 
     async check() {
+      const { ctx } = this;
       const { formKey, formId, dynamicForm } = ctx.request.body;
 
     }

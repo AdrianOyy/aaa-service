@@ -183,7 +183,7 @@ module.exports = app => {
         if (el.foreignTable !== null) {
           itemList = await this.getForeignData(el.foreignTable);
         }
-        parentFormDetail.push(Object.assign(el.dataValues, { itemList, label: el.fieldName, type: el.inputType, labelField: el.foreignDisplayKey, valueField: el.foreignKey }));
+        parentFormDetail.push(Object.assign(el.dataValues, { itemList, label: el.fieldDisplayName, type: el.inputType, labelField: el.foreignDisplayKey, valueField: el.foreignKey }));
       }
 
       // 子表渲染表
@@ -196,7 +196,7 @@ module.exports = app => {
           if (el.foreignTable !== null) {
             itemList = await this.getForeignData(el.foreignTable);
           }
-          childFormDetail.push(Object.assign(el.dataValues, { itemList, label: el.fieldName, type: el.inputType, labelField: el.foreignDisplayKey, valueField: el.foreignKey }));
+          childFormDetail.push(Object.assign(el.dataValues, { itemList, label: el.fieldDisplayName, type: el.inputType, labelField: el.foreignDisplayKey, valueField: el.foreignKey }));
         }
       }
 
@@ -258,7 +258,7 @@ module.exports = app => {
       let foreignList = null;
       switch (tableName) {
         case 'tenant':
-          foreignList = await ctx.service.tenant.getUserTenantList(1);
+          foreignList = await ctx.service.tenant.getUserTenantList(ctx.authUser.id);
           // foreignList = await ctx.service.tenant.getUserTenantList(ctx.authUser.id);
           break;
         default:

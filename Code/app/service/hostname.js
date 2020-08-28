@@ -94,8 +94,8 @@ module.exports = app => {
     async countByType(vmList) {
       const map = new Map();
       vmList.forEach(el => {
-        if (el.applicationType) {
-          const name = el.applicationType.name ? el.applicationType.name : '';
+        if (el.application_type) {
+          const name = el.vm_applicationType.name ? el.vm_applicationType.name : '';
           if (!map.get(name)) {
             map.set(name, 1);
           } else {
