@@ -143,8 +143,8 @@ module.exports = app => {
 
     async preDefine() {
       const { ctx } = this;
-      let pass = true;
-      let message = '';
+      const pass = true;
+      const message = '';
       const { formKey, formId } = ctx.request.body;
       const dynamicForm = await ctx.service.dynamicForm.getDetailByKey(formKey, formId);
       const { childFormKey, childTable } = dynamicForm;
@@ -160,8 +160,8 @@ module.exports = app => {
       // TODO define vm type
 
       // TODO switch vm type to define vm cluster with different route
-      await ctx.service.cluser.getClusterList(vmList);
-      console.log(vmList);
+      // await ctx.service.cluser.getClusterList(childTable);
+      // console.log(childTable);
       // TODO assign IP (delay function, verify IP  in this tern)
 
       // TODO save new VM list(childTable)
