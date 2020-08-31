@@ -188,7 +188,6 @@ module.exports = app => {
               const itemList = await ctx.service.user.getTenants(userId);
               form.itemList = itemList;
             } else {
-              console.log(sonDetail.foreignTable);
               const itemList = await ctx.model.models[sonDetail.foreignTable].findAll({});
               form.itemList = itemList;
             }
@@ -199,8 +198,6 @@ module.exports = app => {
           const p = {};
           for (const sonDetail of sonFormDetail) {
             if (sonDetail.inputType === 'select') {
-              console.log(resd);
-              console.log(resd[sonDetail.fieldName]);
               p[sonDetail.fieldName] = resd[sonDetail.fieldName] ? resd[sonDetail.fieldName].id : null;
             } else {
               p[sonDetail.fieldName] = resd[sonDetail.fieldName];
@@ -221,17 +218,13 @@ module.exports = app => {
       if (formFieldList.length > 0) {
         const parentForm = {};
         for (const formfile of formFieldList) {
-          console.log(formfile);
-          parentForm[formfile.label] = formfile.value;
+          parentForm[formfile.fieldName] = formfile.value;
           if (formfile.foreignTable === 'tenant') {
             tenantCode = formfile.value;
             tenantKey = formfile.foreignKey;
           }
         }
-        // console.log(dynamicForm.formKey);
-        // parents = await ctx.model.models[dynamicForm.formKey].create(parentForm);
         const insertSql = await ctx.service.dynamicForm.getInsertSQL(formKey, parentForm);
-        // console.log(insertSql);
         const parents = await app.model.query(insertSql);
         parentsId = parents[0];
       }
@@ -243,9 +236,9 @@ module.exports = app => {
           };
           for (const sonField of sonFormList) {
             if (sonField.type === 'select') {
-              sonFormDetail[sonField.label] = sonDetail[sonField.label + '_svalue'];
+              sonFormDetail[sonField.fieldName] = sonDetail[sonField.fieldName + '_svalue'];
             } else {
-              sonFormDetail[sonField.label] = sonDetail[sonField.label];
+              sonFormDetail[sonField.fieldName] = sonDetail[sonField.fieldName];
             }
 
           }
@@ -260,7 +253,6 @@ module.exports = app => {
           [tenantKey]: tenantCode,
         },
       });
-      console.log(tenant);
       const activitiData = {
         processDefinitionId,
         variables: {
@@ -285,8 +277,6 @@ module.exports = app => {
       const { formKey, formId } = ctx.query;
       if (!formKey || !formId) ctx.error();
       const res = await ctx.service.dynamicForm.getDetailByKey(formKey, formId);
-      console.log('==========================1');
-      console.log(res);
       if (!res) ctx.error();
       else ctx.success(res);
     }

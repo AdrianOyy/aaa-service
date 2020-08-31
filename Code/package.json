@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "egg-bin dev",
+    "debug": "egg-bin debug",
     "start": "egg-bin dev"
   },
   "keywords": [],

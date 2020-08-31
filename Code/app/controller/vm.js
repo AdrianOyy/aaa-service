@@ -151,11 +151,11 @@ module.exports = app => {
       const tenantId = tenant.id;
       const tenantName = tenant.name;
 
-      // TODO generate hostname
+      // generate hostname
       const typeCountList = await ctx.service.hostname.countByType(childTable);
       const hostnameMap = new Map();
       for (let i = 0; i < typeCountList.length; i++) {
-        const list = await ctx.service.hostname.generateHostname(tenantId, typeCountList[i].applicationType.name, typeCountList[i].requestNum);
+        const list = await ctx.service.hostname.generateHostname(tenantId, typeCountList[i].applicationType, typeCountList[i].requestNum);
         if (!list) {
           pass = false;
           message += `Tenant \`${tenantName}\` with Application type \`${typeCountList[i].applicationType}\` hostname is not enough\n`;
@@ -164,27 +164,33 @@ module.exports = app => {
       }
 
       childTable.forEach(el => {
-        if (el.application_type && el.applicationType.name) {
-          const list = hostnameMap.get(el.applicationType.name);
+        if (el.application_type && el.application_type.name) {
+          const list = hostnameMap.get(el.application_type.name);
           el.hostname = list[0];
-          hostnameMap.set(el.applicationType.name, list.slice(1));
+          hostnameMap.set(el.application_type.name, list.slice(1));
         }
       });
 
       // TODO define vm type
+      const type = 'HCL';
 
-      // TODO switch vm type to define vm cluster with different route
-      const data = await ctx.service.cluster.getClusterList(childTable);
-      if (!data.pass) {
-        pass = false;
-        message += data.message;
+      // switch vm type to define vm cluster with different route
+      if (type === 'HCL') {
+        const data = await ctx.service.cluster.getClusterList(childTable);
+        if (!data.pass) {
+          pass = false;
+          message += data.message;
+        }
+      } else {
+        // TODO another route
       }
+
       // TODO assign IP (delay function, verify IP  in this tern)
 
       // TODO save new VM list(childTable)
       for (let i = 0; i < childTable.length; i++) {
         const el = childTable[i];
-        const columnList = `hostname = \"${el.hostname}\"`;
+        const columnList = `hostname = \"${el.hostname}\", vm_cluster= \"${el.vm_cluster}\"`;
         try {
           const updateSQL = `UPDATE \`${childFormKey}\` SET ${columnList} WHERE \`${childFormKey}\`.id = ${el.id}`;
           await app.model.query(updateSQL);
@@ -197,7 +203,7 @@ module.exports = app => {
         }
       }
 
-      // TODO return a map includes result and message to workflow service
+      // return a map includes result and message to workflow service
       ctx.success({ pass, message });
     }
 

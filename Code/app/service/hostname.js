@@ -95,7 +95,7 @@ module.exports = app => {
       const map = new Map();
       vmList.forEach(el => {
         if (el.application_type) {
-          const name = el.vm_applicationType.name ? el.vm_applicationType.name : '';
+          const name = el.application_type.name ? el.application_type.name : '';
           if (!map.get(name)) {
             map.set(name, 1);
           } else {

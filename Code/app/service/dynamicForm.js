@@ -23,7 +23,7 @@ module.exports = app => {
             fieldType = 'varchar(255)';
             break;
         }
-        fieldList += `\`${el.id}\` ${fieldType},`;
+        fieldList += `\`${el.id.toLowerCase().replace(/\s+/g, '_')}\` ${fieldType},`;
       });
       fieldList += '`createdAt` datetime, `updatedAt` datetime, `deletedAt` datetime, `createBy` int, `updateBy` int, UNIQUE(pid)';
       const basicFormSQL = `CREATE TABLE IF NOT EXISTS ${formKey} (${fieldList})`;
@@ -53,7 +53,7 @@ module.exports = app => {
               fieldType = 'varchar(255)';
               break;
           }
-          fieldList += `\`${key}\` ${fieldType},`;
+          fieldList += `\`${key.toLowerCase().replace(/\s+/g, '_')}\` ${fieldType},`;
         }
         fieldList += `\`createdAt\` datetime, \`updatedAt\` datetime, \`deletedAt\` datetime, \`createBy\` int, \`updateBy\` int,FOREIGN KEY(parentId) REFERENCES ${parentFormKey}(id) on delete cascade on update cascade`;
         const childTableSQL = `CREATE TABLE IF NOT EXISTS ${el.id} (${fieldList})`;
@@ -146,9 +146,15 @@ module.exports = app => {
     }
 
     async getDynamicForm(params) {
+      console.log('params ================= params')
+      console.log(params)
+      console.log('params ================= params')
       const { ctx } = this;
       const { formKey, deploymentId } = params;
       if (!formKey && !deploymentId) return false;
+      console.log('5555 ================= 5555');
+      console.log(5555);
+      console.log('5555 ================= 5555');
       // 基础数据
       const dynamicForm = await ctx.model.models.dynamicForm.findOne({
         where: formKey ? { formKey } : { deploymentId },
@@ -172,8 +178,8 @@ module.exports = app => {
 
     async getDynamicFormWithForeignTable(deploymentId) {
       const dynamicForm = await this.getDynamicForm({ deploymentId });
+      if (!dynamicForm) return false;
       const { workflowName, formKey, dynamicFormDetail, childTable } = dynamicForm;
-      // console.log(childTable[0].formKey);
       let childFormKey = '';
       // 父表渲染表
       const parentFormDetail = [];
@@ -185,7 +191,6 @@ module.exports = app => {
         }
         parentFormDetail.push(Object.assign(el.dataValues, { itemList, label: el.fieldDisplayName, type: el.inputType, labelField: el.foreignDisplayKey, valueField: el.foreignKey }));
       }
-
       // 子表渲染表
       const childFormDetail = [];
       if (childTable.length > 0) {
@@ -274,7 +279,7 @@ function addForeign(list, dId) {
   const dataList = [];
   list.forEach(el => {
     const dynamicFormId = dId ? dId : el.dynamicFormId;
-    let fieldName = el.id.toLowerCase().replace('/\s+/', '_');
+    const fieldName = el.id.toLowerCase().replace(/\s+/g, '_');
     const fieldDisplayName = el.id;
     const fieldType = el.type;
     const readable = el.readable;
@@ -287,22 +292,20 @@ function addForeign(list, dId) {
     let showOnRequest = true;
 
     if (el.name) {
+      if (el.name.trim()[el.name.length - 1] === '!') {
+        showOnRequest = false;
+        el.name = el.name.trim().slice(0, -1);
+      }
       const paramsList = el.name.split('#');
       if (paramsList.length > 2) return false;
       if (paramsList.length === 2) {
-        let inputParams = paramsList[1].trim();
-        if (inputParams[inputParams.length - 1] === '!') {
-          showOnRequest = false;
-          inputParams = inputParams.slice(0, -1);
-        }
-        inputType = inputParams.trim();
+        inputType = paramsList[1].trim();
       }
       let foreign = paramsList[0].trim();
       if (foreign[0] === '$' && foreign[1] === '{' && foreign[foreign.length - 1] === '}') {
         foreign = foreign.slice(2, -1);
         const foreignList = foreign.split('|');
         foreignTable = foreignList[0].split('.')[0].trim();
-        fieldName = foreignTable;
         foreignKey = foreignList[0].split('.')[1].trim();
         if (foreignList.length > 1) {
           foreignDisplayKey = foreignList[1].trim();
@@ -311,6 +314,7 @@ function addForeign(list, dId) {
         }
       }
     }
+
 
     const model = {
       dynamicFormId,
