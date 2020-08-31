@@ -128,7 +128,7 @@ module.exports = app => {
   router.post(`${prefix}/ipAssign/create`, controller.ipAssign.create);
   router.get(`${prefix}/ipAssign/getClosestIP`, controller.ipAssign.getClosestIP);
   router.delete(`${prefix}/ipAssign/deleteMany`, controller.ipAssign.deleteMany);
-  router.get(`${prefix}/ipAssign/checkIpExist`, controller.ipAssign.checkIpExist);
+  router.post(`${prefix}/ipAssign/checkIpExist`, controller.ipAssign.checkIpExist);
 
   router.get(`${prefix}/dc/list`, controller.dc.list);
 
