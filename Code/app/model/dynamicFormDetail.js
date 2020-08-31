@@ -7,6 +7,7 @@ module.exports = app => {
     id: { type: INTEGER, autoIncrement: true, primaryKey: true, cnName: 'ID' },
     dynamicFormId: { type: INTEGER, allowNull: false, cnName: '动态表单id', comment: '动态表单id' },
     fieldName: { type: STRING, allowNull: false, cnName: '字段名', comment: '字段名' },
+    fieldDisplayName: { type: STRING, allowNull: false, cnName: '字段显示名', comment: '字段显示名' },
     fieldType: { type: STRING, allowNull: false, cnName: '字段类型', comment: '字段类型' },
     inputType: { type: STRING, allowNull: false, cnName: '输入框类型', comment: '输入框类型' },
     showOnRequest: { type: BOOLEAN, allowNull: false, cnName: '申请时显示', comment: '申请时显示' },

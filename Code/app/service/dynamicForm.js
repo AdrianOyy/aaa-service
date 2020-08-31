@@ -23,7 +23,7 @@ module.exports = app => {
             fieldType = 'varchar(255)';
             break;
         }
-        fieldList += `\`${el.id}\` ${fieldType},`;
+        fieldList += `\`${el.id.toLowerCase().replace(/\s+/g, '_')}\` ${fieldType},`;
       });
       fieldList += '`createdAt` datetime, `updatedAt` datetime, `deletedAt` datetime, `createBy` int, `updateBy` int, UNIQUE(pid)';
       const basicFormSQL = `CREATE TABLE IF NOT EXISTS ${formKey} (${fieldList})`;
@@ -53,7 +53,7 @@ module.exports = app => {
               fieldType = 'varchar(255)';
               break;
           }
-          fieldList += `\`${key}\` ${fieldType},`;
+          fieldList += `\`${key.toLowerCase().replace(/\s+/g, '_')}\` ${fieldType},`;
         }
         fieldList += `\`createdAt\` datetime, \`updatedAt\` datetime, \`deletedAt\` datetime, \`createBy\` int, \`updateBy\` int,FOREIGN KEY(parentId) REFERENCES ${parentFormKey}(id) on delete cascade on update cascade`;
         const childTableSQL = `CREATE TABLE IF NOT EXISTS ${el.id} (${fieldList})`;
@@ -68,8 +68,6 @@ module.exports = app => {
     }
 
     async getChildDynamicFormDetailData(childTableList, childDynamicFormList) {
-      console.log(childTableList);
-      console.log(childDynamicFormList);
       const childList = [];
       for (let i = 0; i < childTableList.length; i++) {
         for (let j = 0; j < childDynamicFormList.length; j++) {
@@ -106,13 +104,7 @@ module.exports = app => {
           list.push(model);
         }
       }
-      console.log('data ================= data');
-      console.log(list);
-      console.log('data ================= data');
       const dataList = addForeign(list);
-      console.log('dataList ================= dataList');
-      console.log(dataList);
-      console.log('dataList ================= dataList');
       return dataList;
     }
 
@@ -180,8 +172,8 @@ module.exports = app => {
 
     async getDynamicFormWithForeignTable(deploymentId) {
       const dynamicForm = await this.getDynamicForm({ deploymentId });
+      if (!dynamicForm) return false;
       const { workflowName, formKey, dynamicFormDetail, childTable } = dynamicForm;
-      // console.log(childTable[0].formKey);
       let childFormKey = '';
       // 父表渲染表
       const parentFormDetail = [];
@@ -191,9 +183,8 @@ module.exports = app => {
         if (el.foreignTable !== null) {
           itemList = await this.getForeignData(el.foreignTable);
         }
-        parentFormDetail.push(Object.assign(el.dataValues, { itemList, label: el.fieldName, type: el.inputType, labelField: el.foreignDisplayKey, valueField: el.foreignKey }));
+        parentFormDetail.push(Object.assign(el.dataValues, { itemList, label: el.fieldDisplayName, type: el.inputType, labelField: el.foreignDisplayKey, valueField: el.foreignKey }));
       }
-
       // 子表渲染表
       const childFormDetail = [];
       if (childTable.length > 0) {
@@ -204,7 +195,7 @@ module.exports = app => {
           if (el.foreignTable !== null) {
             itemList = await this.getForeignData(el.foreignTable);
           }
-          childFormDetail.push(Object.assign(el.dataValues, { itemList, label: el.fieldName, type: el.inputType, labelField: el.foreignDisplayKey, valueField: el.foreignKey }));
+          childFormDetail.push(Object.assign(el.dataValues, { itemList, label: el.fieldDisplayName, type: el.inputType, labelField: el.foreignDisplayKey, valueField: el.foreignKey }));
         }
       }
 
@@ -266,13 +257,29 @@ module.exports = app => {
       let foreignList = null;
       switch (tableName) {
         case 'tenant':
-          foreignList = await ctx.service.tenant.getUserTenantList(1);
+          foreignList = await ctx.service.tenant.getUserTenantList(ctx.authUser.id);
           // foreignList = await ctx.service.tenant.getUserTenantList(ctx.authUser.id);
           break;
         default:
           foreignList = (await app.model.query(`SELECT * FROM \`${tableName}\``))[0];
       }
       return foreignList;
+    }
+
+    // 验证是否流程部署过
+    /**
+     * @param { string[] } formKeyList startForm's parent and child's formKey list
+     * @returns {Promise<boolean>} isExist
+     */
+    async checkTableExist(formKeyList) {
+      const { ctx } = this;
+      const { Op } = app.Sequelize;
+      const count = await ctx.model.models.dynamicForm.count({
+        where: {
+          formKey: { [Op.in]: formKeyList },
+        },
+      });
+      return !!count;
     }
   };
 };
@@ -282,7 +289,8 @@ function addForeign(list, dId) {
   const dataList = [];
   list.forEach(el => {
     const dynamicFormId = dId ? dId : el.dynamicFormId;
-    const fieldName = el.id;
+    const fieldName = el.id.toLowerCase().replace(/\s+/g, '_');
+    const fieldDisplayName = el.id;
     const fieldType = el.type;
     const readable = el.readable;
     const writable = el.writable;
@@ -296,16 +304,12 @@ function addForeign(list, dId) {
     if (el.name) {
       if (el.name.trim()[el.name.length - 1] === '!') {
         showOnRequest = false;
+        el.name = el.name.trim().slice(0, -1);
       }
       const paramsList = el.name.split('#');
       if (paramsList.length > 2) return false;
       if (paramsList.length === 2) {
-        let inputParams = paramsList[1].trim();
-        if (inputParams[inputParams.length - 1] === '!') {
-          showOnRequest = false;
-          inputParams = inputParams.slice(0, -1);
-        }
-        inputType = inputParams.trim();
+        inputType = paramsList[1].trim();
       }
       let foreign = paramsList[0].trim();
       if (foreign[0] === '$' && foreign[1] === '{' && foreign[foreign.length - 1] === '}') {
@@ -321,9 +325,11 @@ function addForeign(list, dId) {
       }
     }
 
+
     const model = {
       dynamicFormId,
       fieldName,
+      fieldDisplayName,
       fieldType,
       inputType,
       foreignTable,
