@@ -55,6 +55,32 @@ module.exports = app => {
       if (!closestList) return false;
       return closestList;
     }
+
+    /**
+     * @param {Object[]} vmList VM list
+     * @return {Promise<Object[]>} typeCountList
+     */
+    async countByDC(vmList) {
+      const map = new Map();
+      vmList.forEach(el => {
+        if (el.data_center) {
+          if (!map.get(el.data_center)) {
+            map.set(el.data_center, 1);
+          } else {
+            map.set(el.data_center, map.get(el.data_center) + 1);
+          }
+        }
+      });
+      const res = [];
+      for (const [ k, v ] of map) {
+        const model = {
+          dataCenter: k,
+          requestNum: v,
+        };
+        res.push(model);
+      }
+      return res;
+    }
   };
 };
 
