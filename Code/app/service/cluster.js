@@ -55,6 +55,57 @@ module.exports = app => {
       return '';
     }
 
+    async getInMasterList(clusterList, vm, inList, data) {
+      let clusterInList = [];
+      for (const name of clusterList) {
+        // eslint-disable-next-line no-undef
+        const msg = await this.getMsg(name);
+        if (msg) {
+          msg.cluser = clusterList[0];
+          msg.diskfee = 0;
+          const inClusters = inList.filter(t => t.vm_cluster === msg.name);
+          msg.FreeMemory = setDiskByMb(msg['Free Memory']);
+          if (inClusters.length > 0) {
+            for (const inCluster of inClusters) {
+              msg['Number of CPU'] = msg['Number of CPU'] - inCluster.cpu_request_number;
+              msg.FreeMemory = msg.FreeMemory - inCluster.ram_request_number * 1024;
+              msg.diskfee = msg.diskfee - inCluster.data_storage_request_number * 1024;
+            }
+          }
+          if ((msg['Number of CPU'] * 2 * 0.8) < vm.cpu_request_number) {
+            continue;
+          }
+          if (msg.FreeMemory * 0.8 < vm.ram_request_number * 1024) {
+            continue;
+          }
+          let diskfee = 0;
+          let disktotal = 0;
+          for (const disk of msg.Datastore) {
+            disk.diskfee = setDiskByMb(disk.free);
+            disk.disktotal = setDiskByMb(disk.total);
+            diskfee += disk.diskfee;
+            disktotal += disk.disktotal;
+          }
+          msg.diskfee += diskfee;
+          if (msg.diskfee * 0.8 < vm.data_storage_request_number * 1024) {
+            continue;
+          }
+          msg.disktotal = disktotal;
+          clusterInList.push(msg);
+        } else {
+          data.pass = false;
+          data.message += 'ansonbole is not find/n';
+        }
+      }
+      if (clusterInList.length > 0) {
+        clusterInList = _.orderBy(clusterInList, [ 'Number of CPU', 'FreeMemory', 'diskfee' ], [ 'desc', 'desc', 'desc' ]);
+        return clusterInList[0].name;
+      }
+      data.pass = false;
+      data.message += 'not find cluser/n';
+      return '';
+    }
+
     async getClusterList(vmlist) {
       const { ctx } = this;
       const { Op } = app.Sequelize;
@@ -83,10 +134,21 @@ module.exports = app => {
               }
             }
             if (cluster) {
-              const clusterName = await this.getInCluserList(cluster, vm, inCluster, data);
-              // 保存名称
-              vm.vm_cluster = clusterName;
-              inCluster.push(vm);
+              if (vm.type === 'HCI') {
+                const clusterName = await this.getInCluserList(cluster, vm, inCluster, data);
+                // 保存名称
+                vm.vm_cluster = clusterName;
+                inCluster.push(vm);
+              } else if (vm.type === 'VMMaster') {
+                const masterList = await this.getInCluserList(cluster, vm, inCluster, data);
+                // 保存名称
+                vm.vm_cluster = masterList.cluster;
+                vm.master = masterList.master;
+                inCluster.push(vm);
+              } else {
+                data.pass = false;
+                data.message += 'type error' + vm.id + 'cluster not find/n';
+              }
             } else {
               data.pass = false;
               data.message += 'vm allaction: ' + vm.id + 'cluster not find/n';
@@ -118,6 +180,305 @@ module.exports = app => {
     //   const { ctx } = this;
     //
     // }
+    async getMaster() {
+      const msg = [
+        {
+          master: [
+            {
+              'Esxi Name': 'devesxi02a.corpdev.hadev.org.hk',
+              'Free Memory': '817791MB ',
+              'No. of CPU Used': 42,
+              'Number of CPU': 56,
+              'Total Memory': '1047902MB',
+            }, {
+              'Esxi Name': 'devesxi02b.corpdev.hadev.org.hk',
+              'Free Memory': '830935MB ',
+              'No. of CPU Used': 45,
+              'Number of CPU': 56,
+              'Total Memory': '1047902MB',
+            },
+          ],
+          details: [
+            {
+              free: '1.05 TB',
+              name: '02b_datastore1',
+              total: '1.08 TB',
+            },
+            {
+              free: '520.54 GB',
+              name: '02CS_CSV01',
+              total: '2.00 TB',
+            },
+            {
+              free: '1.16 TB',
+              name: '02CS_CSV02',
+              total: '2.00 TB',
+            },
+            {
+              free: '860.56 GB',
+              name: '02CS_CSV03_Encrypted',
+              total: '2.00 TB',
+            },
+            {
+              free: '789.57 GB',
+              name: '02CS_CSV04_Encrypted',
+              total: '2.00 TB',
+            },
+            {
+              free: '513.15 GB',
+              name: '02CS_CSV05_Encrypted',
+              total: '2.00 TB',
+            },
+            {
+              free: '518.79 GB',
+              name: '02CS_CSV06_Encrypted',
+              total: '2.00 TB',
+            },
+            {
+              free: '957.80 GB',
+              name: '02CS_CSV07',
+              total: '2.00 TB',
+            },
+            {
+              free: '1.00 TB',
+              name: '02CS_CSV08',
+              total: '1.00 TB',
+            },
+            {
+              free: '2.00 TB',
+              name: '02CS_CSV09',
+              total: '2.00 TB',
+            },
+            {
+              free: '2.00 TB',
+              name: '02CS_CSV10',
+              total: '2.00 TB',
+            },
+          ],
+        }, {
+          master: [
+            {
+              'Esxi Name': 'devesxi02a.corpdev.hadev.org.hk',
+              'Free Memory': '817791MB ',
+              'No. of CPU Used': 42,
+              'Number of CPU': 56,
+              'Total Memory': '1047902MB',
+            }, {
+              'Esxi Name': 'devesxi02b.corpdev.hadev.org.hk',
+              'Free Memory': '830935MB ',
+              'No. of CPU Used': 45,
+              'Number of CPU': 56,
+              'Total Memory': '1047902MB',
+            },
+          ],
+          details: [
+            {
+              free: '1.05 TB',
+              name: '02b_datastore1',
+              total: '1.08 TB',
+            },
+            {
+              free: '520.54 GB',
+              name: '02CS_CSV01',
+              total: '2.00 TB',
+            },
+            {
+              free: '1.16 TB',
+              name: '02CS_CSV02',
+              total: '2.00 TB',
+            },
+            {
+              free: '860.56 GB',
+              name: '02CS_CSV03_Encrypted',
+              total: '2.00 TB',
+            },
+            {
+              free: '789.57 GB',
+              name: '02CS_CSV04_Encrypted',
+              total: '2.00 TB',
+            },
+            {
+              free: '513.15 GB',
+              name: '02CS_CSV05_Encrypted',
+              total: '2.00 TB',
+            },
+            {
+              free: '518.79 GB',
+              name: '02CS_CSV06_Encrypted',
+              total: '2.00 TB',
+            },
+            {
+              free: '957.80 GB',
+              name: '02CS_CSV07',
+              total: '2.00 TB',
+            },
+            {
+              free: '1.00 TB',
+              name: '02CS_CSV08',
+              total: '1.00 TB',
+            },
+            {
+              free: '2.00 TB',
+              name: '02CS_CSV09',
+              total: '2.00 TB',
+            },
+            {
+              free: '2.00 TB',
+              name: '02CS_CSV10',
+              total: '2.00 TB',
+            },
+          ],
+        }, {
+          master: [
+            {
+              'Esxi Name': 'devesxi02a.corpdev.hadev.org.hk',
+              'Free Memory': '817791MB ',
+              'No. of CPU Used': 42,
+              'Number of CPU': 56,
+              'Total Memory': '1047902MB',
+            }, {
+              'Esxi Name': 'devesxi02b.corpdev.hadev.org.hk',
+              'Free Memory': '830935MB ',
+              'No. of CPU Used': 45,
+              'Number of CPU': 56,
+              'Total Memory': '1047902MB',
+            },
+          ],
+          details: [
+            {
+              free: '1.05 TB',
+              name: '02b_datastore1',
+              total: '1.08 TB',
+            },
+            {
+              free: '520.54 GB',
+              name: '02CS_CSV01',
+              total: '2.00 TB',
+            },
+            {
+              free: '1.16 TB',
+              name: '02CS_CSV02',
+              total: '2.00 TB',
+            },
+            {
+              free: '860.56 GB',
+              name: '02CS_CSV03_Encrypted',
+              total: '2.00 TB',
+            },
+            {
+              free: '789.57 GB',
+              name: '02CS_CSV04_Encrypted',
+              total: '2.00 TB',
+            },
+            {
+              free: '513.15 GB',
+              name: '02CS_CSV05_Encrypted',
+              total: '2.00 TB',
+            },
+            {
+              free: '518.79 GB',
+              name: '02CS_CSV06_Encrypted',
+              total: '2.00 TB',
+            },
+            {
+              free: '957.80 GB',
+              name: '02CS_CSV07',
+              total: '2.00 TB',
+            },
+            {
+              free: '1.00 TB',
+              name: '02CS_CSV08',
+              total: '1.00 TB',
+            },
+            {
+              free: '2.00 TB',
+              name: '02CS_CSV09',
+              total: '2.00 TB',
+            },
+            {
+              free: '2.00 TB',
+              name: '02CS_CSV10',
+              total: '2.00 TB',
+            },
+          ],
+        }, {
+          master: [
+            {
+              'Esxi Name': 'devesxi02a.corpdev.hadev.org.hk',
+              'Free Memory': '817791MB ',
+              'No. of CPU Used': 42,
+              'Number of CPU': 56,
+              'Total Memory': '1047902MB',
+            }, {
+              'Esxi Name': 'devesxi02b.corpdev.hadev.org.hk',
+              'Free Memory': '830935MB ',
+              'No. of CPU Used': 45,
+              'Number of CPU': 56,
+              'Total Memory': '1047902MB',
+            },
+          ],
+          details: [
+            {
+              free: '1.05 TB',
+              name: '02b_datastore1',
+              total: '1.08 TB',
+            },
+            {
+              free: '520.54 GB',
+              name: '02CS_CSV01',
+              total: '2.00 TB',
+            },
+            {
+              free: '1.16 TB',
+              name: '02CS_CSV02',
+              total: '2.00 TB',
+            },
+            {
+              free: '860.56 GB',
+              name: '02CS_CSV03_Encrypted',
+              total: '2.00 TB',
+            },
+            {
+              free: '789.57 GB',
+              name: '02CS_CSV04_Encrypted',
+              total: '2.00 TB',
+            },
+            {
+              free: '513.15 GB',
+              name: '02CS_CSV05_Encrypted',
+              total: '2.00 TB',
+            },
+            {
+              free: '518.79 GB',
+              name: '02CS_CSV06_Encrypted',
+              total: '2.00 TB',
+            },
+            {
+              free: '957.80 GB',
+              name: '02CS_CSV07',
+              total: '2.00 TB',
+            },
+            {
+              free: '1.00 TB',
+              name: '02CS_CSV08',
+              total: '1.00 TB',
+            },
+            {
+              free: '2.00 TB',
+              name: '02CS_CSV09',
+              total: '2.00 TB',
+            },
+            {
+              free: '2.00 TB',
+              name: '02CS_CSV10',
+              total: '2.00 TB',
+            },
+          ],
+        },
+      ];
+      return msg;
+    }
+
 
     async getMsg(name) {
       const msg =
