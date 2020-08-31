@@ -99,6 +99,7 @@ module.exports = app => {
   router.get(`${prefix}/dynamicForm/getDynamicForm`, controller.dynamicForm.getDynamicForm);
   router.get(`${prefix}/dynamicForm/verifyApplicationType`, controller.dynamicForm.verifyApplicationType);
   router.get(`${prefix}/dynamicForm/getDynamicFormDetail`, controller.dynamicForm.getDynamicFormDetail);
+  router.get(`${prefix}/dynamicForm/checkTableExist`, controller.dynamicForm.checkTableExist);
 
   router.get(`${prefix}/platform/list`, controller.platform.list);
   router.get(`${prefix}/platform/detail`, controller.platform.detail);

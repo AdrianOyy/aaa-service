@@ -299,6 +299,16 @@ module.exports = app => {
       ctx.success(dynamicForm ? dynamicForm : {});
     }
 
+    async checkTableExist() {
+      const { ctx } = this;
+      const { formKeyList } = ctx.request.body;
+      if (!formKeyList) ctx.error();
+      else {
+        const isExist = await ctx.service.dynamicForm.checkTableExist(formKeyList);
+        ctx.success({ isExist });
+      }
+    }
+
     // async getDynamicForm() {
     //   const { ctx } = this;
     //   const { deploymentId } = ctx.query;

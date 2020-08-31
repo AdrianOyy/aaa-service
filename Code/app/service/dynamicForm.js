@@ -146,15 +146,9 @@ module.exports = app => {
     }
 
     async getDynamicForm(params) {
-      console.log('params ================= params')
-      console.log(params)
-      console.log('params ================= params')
       const { ctx } = this;
       const { formKey, deploymentId } = params;
       if (!formKey && !deploymentId) return false;
-      console.log('5555 ================= 5555');
-      console.log(5555);
-      console.log('5555 ================= 5555');
       // 基础数据
       const dynamicForm = await ctx.model.models.dynamicForm.findOne({
         where: formKey ? { formKey } : { deploymentId },
@@ -270,6 +264,22 @@ module.exports = app => {
           foreignList = (await app.model.query(`SELECT * FROM \`${tableName}\``))[0];
       }
       return foreignList;
+    }
+
+    // 验证是否流程部署过
+    /**
+     * @param { string[] } formKeyList startForm's parent and child's formKey list
+     * @returns {Promise<boolean>} isExist
+     */
+    async checkTableExist(formKeyList) {
+      const { ctx } = this;
+      const { Op } = app.Sequelize;
+      const count = await ctx.model.models.dynamicForm.count({
+        where: {
+          formKey: { [Op.in]: formKeyList },
+        },
+      });
+      return !!count;
     }
   };
 };
