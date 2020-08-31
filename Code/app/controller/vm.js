@@ -164,43 +164,57 @@ module.exports = app => {
         hostnameMap.set(typeCountList[i].applicationType, list);
       }
 
-      childTable.forEach(el => {
-        if (el.application_type && el.application_type.name) {
+      // TODO assign IP (delay function, verify IP  in this tern)
+      const IPMap = new Map();
+      const DCCountList = await ctx.service.ipAssign.countByDC(childTable);
+      for (let i = 0; i < DCCountList.length; i++) {
+        const list = await ctx.service.ipAssign.assign(DCCountList[i].dataCenter, DCCountList[i].requestNum);
+        if (!list) {
+          pass = false;
+          message += 'IP is not enough\n';
+        }
+        IPMap.set(DCCountList[i].dataCenter, list);
+      }
+
+      for (let i = 0; i < childTable.length; i++) {
+        const el = childTable[i];
+        if (el.application_type && el.application_type.name && pass) {
           const list = hostnameMap.get(el.application_type.name);
           el.hostname = list[0];
           hostnameMap.set(el.application_type.name, list.slice(1));
         }
-      });
-
-      // TODO define vm type
-      const type = 'HCL';
-
-      // switch vm type to define vm cluster with different route
-      if (type === 'HCL') {
-        const data = await ctx.service.cluster.getClusterList(childTable);
-        if (!data.pass) {
-          pass = false;
-          message += data.message;
+        if (el.data_center && el.data_center.id && pass) {
+          const list = IPMap.get(el.data_center.id);
+          el.IP = list[0];
+          IPMap.set(el.application_type.name, list.slice(1));
         }
-      } else {
-        // TODO another route
+        // define VM's type
+        const type = await ctx.service.defineVMType.defineVMType(el.network_zone.id, el.environment_type.id, el.data_storage_request_number);
+        el.type = type;
       }
 
-      // TODO assign IP (delay function, verify IP  in this tern)
+      // switch VM's type to define vm cluster with different route
+      const data = await ctx.service.cluster.getClusterList(childTable);
+      if (!data.pass) {
+        pass = false;
+        message += data.message;
+      }
 
       // TODO save new VM list(childTable)
-      for (let i = 0; i < childTable.length; i++) {
-        const el = childTable[i];
-        const columnList = `hostname = \"${el.hostname}\", vm_cluster= \"${el.vm_cluster}\"`;
-        try {
-          const updateSQL = `UPDATE \`${childFormKey}\` SET ${columnList} WHERE \`${childFormKey}\`.id = ${el.id}`;
-          await app.model.query(updateSQL);
-        } catch (e) {
-          console.log('e ================= e');
-          console.log(e);
-          console.log('e ================= e');
-          message = 'System busy';
-          pass = false;
+      if (pass) {
+        for (let i = 0; i < childTable.length; i++) {
+          const el = childTable[i];
+          const columnList = `hostname = \"${el.hostname}\", vm_cluster= \"${el.vm_cluster}\"`;
+          try {
+            const updateSQL = `UPDATE \`${childFormKey}\` SET ${columnList} WHERE \`${childFormKey}\`.id = ${el.id}`;
+            await app.model.query(updateSQL);
+          } catch (e) {
+            console.log('e ================= e');
+            console.log(e);
+            console.log('e ================= e');
+            message = 'System busy';
+            pass = false;
+          }
         }
       }
 

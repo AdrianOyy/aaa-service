@@ -99,7 +99,7 @@ module.exports = app => {
   router.get(`${prefix}/dynamicForm/getDynamicForm`, controller.dynamicForm.getDynamicForm);
   router.get(`${prefix}/dynamicForm/verifyApplicationType`, controller.dynamicForm.verifyApplicationType);
   router.get(`${prefix}/dynamicForm/getDynamicFormDetail`, controller.dynamicForm.getDynamicFormDetail);
-  router.get(`${prefix}/dynamicForm/checkTableExist`, controller.dynamicForm.checkTableExist);
+  router.post(`${prefix}/dynamicForm/checkTableExist`, controller.dynamicForm.checkTableExist);
 
   router.get(`${prefix}/platform/list`, controller.platform.list);
   router.get(`${prefix}/platform/detail`, controller.platform.detail);
@@ -128,7 +128,7 @@ module.exports = app => {
   router.post(`${prefix}/ipAssign/create`, controller.ipAssign.create);
   router.get(`${prefix}/ipAssign/getClosestIP`, controller.ipAssign.getClosestIP);
   router.delete(`${prefix}/ipAssign/deleteMany`, controller.ipAssign.deleteMany);
-  router.get(`${prefix}/ipAssign/checkIpExist`, controller.ipAssign.checkIpExist);
+  router.post(`${prefix}/ipAssign/checkIpExist`, controller.ipAssign.checkIpExist);
 
   router.get(`${prefix}/dc/list`, controller.dc.list);
 
