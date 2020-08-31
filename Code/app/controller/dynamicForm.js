@@ -198,7 +198,8 @@ module.exports = app => {
           const p = {};
           for (const sonDetail of sonFormDetail) {
             if (sonDetail.inputType === 'select') {
-              p[sonDetail.fieldName] = resd[sonDetail.fieldName] ? resd[sonDetail.fieldName].id : null;
+              p[sonDetail.fieldName + '_svalue'] = resd[sonDetail.fieldName] ? resd[sonDetail.fieldName][sonDetail.foreignKey] : null;
+              p[sonDetail.fieldName] = resd[sonDetail.fieldName] ? resd[sonDetail.fieldName][sonDetail.foreignDisplayKey] : null;
             } else {
               p[sonDetail.fieldName] = resd[sonDetail.fieldName];
             }
@@ -240,8 +241,8 @@ module.exports = app => {
             } else {
               sonFormDetail[sonField.fieldName] = sonDetail[sonField.fieldName];
             }
-
           }
+          sonFormDetail.data_center = await ctx.service.dc.getDC(sonFormDetail.environment_type, sonFormDetail.network_zone);
           const insertSql = await ctx.service.dynamicForm.getInsertSQL(childFormKey, sonFormDetail);
           // console.log(insertSql);
           await app.model.query(insertSql);
