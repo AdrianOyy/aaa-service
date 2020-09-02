@@ -4,11 +4,11 @@ module.exports = app => {
   return class extends app.Controller {
     async updateStatus() {
       const { ctx } = this;
-      const { type, idList } = ctx.request.body;
-      if (!type || !idList || !idList.length) ctx.error();
+      const { status, idList } = ctx.request.body;
+      if (!status || !idList || !idList.length) ctx.error();
       try {
         const idString = '(' + idList.join(',') + ')';
-        const updateSql = `update vmlist set status = '${type}' where id in ${idString}`;
+        const updateSql = `update vmlist set status = '${status}' where id in ${idString}`;
         const [ updateResults ] = await app.model.query(updateSql);
         ctx.success({ result: true, affectedRows: updateResults.affectedRows });
       } catch (error) {
