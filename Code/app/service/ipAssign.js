@@ -38,22 +38,47 @@ module.exports = app => {
       const { Op } = app.Sequelize;
       const IPList = await ctx.model.models.ip_assignment.findAll({
         where: {
-          DC,
+          DCId: DC,
           hostname: { [Op.is]: null },
+          networkType: { [Op.or]: [ 'Cat C - OS', 'Cat F - ATL' ] },
         },
-        attributes: [ 'id', 'IP' ],
+        attributes: [ 'id', 'IP', 'networkType' ],
         order: [[ 'IP', 'ASC' ]],
       });
-      if (IPList.length < requestNum) {
-        return false;
-      } else if (IPList.length === parseInt(requestNum)) {
-        return IPList;
+      if (IPList.length < requestNum * 2) return false;
+      const CList = [];
+      const FList = [];
+      IPList.forEach(el => {
+        if (el.networkType === 'Cat C - OS') {
+          CList.push(el.dataValues);
+        } else {
+          FList.push(el.dataValues);
+        }
+      });
+      if (CList.length < requestNum || FList.length < requestNum) return false;
+
+      let Cres = [],
+        Fres = [];
+
+      if (CList.length === parseInt(requestNum)) {
+        Cres = CList;
       } else if (parseInt(requestNum) === 1) {
-        return [ IPList[0] ];
+        Cres = [ CList[0] ];
+      } else {
+        const closestList = await this.getClosest(CList, parseInt(requestNum));
+        if (!closestList) return false;
+        Cres = closestList;
       }
-      const closestList = await this.getClosest(IPList, parseInt(requestNum));
-      if (!closestList) return false;
-      return closestList;
+      if (FList.length === parseInt(requestNum)) {
+        Fres = FList;
+      } else if (parseInt(requestNum) === 1) {
+        Fres = [ FList[0] ];
+      } else {
+        const closestList = await this.getClosest(FList, parseInt(requestNum));
+        if (!closestList) return false;
+        Fres = closestList;
+      }
+      return [ Cres, Fres ];
     }
 
     /**
@@ -63,11 +88,11 @@ module.exports = app => {
     async countByDC(vmList) {
       const map = new Map();
       vmList.forEach(el => {
-        if (el.data_center) {
-          if (!map.get(el.data_center)) {
-            map.set(el.data_center, 1);
+        if (el.data_center && el.data_center.id) {
+          if (!map.get(el.data_center.id)) {
+            map.set(el.data_center.id, 1);
           } else {
-            map.set(el.data_center, map.get(el.data_center) + 1);
+            map.set(el.data_center.id, map.get(el.data_center.id) + 1);
           }
         }
       });

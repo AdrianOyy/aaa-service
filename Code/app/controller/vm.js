@@ -147,8 +147,7 @@ module.exports = app => {
       let message = '';
       const { formKey, formId } = ctx.request.body;
       const dynamicForm = await ctx.service.dynamicForm.getDetailByKey(formKey, formId);
-      const { childFormKey, childTable, project_name } = dynamicForm;
-      const tenant = project_name;
+      const { childFormKey, childTable, tenant } = dynamicForm;
       const tenantId = tenant.id;
       const tenantName = tenant.name;
 
@@ -163,18 +162,22 @@ module.exports = app => {
         }
         hostnameMap.set(typeCountList[i].applicationType, list);
       }
-
       // TODO assign IP (delay function, verify IP  in this tern)
-      const IPMap = new Map();
+      const CIPMap = new Map();
+      const FIPMap = new Map();
       const DCCountList = await ctx.service.ipAssign.countByDC(childTable);
       for (let i = 0; i < DCCountList.length; i++) {
         const list = await ctx.service.ipAssign.assign(DCCountList[i].dataCenter, DCCountList[i].requestNum);
         if (!list) {
           pass = false;
           message += 'IP is not enough\n';
+        } else {
+          const [ CList, FList ] = list;
+          CIPMap.set(DCCountList[i].dataCenter, CList);
+          FIPMap.set(DCCountList[i].dataCenter, FList);
         }
-        IPMap.set(DCCountList[i].dataCenter, list);
       }
+
 
       for (let i = 0; i < childTable.length; i++) {
         const el = childTable[i];
@@ -184,14 +187,23 @@ module.exports = app => {
           hostnameMap.set(el.application_type.name, list.slice(1));
         }
         if (el.data_center && el.data_center.id && pass) {
-          const list = IPMap.get(el.data_center.id);
-          el.IP = list[0];
-          IPMap.set(el.application_type.name, list.slice(1));
+          const CList = CIPMap.get(el.data_center.id);
+          const FList = FIPMap.get(el.data_center.id);
+          el.os_ip = CList[0].IP;
+          el.atl_ip = FList[0].IP;
+          CIPMap.set(el.data_center.id, CList.slice(1));
+          FIPMap.set(el.data_center.id, FList.slice(1));
         }
         // define VM's type
+
+
         const type = await ctx.service.defineVMType.defineVMType(el.network_zone.id, el.environment_type.id, el.data_storage_request_number);
         el.type = type;
       }
+
+      console.log('childTable ================= childTable');
+      console.log(childTable);
+      console.log('childTable ================= childTable');
 
       // switch VM's type to define vm cluster with different route
       const data = await ctx.service.cluster.getClusterList(childTable);
@@ -226,6 +238,19 @@ module.exports = app => {
       const { ctx } = this;
       const { formKey, formId, dynamicForm } = ctx.request.body;
 
+      // TODO 0. 验证 vmList 中有无重复的 hostname、ip 或者交给前端
+
+      // TODO 1. 根据新的 application type 计算新的 hostname 列表
+
+      // TODO 1.1 验证新的 hostname list 是否为计算出来的 hostname list 的子集
+
+      // TODO 2. 根据 zoom 和 type 确定新的 data center
+
+      // TODO 3. 确定新的 vm type
+
+      // TODO 4. 根据 data center 验证 vm cluster 和 vm master 的正确性
+
+      // TODO 5. 根据 data center
     }
   };
 };
