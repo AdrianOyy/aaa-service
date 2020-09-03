@@ -35,7 +35,7 @@ module.exports = app => {
       }
       if (clusterInList.length > 0) {
         clusterInList = _.orderBy(clusterInList, [ 'orderByCPU', 'orderByMemory', 'orderByRam' ], [ 'desc', 'desc', 'desc' ]);
-        return clusterInList;
+        return clusterInList[0].name;
       }
       data.pass = false;
       data.message += 'not find cluser/n';
