@@ -107,6 +107,26 @@ module.exports = app => {
       return null;
     }
 
+    async checkClusterList(cdcid, application_type) {
+      const { ctx } = this;
+      const cluster = [];
+      if (cdcid && application_type) {
+        const typeClusters = await ctx.model.models.vm_cluster_applicationType.findAll({ where: { applicationTypeId: application_type } });
+        // console.log(appCluster);
+        // 根据 typeId 和 zoomId 获取 dc，根据dc获取 Cluster
+        const dcClusters = await ctx.model.models.vm_cluster_dc_mapping.findAll({ where: { cdcid } });
+        for (const typeCluster of typeClusters) {
+          cluster.push(typeCluster.cluster);
+        }
+        for (const dcCluster of dcClusters) {
+          if (cluster.indexOf(dcCluster.clusterName) === -1) {
+            cluster.push(dcCluster.clusterName);
+          }
+        }
+      }
+      return cluster;
+    }
+
     async getClusterList(vmlist) {
       const { ctx } = this;
       const { Op } = app.Sequelize;

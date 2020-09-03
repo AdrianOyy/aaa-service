@@ -108,6 +108,12 @@ module.exports = app => {
       ctx.success(result);
     }
 
+    async test() {
+      const { ctx } = this;
+      await ctx.service.ipAssign.pingIp();
+      ctx.success('success');
+    }
+
     async getClusterList() {
       const { ctx } = this;
       const { Op } = app.Sequelize;
@@ -234,6 +240,7 @@ module.exports = app => {
       ctx.success({ pass, message });
     }
 
+
     async check() {
       const { ctx } = this;
       const { formKey, formId, sonForm } = ctx.request.body;
@@ -290,16 +297,64 @@ module.exports = app => {
         dcResult.message = 'Data Center with Environment Type and Network Zone is not enough';
       }
       fileList.push(dcResult);
+      // T0D0 2.1 验证新ip是否在
+      const os_ip = sonForm.find(t => t.fieldName === 'os_ip').value;
+      const atl_ip = sonForm.find(t => t.fieldName === 'atl_ip').value;
+      const opResult = await ctx.service.ipAssign.checkAssign(dc, os_ip, 'Cat C - OS');
+      const atlResult = await ctx.service.ipAssign.checkAssign(dc, atl_ip, 'Cat F - ATL');
+      if (opResult) {
+        const opPing = await ctx.service.ipAssign.pingIp(os_ip);
+        if (opPing) {
+          fileList.push({
+            fieldName: 'os_ip',
+            error: true,
+            message: 'os_ip is user',
+          });
+        }
+      } else {
+        fileList.push({
+          fieldName: 'os_ip',
+          error: true,
+          message: 'os_ip is not found ip assign',
+        });
+      }
+      if (atlResult) {
+        const atlPing = await ctx.service.ipAssign.pingIp(atl_ip);
+        if (atlPing) {
+          fileList.push({
+            fieldName: 'atl_ip',
+            error: true,
+            message: 'atl_ip is user',
+          });
+        }
+      } else {
+        fileList.push({
+          fieldName: 'atl_ip',
+          error: true,
+          message: 'atl_ip is not found ip assign',
+        });
+      }
+
       // TODO 3. 确定新的 vm type
       const type = await ctx.service.defineVMType.defineVMType(network_zone.value, environment_type.value, data_storage_request_number.value);
       console.log(type);
       // TODO 4. 根据 data center 验证 vm cluster 和 vm master 的正确性
+      const clusterList = await ctx.service.cluster.checkClusterList(dc, applicationType.value);
       const vm_cluster = sonForm.find(t => t.fieldName === 'vm_cluster').value;
-      const vm_master = sonForm.find(t => t.fieldName === 'vm_master').value;
-      const ram_request_number = sonForm.find(t => t.fieldName === 'ram_request_number').value;
-      const cpu_request_number = sonForm.find(t => t.fieldName === 'cpu_request_number').value;
-      const vmResult = await ctx.service.cluster.getCheck(vm_cluster, vm_master, data_storage_request_number.value, ram_request_number, cpu_request_number, type);
-      fileList.push(vmResult);
+      const cluster = clusterList.indexOf(vm_cluster);
+      if (cluster > -1) {
+        const vm_master = sonForm.find(t => t.fieldName === 'vm_master').value;
+        const ram_request_number = sonForm.find(t => t.fieldName === 'ram_request_number').value;
+        const cpu_request_number = sonForm.find(t => t.fieldName === 'cpu_request_number').value;
+        const vmResult = await ctx.service.cluster.getCheck(vm_cluster, vm_master, data_storage_request_number.value, ram_request_number, cpu_request_number, type);
+        fileList.push(vmResult);
+      } else {
+        fileList.push({
+          fieldName: 'vm_cluster',
+          error: true,
+          message: 'vm_cluster is not found by data center',
+        });
+      }
       // TODO 5. 根据 data center
       return fileList;
     }
