@@ -38,7 +38,7 @@ module.exports = app => {
       const { Op } = app.Sequelize;
       const IPList = await ctx.model.models.ip_assignment.findAll({
         where: {
-          DC,
+          DCId: DC,
           hostname: { [Op.is]: null },
         },
         attributes: [ 'id', 'IP' ],

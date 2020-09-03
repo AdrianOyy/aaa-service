@@ -147,8 +147,7 @@ module.exports = app => {
       let message = '';
       const { formKey, formId } = ctx.request.body;
       const dynamicForm = await ctx.service.dynamicForm.getDetailByKey(formKey, formId);
-      const { childFormKey, childTable, project_name } = dynamicForm;
-      const tenant = project_name;
+      const { childFormKey, childTable, tenant } = dynamicForm;
       const tenantId = tenant.id;
       const tenantName = tenant.name;
 

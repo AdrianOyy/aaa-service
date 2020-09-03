@@ -133,4 +133,7 @@ module.exports = app => {
   router.get(`${prefix}/dc/list`, controller.dc.list);
 
   router.post(`${prefix}/vm/preDefine`, controller.vm.preDefine);
+
+  router.post(`${prefix}/vmlist/updateStatus`, controller.vmlist.updateStatus);
+  router.post(`${prefix}/vmlist/checkStatus`, controller.vmlist.checkStatus);
 };
