@@ -110,6 +110,7 @@ module.exports = app => {
   router.get(`${prefix}/platform/listType`, controller.platform.listType);
 
   router.get(`${prefix}/vmCluster/list`, controller.vmCluster.list);
+  router.post(`${prefix}/vmCluster/updateResources`, controller.vmCluster.updateResources);
 
   router.get(`${prefix}/vmGuest/list`, controller.vmGuest.list);
   router.get(`${prefix}/vmGuest/detail`, controller.vmGuest.detail);
@@ -136,4 +137,5 @@ module.exports = app => {
 
   router.post(`${prefix}/vmlist/updateStatus`, controller.vmlist.updateStatus);
   router.post(`${prefix}/vmlist/checkStatus`, controller.vmlist.checkStatus);
+  router.post(`${prefix}/vmlist/defindVMType`, controller.vmlist.defindVMType);
 };
