@@ -222,10 +222,101 @@ module.exports = app => {
       ctx.success({ pass, message });
     }
 
+
+    async test() {
+      const { ctx } = this;
+      // const str = await ctx.service.cluster.getMaster();
+      // const list = [];
+      // const json = await ctx.service.cluster.JsonToMaster(list, str, 0);
+      // const dist = [ 'devesxi02cs', 'devesxi03cs' ];
+      // const json = await ctx.service.cluster.setCluserAndMaster(dist);
+      // await ctx.service.cluster.saveMaster(json);
+      // const json = await ctx.service.cluster.getHCIAll();
+      const dist = [ 'devesxi02cs', 'devesxi03cs' ];
+      const hci = await ctx.service.cluster.setHCI(dist);
+      await ctx.service.cluster.saveHCI(hci);
+      // const hci = await ctx.service.cluster.setHCI(dist);
+      // const hci = await ctx.service.cluster.JsonToHCI(json);
+      // console.log(json);
+      // const str = 'ok: [localhost] =>';
+      // const end = 'TASK';
+      // const a = list.indexOf(str, 0);
+      // const aEnd = list.indexOf(end, a);
+      // const alist = list.substring(a + str.length, aEnd);
+      // const aJson = JSON.parse(alist);
+      // console.log(aJson);
+      // console.log(aJson.msg['ESXi Details'][0]);
+      // const b = list.indexOf(str, a + str.length);
+      // const bEnd = list.indexOf(end, b);
+      // const blist = list.substring(b + str.length, bEnd);
+      // console.log(JSON.parse(blist));
+      // const c = list.indexOf(str, b + str.length);
+      // const cEnd = list.indexOf(end, c);
+      // const clist = list.substring(c + str.length, cEnd);
+      // console.log(JSON.parse(clist));
+      // const d = list.indexOf(str, c + str.length);
+      // const dEnd = list.indexOf('PLAY', d);
+      // const dlist = list.substring(d + str.length, dEnd);
+      // console.log(JSON.parse(dlist));
+      // console.log(a, b, c, d);
+      // console.log(aEnd, bEnd, cEnd, dEnd);
+      ctx.success('');
+    }
+
     async check() {
       const { ctx } = this;
-      const { formKey, formId, dynamicForm } = ctx.request.body;
+      const { formKey, formId, sonForm } = ctx.request.body;
+      const fileList = [];
+      const dynamicForm = await ctx.service.dynamicForm.getDetailByKey(formKey, formId);
+      const { project_name } = dynamicForm;
+      const tenant = project_name;
+      const tenantId = tenant.id;
+      const tenantName = tenant.name;
+      const applicationType = sonForm.find(t => t.fieldName === 'application_type');
+      const hostname = sonForm.find(t => t.fieldName === 'hostname');
+      const environment_type = sonForm.find(t => t.fieldName === 'environment_type');
+      const network_zone = sonForm.find(t => t.fieldName === 'network_zone');
+      const data_storage_request_number = sonForm.find(t => t.fieldName === 'data_storage_request_number');
+      // TODO 0. 验证 vmList 中有无重复的 hostname、ip 或者交给前端
 
+      // TODO 1. 根据新的 application type 计算新的 hostname 列表
+      const list = await ctx.service.hostname.generateHostname(tenantId, applicationType.value, 1);
+      const appResult = {
+        fieldName: 'hostname',
+        error: false,
+        message: null,
+      };
+      if (!list) {
+        appResult.error = true;
+        appResult.message = `Tenant \`${tenantName}\` with Application type  hostname is not enough`;
+      }
+      // TODO 1.1 验证新的 hostname list 是否为计算出来的 hostname list 的子集
+      if (list && hostname.value) {
+        if (list.indexOf(hostname.value) === -1) {
+          appResult.error = true;
+          appResult.message = `Tenant \`${tenantName}\` with Application type  hostname is not find in hostnameList`;
+        }
+      }
+      fileList.push(appResult);
+      const dcResult = {
+        fieldName: 'dc',
+        error: false,
+        message: null,
+      };
+      // TODO 2. 根据 zoom 和 type 确定新的 data center
+      const dc = await ctx.service.dc.getDC(environment_type.value, network_zone.value);
+      if (!dc) {
+        dcResult.error = true;
+        dcResult.message = 'Data Center with Environment Type and Network Zone is not enough';
+      }
+      fileList.push(dcResult);
+      // TODO 3. 确定新的 vm type
+      const type = await ctx.service.defineVMType.defineVMType(network_zone.value, environment_type.value, data_storage_request_number.value);
+      console.log(type);
+      // TODO 4. 根据 data center 验证 vm cluster 和 vm master 的正确性
+
+      // TODO 5. 根据 data center
+      return fileList;
     }
   };
 };
