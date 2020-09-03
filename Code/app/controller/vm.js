@@ -273,6 +273,16 @@ module.exports = app => {
         error: false,
         message: null,
       };
+      // TODO 1.2 验证新的 hostname 是否被使用中
+      const guestHost = await ctx.model.models.vm_guest.findOne({ where: { hostname: hostname.value } });
+      if (guestHost) {
+        const hostResult = {
+          fieldName: 'hostname',
+          error: true,
+          message: 'hostname is user',
+        };
+        fileList.push(hostResult);
+      }
       // TODO 2. 根据 zoom 和 type 确定新的 data center
       const dc = await ctx.service.dc.getDC(environment_type.value, network_zone.value);
       if (!dc) {
