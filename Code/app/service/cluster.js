@@ -1,6 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
+const axios = require('axios');
 
 module.exports = app => {
   return class extends app.Service {
@@ -170,52 +171,108 @@ module.exports = app => {
       return data;
     }
 
-    async getCheckHCL(vm) {
+    async getCheck(vm_cluster, vm_master, data_storage_request_number, ram_request_number, cpu_request_number, type) {
+      const vm = {
+        vm_cluster,
+        vm_master,
+        data_storage_request_number,
+        ram_request_number,
+        cpu_request_number,
+      };
+      if (type === 'HCI') {
+        return this.getCheckHCI(vm);
+      }
+      return this.getCheckVMMare(vm);
+
+    }
+
+    async getCheckHCI(vm) {
       const hciList = await this.getHCIAll([ vm.vm_cluster ]);
+      const hciResult = {
+        fieldName: 'vm_cluster',
+        error: false,
+        message: null,
+      };
       if (hciList.length > 0) {
         // 保存 HCIList
         await this.saveHCI(hciList);
         const hci = hciList[0];
         if (hci.TotalDiskSize * 0.2 < hci.FreeDiskSize - vm.data_storage_request_number * 1024) {
-          return false;
+          hciResult.error = true;
+          hciResult.message = ' vm_cluster data_storage_request_number beyond 80% ';
+          return hciResult;
         }
         if (hci.TotalMemory * 0.2 < hci.FreeMemory - vm.ram_request_number * 1024) {
-          return false;
+          hciResult.error = true;
+          hciResult.message = ' vm_cluster ram_request_number beyond 80% ';
+          return hciResult;
         }
         if (hci.NumberofCPU * 2 * 0.2 < hci.NumberofCPU * 2 - vm.cpu_request_number - hci.NoCPUUsed) {
-          return false;
+          hciResult.error = true;
+          hciResult.message = ' vm_cluster cpu beyond 80% ';
+          return hciResult;
         }
-        return true;
+      } else {
+        hciResult.error = true;
+        hciResult.message = ' vm_cluster can not be found ';
+        return hciResult;
       }
-      return false;
+      return hciResult;
     }
 
     async getCheckVMMare(vm) {
+      const vmResult = {
+        fieldName: 'vm_cluster',
+        error: false,
+        message: null,
+      };
       const vmmList = await this.getVMMareAll([ vm.vm_cluster ]);
       if (vmmList.length > 0) {
         // 保存 HCIList
         await this.saveVMMare(vmmList);
         const vmm = vmmList[0];
         if (vmm.totalRam * 0.2 < vmm.freeRam - vm.data_storage_request_number * 1024) {
-          return false;
+          vmResult.error = true;
+          vmResult.message = ' vm_cluster data_storage_request_number beyond 80% ';
+          return vmResult;
         }
         if (vmm.TotalMemory * 0.2 < vmm.FreeMemory - vm.ram_request_number * 1024) {
-          return false;
+          vmResult.error = true;
+          vmResult.message = ' vm_cluster data_storage_request_number beyond 80% ';
+          return vmResult;
         }
         if (vmm.NumberofCPU * 2 * 0.2 < vmm.NumberofCPU * 2 - vm.cpu_request_number - vmm.NoCPUUsed) {
-          return false;
+          vmResult.error = true;
+          vmResult.message = ' vm_cluster data_storage_request_number beyond 80% ';
+          return vmResult;
         }
         // 判断VM MASTER
         const master = vmm.ESXiDetails.find(t => t['Esxi Name'] === vm.vm_master);
-        if (master.TotalMemory * 0.2 < master.FreeMemory - vm.ram_request_number * 1024) {
-          return false;
+        if (master) {
+          if (master.TotalMemory * 0.2 < master.FreeMemory - vm.ram_request_number * 1024) {
+            vmResult.fieldName = 'vm_master';
+            vmResult.error = true;
+            vmResult.message = ' vm_master ram_request_number beyond 80% ';
+            return vmResult;
+          }
+          if (master.NumberofCPU * 2 * 0.2 < master.NumberofCPU * 2 - vm.cpu_request_number - master.NoCPUUsed) {
+            vmResult.fieldName = 'vm_master';
+            vmResult.error = true;
+            vmResult.message = ' vm_master cpu beyond 80% ';
+            return vmResult;
+          }
+        } else {
+          vmResult.fieldName = 'vm_master';
+          vmResult.error = true;
+          vmResult.message = ' vm_cluster can not be found ';
+          return vmResult;
         }
-        if (master.NumberofCPU * 2 * 0.2 < master.NumberofCPU * 2 - vm.cpu_request_number - master.NoCPUUsed) {
-          return false;
-        }
-        return true;
+      } else {
+        vmResult.error = true;
+        vmResult.message = ' vm_cluster can not be found ';
+        return vmResult;
       }
-      return false;
+      return vmResult;
     }
 
     async getFormDetailList(formKey, formId) {
@@ -427,8 +484,8 @@ module.exports = app => {
     }
 
     async getHCIAll(names) {
-      console.log(names);
-      const str = await this.getHCI();
+      const name = names.join();
+      const str = await this.getAnsibleHCI({ vClusters: name });
       const msgs = await this.JsonToHCI(str);
       const HCI = [];
       for (const msg of msgs) {
@@ -439,7 +496,8 @@ module.exports = app => {
 
 
     async getVMMareAll(names) {
-      const str = await this.getVMMare();
+      const name = names.join();
+      const str = await this.getAnsibleVMWare({ vClusters: name });
       const msgs = await this.JsonToVMMarm([], str, 0);
       const masters = [];
       for (const name of names) {
@@ -523,6 +581,34 @@ module.exports = app => {
         'PLAY RECAP *********************************************************************\n' +
         'localhost                  : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0 \n';
       return msg;
+    }
+
+    async getAnsibleHCI(params, options) {
+      const url = app.config.activiti.url;
+      const hci = await axios
+        .get(url + '/getAnsibleHCIResource', params, options)
+        .then(function(response) {
+          return new Promise(resolve => {
+            resolve(response.data);
+          });
+        }).catch(function(error) {
+          console.log(error);
+        });
+      return hci;
+    }
+
+    async getAnsibleVMWare(params, options) {
+      const url = app.config.activiti.url;
+      const hci = await axios
+        .get(url + '/getAnsibleVMWareResource', params, options)
+        .then(function(response) {
+          return new Promise(resolve => {
+            resolve(response.data);
+          });
+        }).catch(function(error) {
+          console.log(error);
+        });
+      return hci;
     }
 
     async getVMMare() {

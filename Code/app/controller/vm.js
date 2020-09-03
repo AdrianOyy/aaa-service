@@ -221,47 +221,6 @@ module.exports = app => {
       ctx.success({ pass, message });
     }
 
-
-    async test() {
-      const { ctx } = this;
-      // const str = await ctx.service.cluster.getMaster();
-      // const list = [];
-      // const json = await ctx.service.cluster.JsonToMaster(list, str, 0);
-      // const dist = [ 'devesxi02cs', 'devesxi03cs' ];
-      // const json = await ctx.service.cluster.setCluserAndMaster(dist);
-      // await ctx.service.cluster.saveMaster(json);
-      // const json = await ctx.service.cluster.getHCIAll();
-      const dist = [ 'devesxi02cs', 'devesxi03cs' ];
-      const hci = await ctx.service.cluster.setHCI(dist);
-      await ctx.service.cluster.saveHCI(hci);
-      // const hci = await ctx.service.cluster.setHCI(dist);
-      // const hci = await ctx.service.cluster.JsonToHCI(json);
-      // console.log(json);
-      // const str = 'ok: [localhost] =>';
-      // const end = 'TASK';
-      // const a = list.indexOf(str, 0);
-      // const aEnd = list.indexOf(end, a);
-      // const alist = list.substring(a + str.length, aEnd);
-      // const aJson = JSON.parse(alist);
-      // console.log(aJson);
-      // console.log(aJson.msg['ESXi Details'][0]);
-      // const b = list.indexOf(str, a + str.length);
-      // const bEnd = list.indexOf(end, b);
-      // const blist = list.substring(b + str.length, bEnd);
-      // console.log(JSON.parse(blist));
-      // const c = list.indexOf(str, b + str.length);
-      // const cEnd = list.indexOf(end, c);
-      // const clist = list.substring(c + str.length, cEnd);
-      // console.log(JSON.parse(clist));
-      // const d = list.indexOf(str, c + str.length);
-      // const dEnd = list.indexOf('PLAY', d);
-      // const dlist = list.substring(d + str.length, dEnd);
-      // console.log(JSON.parse(dlist));
-      // console.log(a, b, c, d);
-      // console.log(aEnd, bEnd, cEnd, dEnd);
-      ctx.success('');
-    }
-
     async check() {
       const { ctx } = this;
       const { formKey, formId, sonForm } = ctx.request.body;
@@ -313,7 +272,12 @@ module.exports = app => {
       const type = await ctx.service.defineVMType.defineVMType(network_zone.value, environment_type.value, data_storage_request_number.value);
       console.log(type);
       // TODO 4. 根据 data center 验证 vm cluster 和 vm master 的正确性
-
+      const vm_cluster = sonForm.find(t => t.fieldName === 'vm_cluster').value;
+      const vm_master = sonForm.find(t => t.fieldName === 'vm_master').value;
+      const ram_request_number = sonForm.find(t => t.fieldName === 'ram_request_number').value;
+      const cpu_request_number = sonForm.find(t => t.fieldName === 'cpu_request_number').value;
+      const vmResult = await ctx.service.cluster.getCheck(vm_cluster, vm_master, data_storage_request_number.value, ram_request_number, cpu_request_number, type);
+      fileList.push(vmResult);
       // TODO 5. 根据 data center
       return fileList;
     }
