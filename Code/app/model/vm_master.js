@@ -5,6 +5,7 @@ module.exports = app => {
 
   const vm_master = app.model.define('vm_master', {
     id: { type: INTEGER, autoIncrement: true, primaryKey: true, cnName: 'ID' },
+    VMCMasterName: { type: STRING(256), allowNull: true, cnName: 'VMCMaster Name', comment: 'VMCMaster Name' },
     serialNumber: { type: STRING(256), allowNull: true, cnName: 'Serial Number', comment: 'Serial Number' },
     EAMAssetNumber: { type: STRING(256), allowNull: true, cnName: 'EAM Asset Number', comment: 'EAM Asset Number' },
     model: { type: STRING(256), allowNull: true, cnName: 'Model', comment: 'Model' },

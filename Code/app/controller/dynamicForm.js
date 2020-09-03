@@ -59,73 +59,73 @@ module.exports = app => {
       ctx.success();
     }
 
-    async getDynamicForm() {
-      const { ctx } = this;
-      const { deploymentId, userId } = ctx.request.query;
-      const dynamicForm = await ctx.model.models.dynamicForm.findOne({ where: { deploymentId } });
-      if (!dynamicForm) ctx.error();
-      const dynamicFormDetail = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: dynamicForm.id } });
-      const detailList = [];
-      for (const formDetail of dynamicFormDetail) {
-        const form = {};
-        form.id = formDetail.fieldName;
-        form.label = formDetail.fieldName;
-        form.fileType = formDetail.fileType;
-        form.type = formDetail.inputType;
-        form.showOnRequest = formDetail.showOnRequest;
-        form.foreignTable = formDetail.foreignTable;
-        form.foreignDisplayKey = formDetail.foreignDisplayKey;
-        form.foreignKey = formDetail.foreignKey;
-        form.labelField = formDetail.foreignDisplayKey;
-        form.valueField = formDetail.foreignKey;
-        form.readOnly = !formDetail.writable;
-        form.disabled = true;
-        form.value = '';
-        if (formDetail.inputType === 'select') {
-          if (formDetail.foreignTable === 'tenant') {
-            const itemList = await ctx.service.user.getTenants(userId);
-            form.itemList = itemList;
-          } else {
-            const itemList = await ctx.model.models[formDetail.foreignTable].findAll({});
-            form.itemList = itemList;
-          }
-        }
-        detailList.push(form);
-      }
-      // 获取子流程
-      const sonFormList = [];
-      const sonDetailList = [];
-      const sonForm = await ctx.model.models.dynamicForm.findOne({ where: { parentId: dynamicForm.id } });
-      if (sonForm) {
-        const sonFormDetail = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: sonForm.id, readable: true } });
-        for (const sonDetail of sonFormDetail) {
-          const form = {};
-          form.id = sonDetail.fieldName;
-          form.label = sonDetail.fieldName;
-          form.fileType = sonDetail.fileType;
-          form.type = sonDetail.inputType === 'long' ? 'number' : sonDetail.inputType;
-          form.showOnRequest = sonDetail.showOnRequest;
-          form.foreignTable = sonDetail.foreignTable;
-          form.foreignDisplayKey = sonDetail.foreignDisplayKey;
-          form.foreignKey = sonDetail.foreignKey;
-          form.labelField = sonDetail.foreignDisplayKey;
-          form.valueField = sonDetail.foreignKey;
-          form.readOnly = false;
-          form.value = '';
-          if (sonDetail.inputType === 'select') {
-            if (sonDetail.foreignTable === 'tenant') {
-              const itemList = await ctx.service.user.getTenants(userId);
-              form.itemList = itemList;
-            } else {
-              const itemList = await ctx.model.models[sonDetail.foreignTable].findAll({});
-              form.itemList = itemList;
-            }
-          }
-          sonFormList.push(form);
-        }
-      }
-      ctx.success({ dynamicForm, detailList, sonForm, sonFormList, sonDetailList });
-    }
+    // async getDynamicForm() {
+    //   const { ctx } = this;
+    //   const { deploymentId, userId } = ctx.request.query;
+    //   const dynamicForm = await ctx.model.models.dynamicForm.findOne({ where: { deploymentId } });
+    //   if (!dynamicForm) ctx.error();
+    //   const dynamicFormDetail = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: dynamicForm.id } });
+    //   const detailList = [];
+    //   for (const formDetail of dynamicFormDetail) {
+    //     const form = {};
+    //     form.id = formDetail.fieldName;
+    //     form.label = formDetail.fieldName;
+    //     form.fileType = formDetail.fileType;
+    //     form.type = formDetail.inputType;
+    //     form.showOnRequest = formDetail.showOnRequest;
+    //     form.foreignTable = formDetail.foreignTable;
+    //     form.foreignDisplayKey = formDetail.foreignDisplayKey;
+    //     form.foreignKey = formDetail.foreignKey;
+    //     form.labelField = formDetail.foreignDisplayKey;
+    //     form.valueField = formDetail.foreignKey;
+    //     form.readOnly = !formDetail.writable;
+    //     form.disabled = true;
+    //     form.value = '';
+    //     if (formDetail.inputType === 'select') {
+    //       if (formDetail.foreignTable === 'tenant') {
+    //         const itemList = await ctx.service.user.getTenants(userId);
+    //         form.itemList = itemList;
+    //       } else {
+    //         const itemList = await ctx.model.models[formDetail.foreignTable].findAll({});
+    //         form.itemList = itemList;
+    //       }
+    //     }
+    //     detailList.push(form);
+    //   }
+    //   // 获取子流程
+    //   const sonFormList = [];
+    //   const sonDetailList = [];
+    //   const sonForm = await ctx.model.models.dynamicForm.findOne({ where: { parentId: dynamicForm.id } });
+    //   if (sonForm) {
+    //     const sonFormDetail = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: sonForm.id, readable: true } });
+    //     for (const sonDetail of sonFormDetail) {
+    //       const form = {};
+    //       form.id = sonDetail.fieldName;
+    //       form.label = sonDetail.fieldName;
+    //       form.fileType = sonDetail.fileType;
+    //       form.type = sonDetail.inputType === 'long' ? 'number' : sonDetail.inputType;
+    //       form.showOnRequest = sonDetail.showOnRequest;
+    //       form.foreignTable = sonDetail.foreignTable;
+    //       form.foreignDisplayKey = sonDetail.foreignDisplayKey;
+    //       form.foreignKey = sonDetail.foreignKey;
+    //       form.labelField = sonDetail.foreignDisplayKey;
+    //       form.valueField = sonDetail.foreignKey;
+    //       form.readOnly = false;
+    //       form.value = '';
+    //       if (sonDetail.inputType === 'select') {
+    //         if (sonDetail.foreignTable === 'tenant') {
+    //           const itemList = await ctx.service.user.getTenants(userId);
+    //           form.itemList = itemList;
+    //         } else {
+    //           const itemList = await ctx.model.models[sonDetail.foreignTable].findAll({});
+    //           form.itemList = itemList;
+    //         }
+    //       }
+    //       sonFormList.push(form);
+    //     }
+    //   }
+    //   ctx.success({ dynamicForm, detailList, sonForm, sonFormList, sonDetailList });
+    // }
 
     async getDynamicFormDetail() {
       const { ctx } = this;
@@ -198,7 +198,8 @@ module.exports = app => {
           const p = {};
           for (const sonDetail of sonFormDetail) {
             if (sonDetail.inputType === 'select') {
-              p[sonDetail.fieldName] = resd[sonDetail.fieldName] ? resd[sonDetail.fieldName].id : null;
+              p[sonDetail.fieldName + '_svalue'] = resd[sonDetail.fieldName] ? resd[sonDetail.fieldName][sonDetail.foreignKey] : null;
+              p[sonDetail.fieldName] = resd[sonDetail.fieldName] ? resd[sonDetail.fieldName][sonDetail.foreignDisplayKey] : null;
             } else {
               p[sonDetail.fieldName] = resd[sonDetail.fieldName];
             }
@@ -240,8 +241,8 @@ module.exports = app => {
             } else {
               sonFormDetail[sonField.fieldName] = sonDetail[sonField.fieldName];
             }
-
           }
+          sonFormDetail.data_center = await ctx.service.dc.getDC(sonFormDetail.environment_type, sonFormDetail.network_zone);
           const insertSql = await ctx.service.dynamicForm.getInsertSQL(childFormKey, sonFormDetail);
           // console.log(insertSql);
           await app.model.query(insertSql);
@@ -292,7 +293,7 @@ module.exports = app => {
       }
     }
 
-    async test() {
+    async getDynamicForm() {
       const { ctx } = this;
       const { deploymentId } = ctx.query;
       const dynamicForm = await ctx.service.dynamicForm.getDynamicFormWithForeignTable(deploymentId);

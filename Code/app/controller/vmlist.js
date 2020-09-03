@@ -1,0 +1,39 @@
+'use strict';
+
+module.exports = app => {
+  return class extends app.Controller {
+    async updateStatus() {
+      const { ctx } = this;
+      const { status, idList } = ctx.request.body;
+      if (!status || !idList || !idList.length) ctx.error();
+      try {
+        const idString = '(' + idList.join(',') + ')';
+        const updateSql = `update vmlist set status = '${status}' where id in ${idString}`;
+        const [ updateResults ] = await app.model.query(updateSql);
+        ctx.success({ result: true, affectedRows: updateResults.affectedRows });
+      } catch (error) {
+        console.log('error==========================error');
+        console.log(error);
+        console.log('error==========================error');
+        ctx.error('service busy');
+      }
+    }
+    async checkStatus() {
+      const { ctx } = this;
+      const { idList } = ctx.request.body;
+      if (!idList || !idList.length) ctx.error();
+      try {
+        const idString = '(' + idList.join(',') + ')';
+        const checkSql = `select count(*) as number from vmlist where status is not null and id in ${idString}`;
+        const [ selectResults ] = await app.model.query(checkSql);
+        const result = selectResults[0].number === 0;
+        ctx.success(result);
+      } catch (error) {
+        console.log('error==========================error');
+        console.log(error);
+        console.log('error==========================error');
+        ctx.error('service busy');
+      }
+    }
+  };
+};

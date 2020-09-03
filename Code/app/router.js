@@ -94,7 +94,7 @@ module.exports = app => {
 
   router.post(`${prefix}/dynamicForm/create`, controller.dynamicForm.create);
   router.post(`${prefix}/dynamicForm/save`, controller.dynamicForm.save);
-  router.get(`${prefix}/dynamicForm/test`, controller.dynamicForm.test);
+  // router.get(`${prefix}/dynamicForm/test`, controller.dynamicForm.test);
   router.get(`${prefix}/dynamicForm/getDetailByKey`, controller.dynamicForm.getDetailByKey);
   router.get(`${prefix}/dynamicForm/getDynamicForm`, controller.dynamicForm.getDynamicForm);
   router.get(`${prefix}/dynamicForm/verifyApplicationType`, controller.dynamicForm.verifyApplicationType);
@@ -133,4 +133,7 @@ module.exports = app => {
   router.get(`${prefix}/dc/list`, controller.dc.list);
 
   router.post(`${prefix}/vm/preDefine`, controller.vm.preDefine);
+
+  router.post(`${prefix}/vmlist/updateStatus`, controller.vmlist.updateStatus);
+  router.post(`${prefix}/vmlist/checkStatus`, controller.vmlist.checkStatus);
 };
