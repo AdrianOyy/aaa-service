@@ -142,4 +142,5 @@ module.exports = app => {
   router.post(`${prefix}/vmlist/defindVMType`, controller.vmlist.defindVMType);
 
   router.post(`${prefix}/diyForm/create`, controller.diyForm.create);
+  router.post(`${prefix}/diyForm/update`, controller.diyForm.update);
 };
