@@ -67,9 +67,20 @@ module.exports = app => {
       }
     }
 
-    // async detail() {
-    //
-    // }
+    async detail() {
+      const { ctx } = this;
+      const { pid } = ctx.query;
+      if (!pid) {
+        ctx.error();
+        return;
+      }
+      const detail = await ctx.service.diyForm.getDIYFormDetail(pid, 'VMAllocation', 'VMList');
+      if (!detail) {
+        ctx.error();
+        return;
+      }
+      ctx.success(detail);
+    }
     //
     // async update() {
     //
