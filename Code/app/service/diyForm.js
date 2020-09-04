@@ -25,6 +25,28 @@ module.exports = app => {
       }
       return SQLList;
     }
+
+    /**
+     * get dynamic form detail by pid
+     * @param {string} formKey
+     * @param {string} childFormKey
+     * @param {string | number} pid
+     * @returns {Promise<{object}>}
+     */
+    async getDIYFormDetail(pid, formKey, childFormKey) {
+      const parentSQL = `SELECT * FROM ${formKey} WHERE pid = ${pid}`;
+      const [ parentDataList ] = await app.model.query(parentSQL);
+      if (parentDataList.length === 0) return false;
+      const parentData = parentDataList[0];
+      const parentId = parentData.id;
+      const childSQL = `SELECT * FROM ${childFormKey} WHERE parentId = ${parentId}`;
+      const [ childDataList ] = await app.model.query(childSQL);
+      const model = {
+        parentData,
+        childDataList,
+      };
+      return model;
+    }
   };
 };
 
