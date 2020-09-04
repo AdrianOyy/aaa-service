@@ -103,7 +103,6 @@ module.exports = app => {
         data,
       } = ctx.request.body;
       // if (!serialNumber) ctx.error();
-      console.log(data);
       try {
         const projectCode = data.tenant.code;
         const tenantId = data.tenant.id;
@@ -113,7 +112,7 @@ module.exports = app => {
         for (const _ of data.childTable) {
           const vmGuest = {};
           vmGuest.serialNumber = _.pid;
-          vmGuest.model = null;
+          vmGuest.model = await ctx.service.defineVMType.defineVMType(_.network_zone.id, _.environment_type.id, _.data_storage_request_number);
           vmGuest.assignedMemory = _.RAM_request_number;
           vmGuest.assignedCPUCores = _.CPU_request_number;
           vmGuest.diskVolumeName = null;
@@ -122,9 +121,9 @@ module.exports = app => {
           vmGuest.status = _.status;
           vmGuest.hostname = _.hostname;
           vmGuest.VMClusterId = null;
-          vmGuest.VMClusterName = null;
+          vmGuest.VMClusterName = _.vm_cluster;
           vmGuest.OS = _.OS_IP;
-          vmGuest.serverRole = null;
+          vmGuest.serverRole = _.application_type.name;
           vmGuest.hostIP = null;
           vmGuest.ATLIP = _.ATL_IP;
           vmGuest.magementHost = null;
