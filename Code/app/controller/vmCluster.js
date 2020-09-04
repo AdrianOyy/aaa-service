@@ -104,12 +104,14 @@ module.exports = app => {
       } = ctx.request.body;
       // if (!serialNumber) ctx.error();
       try {
+        console.log(data)
         const projectCode = data.tenant.code;
         const tenantId = data.tenant.id;
         const projectContact = data.tenant.contact_person;
         const projectManager = data.tenant.project_owner;
         const vmGuests = [];
-        for (const _ of data.childTable) {
+        const childTable = data.childTable.filter(_ => _.status === 'comfirmed');
+        for (const _ of childTable) {
           const vmGuest = {};
           vmGuest.serialNumber = _.pid;
           vmGuest.model = await ctx.service.defineVMType.defineVMType(_.network_zone.id, _.environment_type.id, _.data_storage_request_number);
