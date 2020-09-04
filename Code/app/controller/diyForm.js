@@ -91,9 +91,31 @@ module.exports = app => {
       ctx.success(detail);
     }
     //
-    // async update() {
-    //
-    // }
+    async update() {
+      const { ctx } = this;
+      const {
+        formKey,
+        formId,
+        childFormKey,
+        parentData,
+        childDataList,
+      } = ctx.request.body;
+      // 获取父表插入SQL
+      const parentInsertSQL = await ctx.service.diyForm.getParentFormUpdateSQL(formKey, parentData, formId);
+
+      // 获取子表插入SQL
+      const childInsertSQLList = await ctx.service.diyForm.getChildFormUpdateSQLList(childFormKey, childDataList);
+
+      const updateSQLList = [ parentInsertSQL, ...childInsertSQLList ];
+
+      const res = await ctx.service.sql.transaction(updateSQLList);
+
+      if (!res.success) {
+        ctx.error();
+      } else {
+        ctx.success();
+      }
+    }
     //
     // async delete() {
     //
