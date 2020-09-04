@@ -108,12 +108,6 @@ module.exports = app => {
       ctx.success(result);
     }
 
-    async test() {
-      const { ctx } = this;
-      await ctx.service.ipAssign.pingIp();
-      ctx.success('success');
-    }
-
     async getClusterList() {
       const { ctx } = this;
       const { Op } = app.Sequelize;
@@ -145,6 +139,28 @@ module.exports = app => {
         }
       }
       return vmlist;
+    }
+
+    // eslint-disable-next-line no-dupe-class-members
+    async test() {
+      const { ctx } = this;
+      const formId = 14;
+      const formKey = 'VMAllocation';
+      // const { formKey, formId } = ctx.request.body;
+      const dynamicForm = await ctx.service.dynamicForm.getDetailByKey(formKey, formId);
+      const { childTable } = dynamicForm;
+      for (const index in childTable) {
+        if (index % 2 === 0) {
+          childTable[index].type = 'HCI';
+        } else {
+          childTable[index].type = 'VMWare';
+        }
+      }
+      const data = await ctx.service.cluster.getClusterList(childTable);
+      // console.log(data);
+      console.log('============================');
+      console.log(childTable);
+      ctx.success('success');
     }
 
     async preDefine() {
