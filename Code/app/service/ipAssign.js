@@ -5,7 +5,7 @@ module.exports = app => {
     /**
      * @param {Object[]} IPList IP list without hostname
      * @param {number} num number of requested IP
-     * @returns {Object[]}
+     * @return {Object[]}
      */
     async getClosest(IPList, num) {
       const IPNumArr = [];
@@ -31,6 +31,24 @@ module.exports = app => {
         closestList.push(IPList[i]);
       }
       return closestList;
+    }
+
+    async checkAssign(DC, IP, type) {
+      const { ctx } = this;
+      const { Op } = app.Sequelize;
+      const IPList = await ctx.model.models.ip_assignment.findAll({
+        where: {
+          DCId: DC,
+          IP,
+          hostname: { [Op.is]: null },
+          networkType: type,
+        },
+        order: [[ 'IP', 'ASC' ]],
+      });
+      if (IPList.count > 0) {
+        return true;
+      }
+      return false;
     }
 
     async assign(DC, requestNum) {
@@ -81,6 +99,11 @@ module.exports = app => {
       return [ Cres, Fres ];
     }
 
+    async pingIp(ip) {
+      const res = await require('ping').promise.probe(ip);
+      return res.alive;
+    }
+
     /**
      * @param {Object[]} vmList VM list
      * @return {Promise<Object[]>} typeCountList
@@ -111,7 +134,7 @@ module.exports = app => {
 
 /**
  * @param {string} IP IP address
- * @returns {number}
+ * @return {number}
  */
 function IP2Num(IP) {
   const IPArr = IP.split('.');

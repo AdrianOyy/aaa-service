@@ -35,5 +35,20 @@ module.exports = app => {
         ctx.error('service busy');
       }
     }
+
+    async defindVMType() {
+      const { ctx } = this;
+      const { zone_id, type_id, size } = ctx.request.body;
+      if (!zone_id || !type_id || !size) ctx.error();
+      try {
+        const type = await ctx.service.defineVMType.defineVMType(zone_id, type_id, size);
+        ctx.success({ type });
+      } catch (error) {
+        console.log('error==========================error');
+        console.log(error);
+        console.log('error==========================error');
+        ctx.error('service busy');
+      }
+    }
   };
 };

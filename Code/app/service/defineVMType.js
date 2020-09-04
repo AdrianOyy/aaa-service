@@ -30,7 +30,7 @@ module.exports = app => {
       });
       if (vm_zone != null && vm_type != null && size != null) {
         VMType = 'VMWare';
-        if (vm_zone.name === 'Intranet' && vm_type.name === 'Production' && size <= 500) {
+        if (vm_zone.name.trim() === 'Intranet' && vm_type.name.trim() === 'Production' && size <= 500) {
           VMType = 'HCI';
         }
       }
