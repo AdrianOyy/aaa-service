@@ -115,12 +115,11 @@ module.exports = app => {
         // console.log(appCluster);
         // 根据 typeId 和 zoomId 获取 dc，根据dc获取 Cluster
         const dcClusters = await ctx.model.models.vm_cluster_dc_mapping.findAll({ where: { cdcid } });
-        for (const typeCluster of typeClusters) {
-          cluster.push(typeCluster.cluster);
-        }
-        for (const dcCluster of dcClusters) {
-          if (cluster.indexOf(dcCluster.clusterName) === -1) {
-            cluster.push(dcCluster.clusterName);
+        if (typeClusters.count > 0 && dcCluster.count > 0) {
+          for (const dcCluster of dcClusters) {
+            if (typeClusters.indexOf(dcCluster.clusterName) > -1) {
+              cluster.push(dcCluster.clusterName);
+            }
           }
         }
       }
@@ -146,12 +145,11 @@ module.exports = app => {
             const dcClusters = await ctx.model.models.vm_cluster_dc_mapping.findAll({
               where: { cdcid: { [Op.in]: app.Sequelize.literal(`(select cdcid from vm_type_zone_cdc where typeId = ${vm.environment_type.id} and zoneId = ${vm.network_zone.id})`) } },
             });
-            for (const typeCluster of typeClusters) {
-              cluster.push(typeCluster.cluster);
-            }
-            for (const dcCluster of dcClusters) {
-              if (cluster.indexOf(dcCluster.clusterName) === -1) {
-                cluster.push(dcCluster.clusterName);
+            if (dcClusters.count > 0 && typeClusters.count > 0) {
+              for (const dcCluster of dcClusters) {
+                if (typeClusters.indexOf(dcCluster.clusterName) > -1) {
+                  cluster.push(dcCluster.clusterName);
+                }
               }
             }
             if (cluster) {
@@ -217,17 +215,17 @@ module.exports = app => {
         // 保存 HCIList
         await this.saveHCI(hciList);
         const hci = hciList[0];
-        if (hci.TotalDiskSize * 0.2 < hci.FreeDiskSize - vm.data_storage_request_number * 1024) {
+        if (hci.TotalDiskSize * 0.2 > hci.FreeDiskSize - vm.data_storage_request_number * 1024) {
           hciResult.error = true;
           hciResult.message = ' vm_cluster data_storage_request_number beyond 80% ';
           return hciResult;
         }
-        if (hci.TotalMemory * 0.2 < hci.FreeMemory - vm.ram_request_number * 1024) {
+        if (hci.TotalMemory * 0.2 > hci.FreeMemory - vm.ram_request_number * 1024) {
           hciResult.error = true;
           hciResult.message = ' vm_cluster ram_request_number beyond 80% ';
           return hciResult;
         }
-        if (hci.NumberofCPU * 2 * 0.2 < hci.NumberofCPU * 2 - vm.cpu_request_number - hci.NoCPUUsed) {
+        if (hci.NumberofCPU * 2 * 0.2 > hci.NumberofCPU * 2 - vm.cpu_request_number - hci.NoCPUUsed) {
           hciResult.error = true;
           hciResult.message = ' vm_cluster cpu beyond 80% ';
           return hciResult;
@@ -251,17 +249,17 @@ module.exports = app => {
         // 保存 HCIList
         await this.saveVMMare(vmmList);
         const vmm = vmmList[0];
-        if (vmm.totalRam * 0.2 < vmm.freeRam - vm.data_storage_request_number * 1024) {
+        if (vmm.totalRam * 0.2 > vmm.freeRam - vm.data_storage_request_number * 1024) {
           vmResult.error = true;
           vmResult.message = ' vm_cluster data_storage_request_number beyond 80% ';
           return vmResult;
         }
-        if (vmm.TotalMemory * 0.2 < vmm.FreeMemory - vm.ram_request_number * 1024) {
+        if (vmm.TotalMemory * 0.2 > vmm.FreeMemory - vm.ram_request_number * 1024) {
           vmResult.error = true;
           vmResult.message = ' vm_cluster data_storage_request_number beyond 80% ';
           return vmResult;
         }
-        if (vmm.NumberofCPU * 2 * 0.2 < vmm.NumberofCPU * 2 - vm.cpu_request_number - vmm.NoCPUUsed) {
+        if (vmm.NumberofCPU * 2 * 0.2 > vmm.NumberofCPU * 2 - vm.cpu_request_number - vmm.NoCPUUsed) {
           vmResult.error = true;
           vmResult.message = ' vm_cluster data_storage_request_number beyond 80% ';
           return vmResult;
@@ -269,13 +267,13 @@ module.exports = app => {
         // 判断VM MASTER
         const master = vmm.ESXiDetails.find(t => t['Esxi Name'] === vm.vm_master);
         if (master) {
-          if (master.TotalMemory * 0.2 < master.FreeMemory - vm.ram_request_number * 1024) {
+          if (master.TotalMemory * 0.2 > master.FreeMemory - vm.ram_request_number * 1024) {
             vmResult.fieldName = 'vm_master';
             vmResult.error = true;
             vmResult.message = ' vm_master ram_request_number beyond 80% ';
             return vmResult;
           }
-          if (master.NumberofCPU * 2 * 0.2 < master.NumberofCPU * 2 - vm.cpu_request_number - master.NoCPUUsed) {
+          if (master.NumberofCPU * 2 * 0.2 > master.NumberofCPU * 2 - vm.cpu_request_number - master.NoCPUUsed) {
             vmResult.fieldName = 'vm_master';
             vmResult.error = true;
             vmResult.message = ' vm_master cpu beyond 80% ';
