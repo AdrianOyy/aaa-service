@@ -7,7 +7,7 @@ module.exports = app => {
   return class extends app.Service {
     async getInCluserList(clusterNames, vm, inList, data) {
       let clusterInList = [];
-      const hciList = await this.getHCIAll(clusterNames);
+      const hciList = await this.setHCI(clusterNames);
       // 保存 HCIList
       await this.saveHCI(hciList);
       for (const hci of hciList) {
@@ -19,13 +19,13 @@ module.exports = app => {
             hci.FreeDiskSize = hci.FreeDiskSize - inCluster.data_storage_request_number * 1024;
           }
         }
-        if (hci.TotalDiskSize * 0.2 < hci.FreeDiskSize - vm.data_storage_request_number * 1024) {
+        if ((hci.TotalDiskSize * 0.2) > (hci.FreeDiskSize - vm.data_storage_request_number * 1024)) {
           continue;
         }
-        if (hci.TotalMemory * 0.2 < hci.FreeMemory - vm.ram_request_number * 1024) {
+        if ((hci.TotalMemory * 0.2) > (hci.FreeMemory - vm.ram_request_number * 1024)) {
           continue;
         }
-        if (hci.NumberofCPU * 2 * 0.2 < hci.NumberofCPU * 2 - vm.cpu_request_number - hci.NoCPUUsed) {
+        if ((hci.NumberofCPU * 2 * 0.2) > (hci.NumberofCPU * 2 - vm.cpu_request_number - hci.NoCPUUsed)) {
           continue;
         }
         hci.orderByMemory = setFloat(hci.FreeMemory, hci.TotalMemory);
@@ -35,7 +35,7 @@ module.exports = app => {
       }
       if (clusterInList.length > 0) {
         clusterInList = _.orderBy(clusterInList, [ 'orderByCPU', 'orderByMemory', 'orderByRam' ], [ 'desc', 'desc', 'desc' ]);
-        return clusterInList[0].name;
+        return clusterInList[0].ClusterName;
       }
       data.pass = false;
       data.message += 'not find cluser/n';
@@ -44,7 +44,7 @@ module.exports = app => {
 
     async getInMasterList(clusterNames, vm, inList, data) {
       let clusterInList = [];
-      const vmmList = await this.getVMMareAll(clusterNames);
+      const vmmList = await this.setVMMare(clusterNames);
       // 保存 VMMare
       await this.saveVMMare(vmmList);
       const rmaster = {
@@ -60,13 +60,13 @@ module.exports = app => {
             vmm.freeRam = vmm.freeRam - inCluster.data_storage_request_number * 1024;
           }
         }
-        if (vmm.totalRam * 0.2 < vmm.freeRam - vm.data_storage_request_number * 1024) {
+        if ((vmm.totalRam * 0.2) > (vmm.freeRam - vm.data_storage_request_number * 1024)) {
           continue;
         }
-        if (vmm.TotalMemory * 0.2 < vmm.FreeMemory - vm.ram_request_number * 1024) {
+        if ((vmm.TotalMemory * 0.2) > (vmm.FreeMemory - vm.ram_request_number * 1024)) {
           continue;
         }
-        if (vmm.NumberofCPU * 2 * 0.2 < vmm.NumberofCPU * 2 - vm.cpu_request_number - vmm.NoCPUUsed) {
+        if ((vmm.NumberofCPU * 2 * 0.2) > (vmm.NumberofCPU * 2 - vm.cpu_request_number - vmm.NoCPUUsed)) {
           continue;
         }
         vmm.orderByMemory = setFloat(vmm.FreeMemory, vmm.TotalMemory);
@@ -86,10 +86,10 @@ module.exports = app => {
               master.NoCPUUsed = master.NoCPUUsed + inCluster.cpu_request_number;
               master.FreeMemory = master.FreeMemory - inCluster.ram_request_number * 1024;
             }
-            if (master.TotalMemory * 0.2 < master.FreeMemory - vm.ram_request_number * 1024) {
+            if (master.TotalMemory * 0.2 > master.FreeMemory - vm.ram_request_number * 1024) {
               continue;
             }
-            if (master.NumberofCPU * 2 * 0.2 < master.NumberofCPU * 2 - vm.cpu_request_number - master.NoCPUUsed) {
+            if (master.NumberofCPU * 2 * 0.2 > master.NumberofCPU * 2 - vm.cpu_request_number - master.NoCPUUsed) {
               continue;
             }
             rmaster.vm_master = master['Esxi Name'];
@@ -160,12 +160,12 @@ module.exports = app => {
                 // 保存名称
                 vm.vm_cluster = clusterName;
                 inCluster.push(vm);
-              } else if (vm.type === 'VMMaster') {
+              } else if (vm.type === 'VMWare') {
                 const masterList = await this.getInMasterList(cluster, vm, inCluster, data);
                 // 保存名称
                 if (masterList) {
-                  vm.vm_cluster = masterList.cluster;
-                  vm.master = masterList.master;
+                  vm.vm_cluster = masterList.vm_cluster;
+                  vm.vm_master = masterList.vm_master;
                   inCluster.push(vm);
                 } else {
                   data.pass = false;
@@ -181,7 +181,7 @@ module.exports = app => {
             }
           } else {
             data.pass = false;
-            data.message += 'network_zone or application_type is null/n';
+            data.message += ' network_zone or application_type is null/n';
           }
         }
       } catch (e) {
@@ -315,7 +315,6 @@ module.exports = app => {
         for (const cluster of clusters) {
           let clusterId = 0;
           const clusterFind = await ctx.model.models.vm_cluster.findOne({ where: { VMClusterName: cluster.ClusterName } });
-          console.log(clusterFind);
           if (clusterFind) {
             clusterId = clusterFind.id;
             clusterFind.totalMemory = parseFloat(cluster.TotalMemory / 1024).toFixed(2);
@@ -373,8 +372,7 @@ module.exports = app => {
         for (const cluster of clusters) {
           const clusterFind = await ctx.model.models.vm_cluster.findOne({ where: { VMClusterName: cluster.ClusterName } });
           if (clusterFind) {
-            clusterFind.totalMemory = parseFloat(cluster.TotalMemory / 1024)
-              .toFixed(2);
+            clusterFind.totalMemory = parseFloat(parseFloat(cluster.TotalMemory / 1024).toFixed(2));
             clusterFind.totalNumbeOfCPU = cluster.NumberofCPU;
             clusterFind.storagePoolSize = parseInt(cluster.TotalDiskSize / 1024);
             clusterFind.save({ transaction });
@@ -418,7 +416,7 @@ module.exports = app => {
       const msgJson = JSON.parse(msg);
       list.push(msgJson.msg);
       if (!isAll) {
-        await this.JsonToMaster(list, str, startOf + start.length);
+        await this.JsonToVMMarm(list, str, startOf + start.length);
       }
       return list;
     }
@@ -516,26 +514,30 @@ module.exports = app => {
 
 
     async getVMMareAll(names) {
+      names = [ 'devesxi03cs', 'devesxi02cs' ];
       const name = names.join();
       const str = await this.getAnsibleVMWare({ vClusters: name });
       const msgs = await this.JsonToVMMarm([], str, 0);
       const masters = [];
       for (const name of names) {
-        const master = {
-          ClusterName: name,
-          ESXiDetails: [],
-          DatastoreDetails: [],
-        };
         const msg = msgs.filter(t => t['Cluster Name'].trim() === name);
-        for (const detail of msg) {
-          if (detail['ESXi Details']) {
-            master.ESXiDetails = detail['ESXi Details'];
+        if (msg.length > 0) {
+          const master = {
+            ClusterName: name,
+            ESXiDetails: [],
+            DatastoreDetails: [],
+          };
+          const msg = msgs.filter(t => t['Cluster Name'].trim() === name);
+          for (const detail of msg) {
+            if (detail['ESXi Details']) {
+              master.ESXiDetails = detail['ESXi Details'];
+            }
+            if (detail['Datastore Details']) {
+              master.DatastoreDetails = detail['Datastore Details'];
+            }
           }
-          if (detail['Datastore Details']) {
-            master.DatastoreDetails = detail['Datastore Details'];
-          }
+          masters.push(master);
         }
-        masters.push(master);
       }
       return masters;
     }
