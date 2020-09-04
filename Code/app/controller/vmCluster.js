@@ -100,17 +100,17 @@ module.exports = app => {
     async createVMGuest() {
       const { ctx } = this;
       const {
-        dynamicForm,
+        data,
       } = ctx.request.body;
       // if (!serialNumber) ctx.error();
-      console.log(dynamicForm);
+      console.log(data);
       try {
-        const projectCode = dynamicForm.Project_Name.code;
-        const tenantId = dynamicForm.Project_Name.id;
-        const projectContact = dynamicForm.Project_Name.contact_person;
-        const projectManager = dynamicForm.Project_Name.project_owner;
+        const projectCode = data.tenant.code;
+        const tenantId = data.tenant.id;
+        const projectContact = data.tenant.contact_person;
+        const projectManager = data.tenant.project_owner;
         const vmGuests = [];
-        for (const _ of dynamicForm.childTable) {
+        for (const _ of data.childTable) {
           const vmGuest = {};
           vmGuest.serialNumber = _.pid;
           vmGuest.model = null;
@@ -119,7 +119,7 @@ module.exports = app => {
           vmGuest.diskVolumeName = null;
           vmGuest.CSVName = _.CSV;
           vmGuest.diskSize = _.data_storage_request_number;
-          vmGuest.status = 'confirmed';
+          vmGuest.status = _.status;
           vmGuest.hostname = _.hostname;
           vmGuest.VMClusterId = null;
           vmGuest.VMClusterName = null;
