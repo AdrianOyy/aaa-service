@@ -97,5 +97,55 @@ module.exports = app => {
         throw { status: 500, message: 'service busy' };
       }
     }
+    async createVMGuest() {
+      const { ctx } = this;
+      const {
+        dynamicForm,
+      } = ctx.request.body;
+      // if (!serialNumber) ctx.error();
+      console.log(dynamicForm);
+      try {
+        const projectCode = dynamicForm.Project_Name.code;
+        const tenantId = dynamicForm.Project_Name.id;
+        const projectContact = dynamicForm.Project_Name.contact_person;
+        const projectManager = dynamicForm.Project_Name.project_owner;
+        const vmGuests = [];
+        for (const _ of dynamicForm.childTable) {
+          const vmGuest = {};
+          vmGuest.serialNumber = _.pid;
+          vmGuest.model = null;
+          vmGuest.assignedMemory = _.RAM_request_number;
+          vmGuest.assignedCPUCores = _.CPU_request_number;
+          vmGuest.diskVolumeName = null;
+          vmGuest.CSVName = _.CSV;
+          vmGuest.diskSize = _.data_storage_request_number;
+          vmGuest.status = 'confirmed';
+          vmGuest.hostname = _.hostname;
+          vmGuest.VMClusterId = null;
+          vmGuest.VMClusterName = null;
+          vmGuest.OS = _.OS_IP;
+          vmGuest.serverRole = null;
+          vmGuest.hostIP = null;
+          vmGuest.ATLIP = _.ATL_IP;
+          vmGuest.magementHost = null;
+          vmGuest.extraIPs = null;
+          vmGuest.remarks = _.remarks;
+          vmGuest.tenantId = tenantId;
+          vmGuest.projectCode = projectCode;
+          vmGuest.projectContact = projectContact;
+          vmGuest.projectManager = projectManager;
+          vmGuest.section = null;
+          vmGuest.createdAt = _.createdAt;
+          vmGuest.updatedAt = _.updatedAt;
+          vmGuests.push(vmGuest);
+        }
+        await ctx.model.models.vm_guest.bulkCreate(vmGuests);
+        ctx.success(true);
+      } catch (error) {
+        console.log(error);
+        throw { status: 500, message: 'service busy' };
+      }
+    }
   };
 };
+

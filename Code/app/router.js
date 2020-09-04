@@ -111,6 +111,7 @@ module.exports = app => {
 
   router.get(`${prefix}/vmCluster/list`, controller.vmCluster.list);
   router.post(`${prefix}/vmCluster/updateResources`, controller.vmCluster.updateResources);
+  router.post(`${prefix}/vmCluster/createVMGuest`, controller.vmCluster.createVMGuest);
 
   router.get(`${prefix}/vmGuest/list`, controller.vmGuest.list);
   router.get(`${prefix}/vmGuest/detail`, controller.vmGuest.detail);
