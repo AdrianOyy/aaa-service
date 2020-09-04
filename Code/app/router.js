@@ -136,4 +136,6 @@ module.exports = app => {
 
   router.post(`${prefix}/vmlist/updateStatus`, controller.vmlist.updateStatus);
   router.post(`${prefix}/vmlist/checkStatus`, controller.vmlist.checkStatus);
+
+  router.post(`${prefix}/diyForm/create`, controller.diyForm.create);
 };
