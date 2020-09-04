@@ -109,7 +109,6 @@ module.exports = app => {
     }
 
     async getInsertSQL(dynmaic, filelist) {
-      console.log(dynmaic);
       let fieldType = '';
       let fieldValue = '';
       for (const key in filelist) {

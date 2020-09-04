@@ -25,6 +25,53 @@ module.exports = app => {
       }
       return SQLList;
     }
+
+    /**
+    * get dynamic form detail by pid
+    * @param {string | number} pid
+    * @param {string} formKey
+    * @param {string} childFormKey
+    * @return {Promise<{object}>}
+    */
+    async getDIYFormDetail(pid, formKey, childFormKey) {
+      const parentSQL = `SELECT * FROM ${formKey} WHERE pid = ${pid}`;
+      const [ parentDataList ] = await app.model.query(parentSQL);
+      if (parentDataList.length === 0) return false;
+      const parentData = parentDataList[0];
+      const parentId = parentData.id;
+      const childSQL = `SELECT * FROM ${childFormKey} WHERE parentId = ${parentId}`;
+      const [ childDataList ] = await app.model.query(childSQL);
+      const model = {
+        parentData,
+        childDataList,
+      };
+      return model;
+    }
+
+    /**
+     *
+     * @param {string} formKey parent table name
+     * @param {object} parentData parent table data
+     * @return {Promise<string>} insetSQL parent table's insert SQL
+     */
+    async getParentFormUpdateSQL(formKey, parentData, formId) {
+      return getUpdateSQL(formKey, parentData, formId);
+    }
+
+    /**
+     *
+     * @param {string} childFormKey child table name
+     * @param {object[]} childDataList child table data
+     * @return {Promise<string[]>} insetSQL child table's insert SQL list
+     */
+    async getChildFormUpdateSQLList(childFormKey, childDataList) {
+      const SQLList = [];
+      for (let i = 0; i < childDataList.length; i++) {
+        console.log(childDataList[i]);
+        // SQLList.push(getUpdateSQL(childFormKey, childDataList[i]));
+      }
+      return SQLList;
+    }
   };
 };
 
@@ -44,6 +91,21 @@ function getInsertSQL(formKey, data) {
   fieldType += '\`createdAt\`,\`updatedAt\`';
   fieldValue += `\'${getNow()}\',\'${getNow()}\'`;
   return `INSERT INTO ${formKey}(${fieldType}) VALUES (${fieldValue})`;
+}
+
+/**
+ *
+ * @param {string} formKey  table name
+ * @param {object} data  table data
+ * @return {Promise<string>} insetSQL table's insert SQL
+ */
+// eslint-disable-next-line no-unused-vars
+function getUpdateSQL(formKey, data, formId) {
+  let fieldValue = '';
+  for (const key in data) {
+    fieldValue += !data[key] || !data[key].value ? ` ${key} = null ` : ` ${key} = \'${data[key].value}\' `;
+  }
+  return `UPDATE  ${formKey} SET  ${fieldValue} WHERE ID = ${formId}`;
 }
 
 function getNow() {
