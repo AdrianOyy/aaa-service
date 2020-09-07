@@ -17,6 +17,14 @@ module.exports = app => {
       const parentInsertSQL = await ctx.service.diyForm.getParentFormInsetSQL(formKey, parentData);
 
       // 获取子表插入SQL
+      for (const childData of childDataList) {
+        const dc = await ctx.service.dc.getDC(childData.environment_type.value, childData.network_zone.value);
+        childData.data_center = {
+          id: 'data_center',
+          value: dc,
+          label: dc,
+        };
+      }
       const childInsertSQLList = await ctx.service.diyForm.getChildFormInsertSQLList(childFormKey, childDataList);
 
       const insertSQLList = [ parentInsertSQL, ...childInsertSQLList ];
@@ -94,22 +102,27 @@ module.exports = app => {
     async update() {
       const { ctx } = this;
       const {
-        formKey,
-        formId,
         childFormKey,
-        parentData,
         childDataList,
+        taskId,
       } = ctx.request.body;
       // 获取父表插入SQL
-      const parentInsertSQL = await ctx.service.diyForm.getParentFormUpdateSQL(formKey, parentData, formId);
+      // let parentUpdateSQL = null;
+      // console.log(parentData);
+      // if (parentData.tenant) {
+      //   parentUpdateSQL = await ctx.service.diyForm.getParentFormUpdateSQL(formKey, parentData, pid);
+      // }
 
       // 获取子表插入SQL
-      const childInsertSQLList = await ctx.service.diyForm.getChildFormUpdateSQLList(childFormKey, childDataList);
+      const childUpdateSQLList = await ctx.service.diyForm.getChildFormUpdateSQLList(childFormKey, childDataList);
 
-      const updateSQLList = [ parentInsertSQL, ...childInsertSQLList ];
-
+      const updateSQLList = [ ...childUpdateSQLList ];
+      console.log(updateSQLList);
+      // console.log(updateSQLList);
       const res = await ctx.service.sql.transaction(updateSQLList);
-
+      // 下一步启动
+      await ctx.service.syncActiviti.actionTask({ taskId, variables: { leaderCheck: true } }, { headers: ctx.headers });
+      ctx.success();
       if (!res.success) {
         ctx.error();
       } else {

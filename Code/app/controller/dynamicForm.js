@@ -278,6 +278,7 @@ module.exports = app => {
       const { formKey, formId } = ctx.query;
       if (!formKey || !formId) ctx.error();
       const res = await ctx.service.dynamicForm.getDetailByKey(formKey, formId);
+      console.log(res);
       if (!res) ctx.error();
       else ctx.success(res);
     }

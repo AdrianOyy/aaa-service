@@ -18,6 +18,20 @@ module.exports = app => {
       return auth;
     }
 
+    async actionTask(data, options) {
+      const url = app.config.activiti.url;
+      const auth = await axios
+        .post(url + '/runtime/actionTask', data, options)
+        .then(function(response) {
+          return new Promise(resolve => {
+            resolve(response.data);
+          });
+        }).catch(function(error) {
+          console.log(error);
+        });
+      return auth;
+    }
+
     async deleteGroup(groupIds, headers) {
       const url = app.config.activiti.url;
       const auth = await axios

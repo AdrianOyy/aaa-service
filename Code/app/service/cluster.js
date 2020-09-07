@@ -115,10 +115,14 @@ module.exports = app => {
         // console.log(appCluster);
         // 根据 typeId 和 zoomId 获取 dc，根据dc获取 Cluster
         const dcClusters = await ctx.model.models.vm_cluster_dc_mapping.findAll({ where: { cdcid } });
-        if (typeClusters.count > 0 && dcCluster.count > 0) {
+        if (typeClusters.length > 0 && dcClusters.length > 0) {
           for (const dcCluster of dcClusters) {
-            if (typeClusters.indexOf(dcCluster.clusterName) > -1) {
-              cluster.push(dcCluster.clusterName);
+            for (const typeclster of typeClusters) {
+              if (typeclster.cluster === dcCluster.clusterName) {
+                if (cluster.indexOf(dcCluster.clusterName) === -1) {
+                  cluster.push(dcCluster.clusterName);
+                }
+              }
             }
           }
         }
@@ -137,18 +141,22 @@ module.exports = app => {
       try {
         for (const vm of vmlist) {
           const cluster = [];
-          if (vm.network_zone && vm.application_type) {
+          if (vm.data_center && vm.application_type) {
             // 根据applicationType 获取 Cluster
             const typeClusters = await ctx.model.models.vm_cluster_applicationType.findAll({ where: { applicationTypeId: vm.application_type.id } });
             // console.log(appCluster);
             // 根据 typeId 和 zoomId 获取 dc，根据dc获取 Cluster
             const dcClusters = await ctx.model.models.vm_cluster_dc_mapping.findAll({
-              where: { cdcid: { [Op.in]: app.Sequelize.literal(`(select cdcid from vm_type_zone_cdc where typeId = ${vm.environment_type.id} and zoneId = ${vm.network_zone.id})`) } },
+              where: { cdcid: vm.data_center.id },
             });
-            if (dcClusters.count > 0 && typeClusters.count > 0) {
+            if (dcClusters.length > 0 && typeClusters.length > 0) {
               for (const dcCluster of dcClusters) {
-                if (typeClusters.indexOf(dcCluster.clusterName) > -1) {
-                  cluster.push(dcCluster.clusterName);
+                for (const typeclster of typeClusters) {
+                  if (typeclster.cluster === dcCluster.clusterName) {
+                    if (cluster.indexOf(dcCluster.clusterName) === -1) {
+                      cluster.push(dcCluster.clusterName);
+                    }
+                  }
                 }
               }
             }
@@ -205,7 +213,7 @@ module.exports = app => {
     }
 
     async getCheckHCI(vm) {
-      const hciList = await this.getHCIAll([ vm.vm_cluster ]);
+      const hciList = await this.setHCI([ vm.vm_cluster ]);
       const hciResult = {
         fieldName: 'vm_cluster',
         error: false,
@@ -244,7 +252,7 @@ module.exports = app => {
         error: false,
         message: null,
       };
-      const vmmList = await this.getVMMareAll([ vm.vm_cluster ]);
+      const vmmList = await this.setVMMare([ vm.vm_cluster ]);
       if (vmmList.length > 0) {
         // 保存 HCIList
         await this.saveVMMare(vmmList);
@@ -282,7 +290,7 @@ module.exports = app => {
         } else {
           vmResult.fieldName = 'vm_master';
           vmResult.error = true;
-          vmResult.message = ' vm_cluster can not be found ';
+          vmResult.message = ' vm_master can not be found ';
           return vmResult;
         }
       } else {
@@ -315,15 +323,15 @@ module.exports = app => {
           const clusterFind = await ctx.model.models.vm_cluster.findOne({ where: { VMClusterName: cluster.ClusterName } });
           if (clusterFind) {
             clusterId = clusterFind.id;
-            clusterFind.totalMemory = parseFloat(cluster.TotalMemory / 1024).toFixed(2);
+            clusterFind.totalMemory = parseFloat(parseFloat(cluster.TotalMemory / 1024).toFixed(2));
             clusterFind.totalNumbeOfCPU = cluster.NumberofCPU;
             clusterFind.storagePoolSize = parseInt(cluster.totalRam / 1024);
             clusterFind.save({ transaction });
             // await ctx.model.models.vm_cluster.update(clusterFind, { transaction });
           } else {
             const clusterModel = {
-              totalMemory: parseFloat(cluster.TotalMemory / 1024)
-                .toFixed(2),
+              totalMemory: parseFloat(parseFloat(cluster.TotalMemory / 1024)
+                .toFixed(2)),
               totalNumbeOfCPU: cluster.NumberofCPU,
               storagePoolSize: parseInt(cluster.totalRam / 1024),
               VMClusterName: cluster.ClusterName,
@@ -377,8 +385,8 @@ module.exports = app => {
             // await ctx.model.models.vm_cluster.update(clusterFind, { transaction });
           } else {
             const clusterModel = {
-              totalMemory: parseFloat(cluster.TotalMemory / 1024)
-                .toFixed(2),
+              totalMemory: parseFloat(parseFloat(cluster.TotalMemory / 1024)
+                .toFixed(2)),
               totalNumbeOfCPU: cluster.NumberofCPU,
               storagePoolSize: parseInt(cluster.TotalDiskSize / 1024),
               VMClusterName: cluster.ClusterName,

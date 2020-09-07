@@ -158,8 +158,6 @@ module.exports = app => {
       }
       const data = await ctx.service.cluster.getClusterList(childTable);
       // console.log(data);
-      console.log('============================');
-      console.log(childTable);
       ctx.success('success');
     }
 
@@ -195,6 +193,7 @@ module.exports = app => {
           message += 'IP is not enough\n';
         } else {
           const [ CList, FList ] = list;
+          console.log(list);
           CIPMap.set(DCCountList[i].dataCenter, CList);
           FIPMap.set(DCCountList[i].dataCenter, FList);
         }
@@ -223,12 +222,9 @@ module.exports = app => {
         el.type = type;
       }
 
-      console.log('childTable ================= childTable');
-      console.log(childTable);
-      console.log('childTable ================= childTable');
-
       // switch VM's type to define vm cluster with different route
       const data = await ctx.service.cluster.getClusterList(childTable);
+      console.log(data);
       if (!data.pass) {
         pass = false;
         message += data.message;
@@ -238,7 +234,8 @@ module.exports = app => {
       if (pass) {
         for (let i = 0; i < childTable.length; i++) {
           const el = childTable[i];
-          const columnList = `hostname = \"${el.hostname}\", vm_cluster= \"${el.vm_cluster}\"`;
+          console.log(el);
+          const columnList = `hostname = \"${el.hostname}\", vm_cluster= \"${el.vm_cluster}\", vm_master= \"${el.vm_master}\",os_ip= \"${el.os_ip}\",atl_ip= \"${el.atl_ip}\"`;
           try {
             const updateSQL = `UPDATE \`${childFormKey}\` SET ${columnList} WHERE \`${childFormKey}\`.id = ${el.id}`;
             await app.model.query(updateSQL);
@@ -259,21 +256,20 @@ module.exports = app => {
 
     async check() {
       const { ctx } = this;
-      const { formKey, formId, sonForm } = ctx.request.body;
+      const { formKey, formId, childDataList } = ctx.request.body;
       const fileList = [];
       const dynamicForm = await ctx.service.dynamicForm.getDetailByKey(formKey, formId);
-      const { project_name } = dynamicForm;
-      const tenant = project_name;
+      const { tenant } = dynamicForm;
       const tenantId = tenant.id;
       const tenantName = tenant.name;
-      const applicationType = sonForm.find(t => t.fieldName === 'application_type');
-      const hostname = sonForm.find(t => t.fieldName === 'hostname');
-      const environment_type = sonForm.find(t => t.fieldName === 'environment_type');
-      const network_zone = sonForm.find(t => t.fieldName === 'network_zone');
-      const data_storage_request_number = sonForm.find(t => t.fieldName === 'data_storage_request_number');
+      const applicationType = childDataList.application_type.value;
+      const hostname = childDataList.hostname.value;
+      const environment_type = childDataList.environment_type.value;
+      const network_zone = childDataList.network_zone.value;
+      const data_storage_request_number = childDataList.data_storage_request_number.value;
 
       // TODO 1. 根据新的 application type 计算新的 hostname 列表
-      const list = await ctx.service.hostname.generateHostname(tenantId, applicationType.value, 1);
+      const list = await ctx.service.hostname.generateHostname(tenantId, applicationType, 1);
       const appResult = {
         fieldName: 'hostname',
         error: false,
@@ -297,7 +293,7 @@ module.exports = app => {
         message: null,
       };
       // TODO 1.2 验证新的 hostname 是否被使用中
-      const guestHost = await ctx.model.models.vm_guest.findOne({ where: { hostname: hostname.value } });
+      const guestHost = await ctx.model.models.vm_guest.findOne({ where: { hostname } });
       if (guestHost) {
         const hostResult = {
           fieldName: 'hostname',
@@ -307,15 +303,15 @@ module.exports = app => {
         fileList.push(hostResult);
       }
       // TODO 2. 根据 zoom 和 type 确定新的 data center
-      const dc = await ctx.service.dc.getDC(environment_type.value, network_zone.value);
+      const dc = await ctx.service.dc.getDC(environment_type, network_zone);
       if (!dc) {
         dcResult.error = true;
         dcResult.message = 'Data Center with Environment Type and Network Zone is not enough';
       }
       fileList.push(dcResult);
       // T0D0 2.1 验证新ip是否在
-      const os_ip = sonForm.find(t => t.fieldName === 'os_ip').value;
-      const atl_ip = sonForm.find(t => t.fieldName === 'atl_ip').value;
+      const os_ip = childDataList.os_ip.value;
+      const atl_ip = childDataList.atl_ip.value;
       const opResult = await ctx.service.ipAssign.checkAssign(dc, os_ip, 'Cat C - OS');
       const atlResult = await ctx.service.ipAssign.checkAssign(dc, atl_ip, 'Cat F - ATL');
       if (opResult) {
@@ -352,16 +348,15 @@ module.exports = app => {
       }
 
       // TODO 3. 确定新的 vm type
-      const type = await ctx.service.defineVMType.defineVMType(network_zone.value, environment_type.value, data_storage_request_number.value);
-      console.log(type);
+      const type = await ctx.service.defineVMType.defineVMType(network_zone, environment_type, data_storage_request_number);
       // TODO 4. 根据 data center 验证 vm cluster 和 vm master 的正确性
-      const clusterList = await ctx.service.cluster.checkClusterList(dc, applicationType.value);
-      const vm_cluster = sonForm.find(t => t.fieldName === 'vm_cluster').value;
+      const clusterList = await ctx.service.cluster.checkClusterList(dc, applicationType);
+      const vm_cluster = childDataList.vm_cluster.value;
       const cluster = clusterList.indexOf(vm_cluster);
       if (cluster > -1) {
-        const vm_master = sonForm.find(t => t.fieldName === 'vm_master').value;
-        const ram_request_number = sonForm.find(t => t.fieldName === 'ram_request_number').value;
-        const cpu_request_number = sonForm.find(t => t.fieldName === 'cpu_request_number').value;
+        const vm_master = childDataList.vm_master.value;
+        const ram_request_number = childDataList.ram_request_number.value;
+        const cpu_request_number = childDataList.cpu_request_number.value;
         const vmResult = await ctx.service.cluster.getCheck(vm_cluster, vm_master, data_storage_request_number.value, ram_request_number, cpu_request_number, type);
         fileList.push(vmResult);
       } else {
@@ -372,7 +367,7 @@ module.exports = app => {
         });
       }
       // TODO 5. 根据 data center
-      return fileList;
+      ctx.success(fileList);
     }
   };
 };

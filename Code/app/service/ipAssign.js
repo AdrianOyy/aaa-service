@@ -45,7 +45,7 @@ module.exports = app => {
         },
         order: [[ 'IP', 'ASC' ]],
       });
-      if (IPList.count > 0) {
+      if (IPList.length > 0) {
         return true;
       }
       return false;
