@@ -104,7 +104,6 @@ module.exports = app => {
       } = ctx.request.body;
       // if (!serialNumber) ctx.error();
       try {
-        console.log(data)
         const projectCode = data.tenant.code;
         const tenantId = data.tenant.id;
         const projectContact = data.tenant.contact_person;
