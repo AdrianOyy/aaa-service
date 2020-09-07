@@ -8,7 +8,7 @@ module.exports = app => {
       if (!status || !idList || !idList.length) ctx.error();
       try {
         const idString = '(' + idList.join(',') + ')';
-        const updateSql = `update vmlist set status = '${status}' where id in ${idString}`;
+        const updateSql = `update VMLIST set status = '${status}' where id in ${idString}`;
         const [ updateResults ] = await app.model.query(updateSql);
         ctx.success({ result: true, affectedRows: updateResults.affectedRows });
       } catch (error) {
@@ -24,7 +24,7 @@ module.exports = app => {
       if (!idList || !idList.length) ctx.error();
       try {
         const idString = '(' + idList.join(',') + ')';
-        const checkSql = `select count(*) as number from vmlist where status is not null and id in ${idString}`;
+        const checkSql = `select count(*) as number from VMLIST where status is not null and id in ${idString}`;
         const [ selectResults ] = await app.model.query(checkSql);
         const result = selectResults[0].number === 0;
         ctx.success(result);
