@@ -5,7 +5,7 @@ const axios = require('axios');
 
 module.exports = app => {
   return class extends app.Service {
-    async getInCluserList(clusterNames, vm, inList, data) {
+    async getInCluserList(clusterNames, vm, inList) {
       let clusterInList = [];
       const hciList = await this.setHCI(clusterNames);
       // 保存 HCIList
@@ -37,12 +37,12 @@ module.exports = app => {
         clusterInList = _.orderBy(clusterInList, [ 'orderByCPU', 'orderByMemory', 'orderByRam' ], [ 'desc', 'desc', 'desc' ]);
         return clusterInList[0].ClusterName;
       }
-      data.pass = false;
-      data.message += 'not find cluser/n';
+      // data.pass = false;
+      // data.message += 'not find cluser\n';
       return null;
     }
 
-    async getInMasterList(clusterNames, vm, inList, data) {
+    async getInMasterList(clusterNames, vm, inList) {
       let clusterInList = [];
       const vmmList = await this.setVMMare(clusterNames);
       // 保存 VMMare
@@ -102,8 +102,8 @@ module.exports = app => {
         }
         return rmaster;
       }
-      data.pass = false;
-      data.message += 'not find cluser/n';
+      // data.pass = false;
+      // data.message += 'not find cluser\n';
       return null;
     }
 
@@ -175,19 +175,19 @@ module.exports = app => {
                   inCluster.push(vm);
                 } else {
                   data.pass = false;
-                  data.message += 'master cluster not find/n';
+                  data.message += 'cluster or master not find \n';
                 }
               } else {
                 data.pass = false;
-                data.message += 'type error' + vm.id + 'cluster not find/n';
+                data.message += 'type error' + vm.id + 'cluster not find \n';
               }
             } else {
               data.pass = false;
-              data.message += 'vm allaction: ' + vm.id + 'cluster not find/n';
+              data.message += 'vm allaction: ' + vm.id + 'cluster not find \n';
             }
           } else {
             data.pass = false;
-            data.message += ' network_zone or application_type is null/n';
+            data.message += ' network_zone or application_type is null \n';
           }
         }
       } catch (e) {
@@ -510,12 +510,15 @@ module.exports = app => {
     async getHCIAll(names) {
       const name = names.join();
       const str = await this.getAnsibleHCI({ vClusters: name });
-      const msgs = await this.JsonToHCI(str);
-      const HCI = [];
-      for (const msg of msgs) {
-        HCI.push(setColoumn(msg));
+      if (str) {
+        const msgs = await this.JsonToHCI(str);
+        const HCI = [];
+        for (const msg of msgs) {
+          HCI.push(setColoumn(msg));
+        }
+        return HCI;
       }
-      return HCI;
+      return [];
     }
 
 
@@ -523,29 +526,32 @@ module.exports = app => {
       names = [ 'devesxi03cs', 'devesxi02cs' ];
       const name = names.join();
       const str = await this.getAnsibleVMWare({ vClusters: name });
-      const msgs = await this.JsonToVMMarm([], str, 0);
-      const masters = [];
-      for (const name of names) {
-        const msg = msgs.filter(t => t['Cluster Name'].trim() === name);
-        if (msg.length > 0) {
-          const master = {
-            ClusterName: name,
-            ESXiDetails: [],
-            DatastoreDetails: [],
-          };
+      if (str) {
+        const msgs = await this.JsonToVMMarm([], str, 0);
+        const masters = [];
+        for (const name of names) {
           const msg = msgs.filter(t => t['Cluster Name'].trim() === name);
-          for (const detail of msg) {
-            if (detail['ESXi Details']) {
-              master.ESXiDetails = detail['ESXi Details'];
+          if (msg.length > 0) {
+            const master = {
+              ClusterName: name,
+              ESXiDetails: [],
+              DatastoreDetails: [],
+            };
+            const msg = msgs.filter(t => t['Cluster Name'].trim() === name);
+            for (const detail of msg) {
+              if (detail['ESXi Details']) {
+                master.ESXiDetails = detail['ESXi Details'];
+              }
+              if (detail['Datastore Details']) {
+                master.DatastoreDetails = detail['Datastore Details'];
+              }
             }
-            if (detail['Datastore Details']) {
-              master.DatastoreDetails = detail['Datastore Details'];
-            }
+            masters.push(master);
           }
-          masters.push(master);
         }
+        return masters;
       }
-      return masters;
+      return [];
     }
 
     async getHCI() {
@@ -621,6 +627,9 @@ module.exports = app => {
           });
         }).catch(function(error) {
           console.log(error);
+          return new Promise(resolve => {
+            resolve(null);
+          });
         });
       return hci;
     }
@@ -635,6 +644,9 @@ module.exports = app => {
           });
         }).catch(function(error) {
           console.log(error);
+          return new Promise(resolve => {
+            resolve(null);
+          });
         });
       return hci;
     }
