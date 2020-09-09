@@ -18,3 +18,26 @@ docker镜像删除（非第一次安装时，请先执行此操作）
 4 重复执行2、3，直到所有IMAGE为aaa-service的都被删除
 4 docker images 查看所有images
 5 docker rmi aaa-service
+
+
+
+运行
+
+````cmd
+docker run -dit \
+--name aaa-service \
+--restart always \
+-p 3003:7001 \
+-e dbType=mysql \
+-e dbName=aaa_service \
+-e dbHost=10.231.131.123 \
+-e dbPort=3306 \
+-e dbUser=admin \
+-e dbPassword=APJ@com123 \
+-e adServiceUrl=http://10.231.131.123:3010 \
+-e activitiUrl=http://10.231.131.123:3004 \
+-e jwtExpiresIn=10m \
+-e jwtSecret=1234567abc \
+-e jwtIss=SENSEPLATFORM \
+aaa-service
+````

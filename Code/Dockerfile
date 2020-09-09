@@ -25,4 +25,4 @@ COPY . /home/node-app/aaa-server
 EXPOSE 7001
 
 # 启动node应用
-CMD npm run dev
+CMD ["sh", "-c", "npm start --dbType=${dbType} --dbName=${dbName} --dbHost=${dbHost} --dbPort=${dbPort} --dbUser=${dbUser} --dbPassword=${dbPassword} --adServiceUrl=${adServiceUrl} --activitiUrl=${activitiUrl} --jwtExpiresIn=${jwtExpiresIn} --jwtSecret=${jwtSecret} --jwtIss=${jwtIss}"]
