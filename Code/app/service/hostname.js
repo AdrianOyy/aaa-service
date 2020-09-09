@@ -64,12 +64,7 @@ module.exports = app => {
     async generateHostname(tenantId, typeCount) {
       const hostNameList = [];
       const { applicationType, hostname_prefix, requestNum } = typeCount;
-      if (!hostname_prefix) {
-        for (let i = 0; i < requestNum; i++) {
-          hostNameList.push('');
-        }
-        return hostNameList;
-      }
+      if (!hostname_prefix) return false;
       const referenceList = await this.getReferenceList(tenantId);
       if (!referenceList) return false;
       let flag = false;

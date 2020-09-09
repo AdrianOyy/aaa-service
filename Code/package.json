@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "egg-bin dev",
     "debug": "egg-bin debug",
-    "start": "egg-bin dev"
+    "start": "egg-scripts start",
+    "stop": "egg-scripts stop"
   },
   "keywords": [],
   "author": "APJ",
@@ -19,6 +20,7 @@
     "egg-bin": "^4.14.1",
     "egg-cors": "^2.2.3",
     "egg-multipart": "^2.10.3",
+    "egg-scripts": "^2.13.0",
     "egg-sequelize": "^5.2.2",
     "jsonwebtoken": "^8.5.1",
     "mysql2": "^2.1.0",
