@@ -121,8 +121,6 @@ module.exports = app => {
           vmGuest.diskSize = _.data_storage_request_number;
           vmGuest.status = _.status;
           vmGuest.hostname = _.hostname;
-          vmGuest.VMClusterId = null;
-          vmGuest.VMClusterName = _.vm_cluster;
           vmGuest.OS = _.platform.name;
           vmGuest.serverRole = _.application_type.name;
           vmGuest.hostIP = _.os_ip;
@@ -137,6 +135,43 @@ module.exports = app => {
           vmGuest.section = null;
           vmGuest.createdAt = _.createdAt;
           vmGuest.updatedAt = _.updatedAt;
+          vmGuest.VMClusterId = null;
+          vmGuest.VMClusterName = _.vm_cluster;
+          vmGuest.VMMasterId = null;
+          vmGuest.VMMasterName = _.vm_master;
+          if (_.vm_master) {
+            const VMMaster = await ctx.model.models.vm_master.findOne({
+              raw: true,
+              where: {
+                VMCMasterName: _.vm_master,
+              },
+            });
+            if (VMMaster) {
+              vmGuest.VMMasterId = VMMaster.id;
+              const newModel = await ctx.model.models.vm_master.findByPk(VMMaster.id);
+              VMMaster.freeMemory = VMMaster.freeMemory - vmGuest.assignedMemory;
+              VMMaster.freeNumberOfCPU = VMMaster.freeNumberOfCPU - vmGuest.assignedCPUCores;
+              VMMaster.updatedAt = new Date();
+              await newModel.update(VMMaster);
+            }
+          }
+          if (_.vm_cluster) {
+            const VMCluster = await ctx.model.models.vm_cluster.findOne({
+              raw: true,
+              where: {
+                VMClusterName: _.vm_cluster,
+              },
+            });
+            if (VMCluster) {
+              vmGuest.VMClusterId = VMCluster.id;
+              const newModel = await ctx.model.models.vm_cluster.findByPk(VMCluster.id);
+              VMCluster.freeTotalMemory = VMCluster.freeTotalMemory - vmGuest.assignedMemory;
+              VMCluster.freeTotalNumbeOfCPU = VMCluster.freeTotalNumbeOfCPU - vmGuest.assignedCPUCores;
+              VMCluster.freeStoragePoolSize = VMCluster.freeStoragePoolSize - vmGuest.diskSize;
+              VMCluster.updatedAt = new Date();
+              await newModel.update(VMCluster);
+            }
+          }
           vmGuests.push(vmGuest);
         }
         await ctx.model.models.vm_guest.bulkCreate(vmGuests);
