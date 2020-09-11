@@ -16,6 +16,8 @@ module.exports = app => {
     hostname: { type: STRING(256), allowNull: true, cnName: 'Hostname', comment: 'Hostname' },
     VMClusterId: { type: INTEGER, allowNull: true, cnName: 'VMCluster Id', comment: 'VMCluster Id' },
     VMClusterName: { type: STRING(256), allowNull: true, cnName: 'VMCluster Name', comment: 'VMCluster Name' },
+    VMMasterId: { type: INTEGER, allowNull: true, cnName: 'VMMaster Id', comment: 'VMMaster Id' },
+    VMMasterName: { type: STRING(256), allowNull: true, cnName: 'VMMaster Name', comment: 'VMMaster Name' },
     OS: { type: STRING(256), allowNull: true, cnName: 'OS', comment: 'OS' },
     serverRole: { type: STRING(256), allowNull: true, cnName: 'Server Role', comment: 'Server Role' },
     hostIP: { type: STRING(256), allowNull: true, cnName: 'Host IP', comment: 'Host IP' },
@@ -39,6 +41,7 @@ module.exports = app => {
   vm_guest.associate = function() {
     const ms = app.model.models;
     ms.vm_guest.belongsTo(ms.vm_cluster, { as: 'vm_cluster', foreignKey: 'VMClusterId', constraint: false });
+    ms.vm_guest.belongsTo(ms.vm_master, { as: 'vm_master', foreignKey: 'VMMasterId', constraint: false });
   };
 
   return vm_guest;
