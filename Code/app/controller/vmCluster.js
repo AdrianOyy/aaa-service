@@ -109,7 +109,7 @@ module.exports = app => {
         const projectContact = data.tenant.contact_person;
         const projectManager = data.tenant.project_owner;
         const vmGuests = [];
-        const childTable = data.childTable.filter(_ => _.status === 'comfirmed');
+        const childTable = data.childTable.filter(_ => _.status === 'confirmed');
         for (const _ of childTable) {
           const vmGuest = {};
           vmGuest.serialNumber = _.pid;
