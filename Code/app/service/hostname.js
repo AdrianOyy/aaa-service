@@ -4,7 +4,7 @@ module.exports = app => {
   return class extends app.Service {
     /**
      *
-     * @param {number} tenantId Table tenant primary key
+     * @param {number|string} tenantId Table tenant primary key
      * @return {Object} Table tenant_hostname_reference entity list
      */
     async getReferenceList(tenantId) {
@@ -58,19 +58,20 @@ module.exports = app => {
 
     /**
      * @param {string} tenantId
-     * @param {string} applicationType
-     * @param {number} requestNum
+     * @param {object} typeCount
      * @return {string[]} hostname hostname
      */
-    async generateHostname(tenantId, applicationType, requestNum) {
+    async generateHostname(tenantId, typeCount) {
+      const hostNameList = [];
+      const { applicationType, hostname_prefix, requestNum } = typeCount;
+      if (!hostname_prefix) return false;
       const referenceList = await this.getReferenceList(tenantId);
       if (!referenceList) return false;
-      const hostNameList = [];
       let flag = false;
       for (let i = 0; i < referenceList.length; i++) {
         const lastCharList = await this.getLastCharList(applicationType, referenceList[i]);
         for (let j = 0; j < lastCharList.length; j++) {
-          const hostName = `WCDC${applicationType}${referenceList[i].windows_vm_hostname_reference}${lastCharList[j]}`;
+          const hostName = `${hostname_prefix}${applicationType}${referenceList[i].windows_vm_hostname_reference}${lastCharList[j]}`;
           hostNameList.push(hostName);
           if (hostNameList.length === requestNum) {
             flag = true;
@@ -93,25 +94,50 @@ module.exports = app => {
      */
     async countByType(vmList) {
       const map = new Map();
-      vmList.forEach(el => {
-        if (el.application_type) {
-          const name = el.application_type.name ? el.application_type.name : '';
-          if (!map.get(name)) {
-            map.set(name, 1);
+      for (let i = 0; i < vmList.length; i++) {
+        const el = vmList[i];
+        const name = el.application_type ? el.application_type.code : '';
+        const hostnamePrefix = el.hostnamePrefix ? el.hostnamePrefix : null;
+        if (!map.get(name)) {
+          map.set(name, new Map().set(hostnamePrefix, 1));
+        } else {
+          if (!map.get(name).get(hostnamePrefix)) {
+            map.get(name).set(hostnamePrefix, 1);
           } else {
-            map.set(name, map.get(name) + 1);
+            map.get(name).set(hostnamePrefix, map.get(name).get(hostnamePrefix) + 1);
           }
         }
-      });
+      }
       const res = [];
       for (const [ k, v ] of map) {
-        const model = {
-          applicationType: k,
-          requestNum: v,
-        };
-        res.push(model);
+        for (const [ p, c ] of v) {
+          const model = {
+            applicationType: k,
+            hostname_prefix: p,
+            requestNum: c,
+          };
+          res.push(model);
+        }
       }
       return res;
+    }
+
+    /**
+     * @param {string} vm
+     * @return {Promise<string>} hostnamePrefix
+     */
+    async getPrefix(vm) {
+      const { ctx } = this;
+      const typeId = vm.environment_type ? vm.environment_type.id : 0;
+      const zoneId = vm.network_zone ? vm.network_zone.id : 0;
+      const vm_type_zone_cdc = await ctx.model.models.vm_type_zone_cdc.findOne({
+        where: {
+          typeId,
+          zoneId,
+        },
+      });
+      const { hostname_prefix } = vm_type_zone_cdc;
+      return hostname_prefix;
     }
   };
 };

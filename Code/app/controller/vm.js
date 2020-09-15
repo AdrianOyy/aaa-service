@@ -146,6 +146,19 @@ module.exports = app => {
       const { ctx } = this;
       await ctx.service.mailer.testMail();
       // console.log(data);
+      const formId = 14;
+      const formKey = 'VMAllocation';
+      // const { formKey, formId } = ctx.request.body;
+      const dynamicForm = await ctx.service.dynamicForm.getDetailByKey(formKey, formId);
+      const { childTable } = dynamicForm;
+      for (const index in childTable) {
+        if (index % 2 === 0) {
+          childTable[index].type = 'HCI';
+        } else {
+          childTable[index].type = 'VMWare';
+        }
+      }
+      await ctx.service.cluster.getClusterList(childTable);
       ctx.success('success');
     }
 
@@ -160,15 +173,19 @@ module.exports = app => {
       const tenantName = tenant.name;
 
       // generate hostname
+      for (let i = 0; i < childTable.length; i++) {
+        const prefix = await ctx.service.hostname.getPrefix(childTable[i]);
+        childTable[i].hostnamePrefix = prefix;
+      }
       const typeCountList = await ctx.service.hostname.countByType(childTable);
       const hostnameMap = new Map();
       for (let i = 0; i < typeCountList.length; i++) {
-        const list = await ctx.service.hostname.generateHostname(tenantId, typeCountList[i].applicationType, typeCountList[i].requestNum);
+        const list = await ctx.service.hostname.generateHostname(tenantId, typeCountList[i]);
         if (!list) {
           pass = false;
           message += `Tenant \`${tenantName}\` with Application type \`${typeCountList[i].applicationType}\` hostname is not enough\n`;
         }
-        hostnameMap.set(typeCountList[i].applicationType, list);
+        hostnameMap.set(typeCountList[i].applicationType, new Map().set(typeCountList[i].hostname_prefix, list));
       }
       // TODO assign IP (delay function, verify IP  in this tern)
       const CIPMap = new Map();
@@ -181,19 +198,17 @@ module.exports = app => {
           message += 'IP is not enough\n';
         } else {
           const [ CList, FList ] = list;
-          console.log(list);
           CIPMap.set(DCCountList[i].dataCenter, CList);
           FIPMap.set(DCCountList[i].dataCenter, FList);
         }
       }
 
-
       for (let i = 0; i < childTable.length; i++) {
         const el = childTable[i];
         if (el.application_type && el.application_type.name && pass) {
-          const list = hostnameMap.get(el.application_type.name);
+          const list = hostnameMap.get(el.application_type.name).get(el.hostnamePrefix);
           el.hostname = list[0];
-          hostnameMap.set(el.application_type.name, list.slice(1));
+          hostnameMap.get(el.application_type.name).set(el.hostnamePrefix, list.slice(1));
         }
         if (el.data_center && el.data_center.id && pass) {
           const CList = CIPMap.get(el.data_center.id);
@@ -204,7 +219,6 @@ module.exports = app => {
           FIPMap.set(el.data_center.id, FList.slice(1));
         }
         // define VM's type
-
 
         const type = await ctx.service.defineVMType.defineVMType(el.network_zone.id, el.environment_type.id, el.data_storage_request_number);
         el.type = type;
@@ -222,7 +236,6 @@ module.exports = app => {
       if (pass) {
         for (let i = 0; i < childTable.length; i++) {
           const el = childTable[i];
-          console.log(el);
           const columnList = `hostname = \"${el.hostname}\", vm_cluster= \"${el.vm_cluster}\", vm_master= \"${el.vm_master}\",os_ip= \"${el.os_ip}\",atl_ip= \"${el.atl_ip}\"`;
           try {
             const updateSQL = `UPDATE \`${childFormKey}\` SET ${columnList} WHERE \`${childFormKey}\`.id = ${el.id}`;

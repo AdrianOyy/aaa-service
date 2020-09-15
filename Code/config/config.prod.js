@@ -10,12 +10,12 @@ module.exports = appInfo => {
   //             ORM 设置
   // ===================================
   config.sequelize = {
-    dialect: 'mysql', // support: mysql, mariadb, postgres, mssql
-    database: 'aaa_service',
-    host: '10.231.131.123',
-    port: '3306',
-    username: 'admin',
-    password: 'APJ@com123',
+    dialect: process.env.npm_config_dbType, // support: mysql, mariadb, postgres, mssql
+    database: process.env.npm_config_dbName,
+    host: process.env.npm_config_dbHost,
+    port: process.env.npm_config_dbPort,
+    username: process.env.npm_config_dbUser,
+    password: process.env.npm_config_dbPassword,
     logging: false,
     define: {
       freezeTableName: false,
@@ -57,11 +57,11 @@ module.exports = appInfo => {
     },
   };
   config.adService = {
-    url: 'http://10.231.131.123:3010',
+    url: process.env.npm_config_adServiceUrl,
   };
 
   config.activiti = {
-    url: 'http://10.231.131.123:3004',
+    url: process.env.npm_config_activitiUrl,
   };
 
   // ===================================
@@ -73,9 +73,9 @@ module.exports = appInfo => {
   };
 
   config.jwt = {
-    expiresIn: '10m',
-    secret: '1234567abc',
-    iss: 'SENSEPLATFORM',
+    expiresIn: process.env.npm_config_jwtExpiresIn,
+    secret: process.env.npm_config_jwtSecret,
+    iss: process.env.npm_config_jwtIss,
   };
 
   return config;

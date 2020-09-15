@@ -11,6 +11,8 @@ module.exports = app => {
     model: { type: STRING(256), allowNull: true, cnName: 'Model', comment: 'Model' },
     memory: { type: FLOAT, allowNull: true, cnName: 'Memory(GB)', comment: 'Memory(GB)' },
     numberOfCPU: { type: INTEGER, allowNull: true, cnName: 'Number of CPU', comment: 'Number of CPU' },
+    freeMemory: { type: FLOAT, allowNull: true, cnName: 'Free Memory(GB)', comment: 'Free Memory(GB)' },
+    freeNumberOfCPU: { type: INTEGER, allowNull: true, cnName: 'Free Number of CPU', comment: 'Free Number of CPU' },
     CPUType: { type: STRING(256), allowNull: true, cnName: 'CPU Type', comment: 'CPU Type' },
     status: { type: STRING(256), allowNull: true, cnName: 'Status', comment: 'Status' },
     hostname: { type: STRING(256), allowNull: true, cnName: 'Hostname', comment: 'Hostname' },
