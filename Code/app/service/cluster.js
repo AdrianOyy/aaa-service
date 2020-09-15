@@ -50,8 +50,12 @@ module.exports = app => {
       const rmaster = {
         vm_cluster: '',
         vm_master: '',
+        csv: '',
       };
       for (const vmm of vmmList) {
+        if (!vmm.isRamCsv) {
+          continue;
+        }
         const inClusters = inList.filter(t => t.vm_cluster === vmm.ClusterName);
         if (inClusters.length > 0) {
           for (const inCluster of inClusters) {
@@ -97,7 +101,21 @@ module.exports = app => {
             break;
           }
           if (isMaster) {
-            break;
+            // 判断CSV
+            const csvList = cluster.DatastoreDetails.filter(t => t.isCsv === true);
+            const cList = _.orderBy(csvList, [ 'orderByCsv' ], [ 'desc' ]);
+            if (cList.length > 0) {
+              rmaster.csv = cList[0].name;
+              break;
+            } else {
+              rmaster.vm_cluster = '';
+              rmaster.vm_master = '';
+              rmaster.csv = '';
+            }
+          } else {
+            rmaster.vm_cluster = '';
+            rmaster.vm_master = '';
+            rmaster.csv = '';
           }
         }
         return rmaster;
@@ -172,6 +190,7 @@ module.exports = app => {
                 if (masterList) {
                   vm.vm_cluster = masterList.vm_cluster;
                   vm.vm_master = masterList.vm_master;
+                  vm.csv = masterList.csv;
                   inCluster.push(vm);
                 } else {
                   data.pass = false;
@@ -469,10 +488,22 @@ module.exports = app => {
           // 循环硬盘
           let freeRam = 0;
           let totalRam = 0;
+          let isRamCsv = false;
           for (const ram of msg.DatastoreDetails) {
-            freeRam += setDiskByMb(ram.free);
-            totalRam += setDiskByMb(ram.total);
+            // 判断硬盘信息
+            const freeRamData = setDiskByMb(ram.free);
+            const totalRamData = setDiskByMb(ram.total);
+            if ((totalRamData * 0.2) > (freeRamData - (150 * 1024))) {
+              isRamCsv = true;
+              ram.isCsv = true;
+            } else {
+              ram.isCsv = false;
+            }
+            ram.orderByCsv = setFloat(freeRamData, totalRamData);
+            freeRam += freeRamData;
+            totalRam += totalRamData;
           }
+          msg.isRamCsv = isRamCsv;
           msg.freeRam = freeRam;
           msg.totalRam = totalRam;
           msg.orderByRam = setFloat(freeRam, totalRam);

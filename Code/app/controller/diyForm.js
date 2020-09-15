@@ -120,6 +120,8 @@ module.exports = app => {
       console.log(updateSQLList);
       // console.log(updateSQLList);
       const res = await ctx.service.sql.transaction(updateSQLList);
+      // 发送邮件
+
       // 下一步启动
       await ctx.service.syncActiviti.actionTask({ taskId, variables: { leaderCheck: true } }, { headers: ctx.headers });
       ctx.success();

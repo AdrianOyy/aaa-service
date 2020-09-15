@@ -144,19 +144,7 @@ module.exports = app => {
     // eslint-disable-next-line no-dupe-class-members
     async test() {
       const { ctx } = this;
-      const formId = 14;
-      const formKey = 'VMAllocation';
-      // const { formKey, formId } = ctx.request.body;
-      const dynamicForm = await ctx.service.dynamicForm.getDetailByKey(formKey, formId);
-      const { childTable } = dynamicForm;
-      for (const index in childTable) {
-        if (index % 2 === 0) {
-          childTable[index].type = 'HCI';
-        } else {
-          childTable[index].type = 'VMWare';
-        }
-      }
-      const data = await ctx.service.cluster.getClusterList(childTable);
+      await ctx.service.mailer.testMail();
       // console.log(data);
       ctx.success('success');
     }
@@ -248,7 +236,8 @@ module.exports = app => {
           }
         }
       }
-
+      console.log(pass);
+      console.log(message);
       // return a map includes result and message to workflow service
       ctx.success({ pass, message });
     }
@@ -357,7 +346,7 @@ module.exports = app => {
         const vm_master = childDataList.vm_master.value;
         const ram_request_number = childDataList.ram_request_number.value;
         const cpu_request_number = childDataList.cpu_request_number.value;
-        const vmResult = await ctx.service.cluster.getCheck(vm_cluster, vm_master, data_storage_request_number.value, ram_request_number, cpu_request_number, type);
+        const vmResult = await ctx.service.cluster.getCheck(vm_cluster, vm_master, data_storage_request_number, ram_request_number, cpu_request_number, type);
         fileList.push(vmResult);
       } else {
         fileList.push({
