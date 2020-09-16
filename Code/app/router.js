@@ -144,4 +144,6 @@ module.exports = app => {
   router.post(`${prefix}/diyForm/create`, controller.diyForm.create);
   router.post(`${prefix}/diyForm/update`, controller.diyForm.update);
   router.get(`${prefix}/diyForm/detail`, controller.diyForm.detail);
+
+  router.get(`${prefix}/inventory/detail`, controller.inventory.detail);
 };
