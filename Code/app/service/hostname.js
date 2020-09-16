@@ -139,5 +139,21 @@ module.exports = app => {
       const { hostname_prefix } = vm_type_zone_cdc;
       return hostname_prefix;
     }
+
+    /**
+     * @param {string} vm
+     * @return {Promise<string>} hostnamePrefix
+     */
+    async getPrefixByTypeZone(environment_type, network_zone) {
+      const { ctx } = this;
+      const vm_type_zone_cdc = await ctx.model.models.vm_type_zone_cdc.findOne({
+        where: {
+          typeId: environment_type,
+          zoneId: network_zone,
+        },
+      });
+      const { hostname_prefix } = vm_type_zone_cdc;
+      return hostname_prefix;
+    }
   };
 };
