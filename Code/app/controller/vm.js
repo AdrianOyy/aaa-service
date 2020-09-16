@@ -271,7 +271,13 @@ module.exports = app => {
       const data_storage_request_number = childDataList.data_storage_request_number.value;
 
       // TODO 1. 根据新的 application type 计算新的 hostname 列表
-      const list = await ctx.service.hostname.generateHostname(tenantId, applicationType, 1);
+      const hostname_prefix = await ctx.service.hostname.getPrefixByTypeZone(environment_type, network_zone);
+      const typeCount = {
+        applicationType,
+        hostname_prefix,
+        requestNum: 1,
+      };
+      const list = await ctx.service.hostname.generateHostname(tenantId, typeCount);
       const appResult = {
         fieldName: 'hostname',
         error: false,
@@ -282,8 +288,8 @@ module.exports = app => {
         appResult.message = `Tenant \`${tenantName}\` with Application type  hostname is not enough`;
       }
       // TODO 1.1 验证新的 hostname list 是否为计算出来的 hostname list 的子集
-      if (list && hostname.value) {
-        if (list.indexOf(hostname.value) === -1) {
+      if (list && hostname) {
+        if (list.indexOf(hostname) === -1) {
           appResult.error = true;
           appResult.message = `Tenant \`${tenantName}\` with Application type  hostname is not find in hostnameList`;
         }
