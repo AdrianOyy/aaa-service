@@ -24,8 +24,8 @@ module.exports = app => {
 
     async sentT3bySkile(childDataList) {
       for (const child of childDataList) {
-        if (child.status.value === 'skile') {
-          await this.sentMail('lukeli@apjcorp.com', 'rexshen@apjcorp.com', 't3测试', 't3测试邮件');
+        if (child.status.value === 'skip') {
+          await this.sentMail('lukeli@apjcorp.com', 'rexshen@apjcorp.com', 't1/t2/t6test', 't1/t2/t6 test mailer');
         }
       }
     }
