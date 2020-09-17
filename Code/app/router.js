@@ -144,4 +144,12 @@ module.exports = app => {
   router.post(`${prefix}/diyForm/create`, controller.diyForm.create);
   router.post(`${prefix}/diyForm/update`, controller.diyForm.update);
   router.get(`${prefix}/diyForm/detail`, controller.diyForm.detail);
+
+  router.get(`${prefix}/inventory/list`, controller.inventory.list);
+  router.get(`${prefix}/inventory/listStatus`, controller.inventory.listStatus);
+  router.get(`${prefix}/inventory/detail`, controller.inventory.detail);
+  router.post(`${prefix}/inventory/create`, controller.inventory.create);
+  router.put(`${prefix}/inventory/update`, controller.inventory.update);
+  router.delete(`${prefix}/inventory/deleteMany`, controller.inventory.deleteMany);
+  router.get(`${prefix}/inventory/checkIDExist`, controller.inventory.checkIDExist);
 };
