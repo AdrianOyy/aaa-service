@@ -27,9 +27,14 @@ module.exports = app => {
       }
       const childInsertSQLList = await ctx.service.diyForm.getChildFormInsertSQLList(childFormKey, childDataList);
 
+      
+
+
       const insertSQLList = [ parentInsertSQL, ...childInsertSQLList ];
 
       const res = await ctx.service.sql.transaction(insertSQLList);
+
+
 
       if (!res.success) {
         ctx.error();
@@ -44,16 +49,21 @@ module.exports = app => {
         childIdListString += id + ',';
       });
       childIdListString = childIdListString.substring(0, childIdListString.length - 1);
+      if(childInsertSQLList.length){
+        const SQL = `UPDATE ${childFormKey} SET parentId = ${parentId} where id IN (${childIdListString})`;
+        const updateRes = await ctx.service.sql.transaction([ SQL ]);
 
-      const SQL = `UPDATE ${childFormKey} SET parentId = ${parentId} where id IN (${childIdListString})`;
+        if (!updateRes.success) {
+          ctx.error();
+          return;
+        }
 
-      const updateRes = await ctx.service.sql.transaction([ SQL ]);
-
-      if (!updateRes.success) {
-        ctx.error();
-        return;
       }
 
+
+      
+
+      
       const tenant = await ctx.model.models.tenant.findByPk(parentData && parentData.tenant ? parentData.tenant.value : 0);
 
       let manager_group_id = 0;
@@ -75,13 +85,17 @@ module.exports = app => {
       const datas = await ctx.service.syncActiviti.startProcess(activitiData, { headers: ctx.headers });
       // 保存 pid 同时更新子表 parentId
       const parentUpdateSQL = `UPDATE ${formKey} SET pid = ${datas.data} where id = ${parentId}`;
-      const childUpdateSQL = `UPDATE ${childFormKey} SET pid = ${datas.data} where parentId = ${parentId}`;
-      const updateFormRes = await ctx.service.sql.transaction([ parentUpdateSQL, childUpdateSQL ]);
-      if (updateFormRes.success) {
-        ctx.success();
-      } else {
-        ctx.error();
+      const updateSQL = [parentUpdateSQL]
+      if(childInsertSQLList.length){
+        const childUpdateSQL = `UPDATE ${childFormKey} SET pid = ${datas.data} where parentId = ${parentId}`;
+        updateSQL.push(childUpdateSQL)
       }
+      const updateFormRes = await ctx.service.sql.transaction(updateSQL);
+        if (updateFormRes.success) {
+          ctx.success();
+        } else {
+          ctx.error();
+        }
     }
 
     async detail() {
