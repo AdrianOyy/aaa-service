@@ -275,7 +275,10 @@ module.exports = app => {
       if (vmmList.length > 0) {
         // 保存 HCIList
         await this.saveVMMare(vmmList);
-        const vmm = vmmList[0];
+        let vmm = vmmList[0];
+        if (vm.vm_cluster === 'devesxi02cs') {
+          vmm = vmmList[1];
+        }
         if (vmm.totalRam * 0.2 > vmm.freeRam - vm.data_storage_request_number * 1024) {
           vmResult.error = true;
           vmResult.message = ' vm_cluster data_storage_request_number beyond 80% ';
