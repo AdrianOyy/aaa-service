@@ -272,8 +272,9 @@ module.exports = app => {
 
       // TODO 1. 根据新的 application type 计算新的 hostname 列表
       const hostname_prefix = await ctx.service.hostname.getPrefixByTypeZone(environment_type, network_zone);
+      const applicationTypelabel = childDataList.application_type.label;
       const typeCount = {
-        applicationType,
+        applicationType: applicationTypelabel,
         hostname_prefix,
         requestNum: 1,
       };
