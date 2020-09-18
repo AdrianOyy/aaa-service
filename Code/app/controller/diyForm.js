@@ -27,14 +27,9 @@ module.exports = app => {
       }
       const childInsertSQLList = await ctx.service.diyForm.getChildFormInsertSQLList(childFormKey, childDataList);
 
-      
-
-
       const insertSQLList = [ parentInsertSQL, ...childInsertSQLList ];
 
       const res = await ctx.service.sql.transaction(insertSQLList);
-
-
 
       if (!res.success) {
         ctx.error();
@@ -49,7 +44,7 @@ module.exports = app => {
         childIdListString += id + ',';
       });
       childIdListString = childIdListString.substring(0, childIdListString.length - 1);
-      if(childInsertSQLList.length){
+      if (childInsertSQLList.length) {
         const SQL = `UPDATE ${childFormKey} SET parentId = ${parentId} where id IN (${childIdListString})`;
         const updateRes = await ctx.service.sql.transaction([ SQL ]);
 
@@ -60,13 +55,9 @@ module.exports = app => {
 
       }
 
-
-      
-
-      
       const tenant = await ctx.model.models.tenant.findByPk(parentData && parentData.tenant ? parentData.tenant.value : 0);
-
-      let manager_group_id = 0;
+      // todo 暂时使用1
+      let manager_group_id = 1;
 
       if (tenant) {
         manager_group_id = tenant.manager_group_id;
@@ -85,17 +76,17 @@ module.exports = app => {
       const datas = await ctx.service.syncActiviti.startProcess(activitiData, { headers: ctx.headers });
       // 保存 pid 同时更新子表 parentId
       const parentUpdateSQL = `UPDATE ${formKey} SET pid = ${datas.data} where id = ${parentId}`;
-      const updateSQL = [parentUpdateSQL]
-      if(childInsertSQLList.length){
+      const updateSQL = [ parentUpdateSQL ];
+      if (childInsertSQLList.length) {
         const childUpdateSQL = `UPDATE ${childFormKey} SET pid = ${datas.data} where parentId = ${parentId}`;
-        updateSQL.push(childUpdateSQL)
+        updateSQL.push(childUpdateSQL);
       }
       const updateFormRes = await ctx.service.sql.transaction(updateSQL);
-        if (updateFormRes.success) {
-          ctx.success();
-        } else {
-          ctx.error();
-        }
+      if (updateFormRes.success) {
+        ctx.success();
+      } else {
+        ctx.error();
+      }
     }
 
     async detail() {
