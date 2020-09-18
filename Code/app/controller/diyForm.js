@@ -106,10 +106,10 @@ module.exports = app => {
         return;
       }
       const detail = await ctx.service.diyForm.getDIYFormDetail(pid, 'VMAllocation', 'VMList');
-      if (!detail) {
-        ctx.error();
-        return;
-      }
+      // if (!detail) {
+      //   ctx.error();
+      //   return;
+      // }
       ctx.success(detail);
     }
     //
