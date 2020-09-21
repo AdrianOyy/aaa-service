@@ -57,6 +57,10 @@ module.exports = app => {
             as: 'status',
           },
           {
+            model: ctx.model.models.equipType,
+            as: 'equipType',
+          },
+          {
             model: ctx.model.models.equipmentPort,
             as: 'equipPort',
             include: {
@@ -121,7 +125,7 @@ module.exports = app => {
       const {
         _ID, UnitCode, AssetID, ModelCode, ModelDesc, ClosetID,
         Rack, RLU, ItemOwner, Status, Remark, UnitNo, PortQty, ReqNo,
-        DOB, DeliveryDate, DeliveryNoteReceivedDate, MaintID,
+        DOB, DeliveryDate, DeliveryNoteReceivedDate, MaintID, EquipType,
       } = ctx.request.body;
       if (!_ID) ctx.error();
       const oldModel = await ctx.model.models.inventory.findByPk(id);
@@ -130,7 +134,7 @@ module.exports = app => {
         {
           _ID, ModelCode, ModelDesc,
           Rack, RLU, ItemOwner, Remark, UnitNo, ReqNo,
-          MaintID,
+          MaintID, EquipType,
           updatedAt: new Date(),
         },
         UnitCode ? { UnitCode } : undefined,

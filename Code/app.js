@@ -12,9 +12,9 @@ module.exports = app => {
       'vm_platform_type', 'vm_platform', 'vm_type', 'vm_cluster_applicationType',
       'vm_platform_applicationType', 'vm_type_zone_cdc',
       'resource_request_history', 'dynamicForm', 'dynamicFormDetail', 'vm_cluster_dc_mapping',
-      'tenant_hostname_reference', 'ip_assignment', 'inventoryStatus', 'inventory',
-      'policy', 'equipmentPort', 'portAssignment', 'power', 'powerInput', 'powerOutput',
-      'equipType', 'inventoryLifeCycle',
+      'tenant_hostname_reference', 'ip_assignment', 'inventoryStatus', 'equipType',
+      'inventory', 'policy', 'equipmentPort', 'portAssignment', 'power', 'powerInput',
+      'powerOutput', 'inventoryLifeCycle',
     ];
     console.log('=============================================');
     console.log('Start syncing model');
