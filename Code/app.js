@@ -14,7 +14,7 @@ module.exports = app => {
       'resource_request_history', 'dynamicForm', 'dynamicFormDetail', 'vm_cluster_dc_mapping',
       'tenant_hostname_reference', 'ip_assignment', 'inventoryStatus', 'inventory',
       'policy', 'equipmentPort', 'portAssignment', 'power', 'powerInput', 'powerOutput',
-      'equipType',
+      'equipType', 'inventoryLifeCycle',
     ];
     console.log('=============================================');
     console.log('Start syncing model');
