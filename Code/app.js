@@ -14,6 +14,7 @@ module.exports = app => {
       'resource_request_history', 'dynamicForm', 'dynamicFormDetail', 'vm_cluster_dc_mapping',
       'tenant_hostname_reference', 'ip_assignment', 'inventoryStatus', 'inventory',
       'policy', 'equipmentPort', 'portAssignment', 'power', 'powerInput', 'powerOutput',
+      'equipType',
     ];
     console.log('=============================================');
     console.log('Start syncing model');
@@ -34,6 +35,9 @@ module.exports = app => {
     }
     if (!await model.inventoryStatus.findOne()) {
       await sequelizeFixtures.loadFile(fixturesPath + 'inventoryStatus.js', model);
+    }
+    if (!await model.equipType.findOne()) {
+      await sequelizeFixtures.loadFile(fixturesPath + 'equipType.js', model);
     }
   });
 };

@@ -33,6 +33,13 @@ module.exports = app => {
       ctx.success(result);
     }
 
+    async listEquipType() {
+      const { ctx } = this;
+
+      const result = await ctx.model.models.equipType.findAll({});
+      ctx.success(result);
+    }
+
     async detail() {
       const { ctx } = this;
       const { id } = ctx.query;
@@ -57,6 +64,18 @@ module.exports = app => {
               as: 'portAssignment',
             },
           },
+          {
+            model: ctx.model.models.policy,
+            as: 'policy',
+          },
+          {
+            model: ctx.model.models.powerInput,
+            as: 'powerInput',
+          },
+          {
+            model: ctx.model.models.powerOutput,
+            as: 'powerOutput',
+          },
         ],
       });
       ctx.success(inventory);
@@ -67,14 +86,14 @@ module.exports = app => {
       const {
         _ID, UnitCode, AssetID, ModelCode, ModelDesc, ClosetID,
         Rack, RLU, ItemOwner, Status, Remark, UnitNo, PortQty, ReqNo,
-        DOB, DeliveryDate, DeliveryNoteReceivedDate, MaintID,
+        DOB, DeliveryDate, DeliveryNoteReceivedDate, MaintID, EquipType,
       } = ctx.request.body;
       if (!_ID) ctx.error();
       const inventory = Object.assign(
         {
           _ID, ModelCode, ModelDesc,
           Rack, RLU, ItemOwner, Remark, UnitNo, ReqNo,
-          MaintID,
+          MaintID, EquipType,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
