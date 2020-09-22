@@ -2,62 +2,106 @@
 
 module.exports = app => {
   return class extends app.Controller {
+    // async create() {
+    //   const { ctx } = this;
+    //   const { formKey, deploymentId, list, workflowName } = ctx.request.body;
+    //   const basicFormFieldList = [];
+    //   const childTableList = [];
+    //   JSON.parse(list)
+    //     .forEach(el => {
+    //       if (el.type === 'enum') {
+    //         childTableList.push(el);
+    //       } else {
+    //         basicFormFieldList.push(el);
+    //       }
+    //     });
+    //
+    //   // 记录表
+    //   // 父表
+    //   const basicDynamicForm = await ctx.model.models.dynamicForm.create({
+    //     deploymentId,
+    //     formKey,
+    //     workflowName,
+    //     createdAt: new Date(),
+    //     updatedAt: new Date(),
+    //   });
+    //   // 子表
+    //   const childFormData = [];
+    //   childTableList.forEach(el => {
+    //     const model = {
+    //       parentId: basicDynamicForm.id,
+    //       formKey: el.id,
+    //       workflowName,
+    //       createdAt: new Date(),
+    //       updatedAt: new Date(),
+    //     };
+    //     childFormData.push(model);
+    //   });
+    //   const childDynamicFormList = await ctx.model.models.dynamicForm.bulkCreate(childFormData);
+    //
+    //   // 渲染表
+    //   const basicDynamicFormDetailData = await ctx.service.dynamicForm.getBasicDynamicFormDetailData(basicDynamicForm.id, basicFormFieldList);
+    //   const childDynamicFormDetailData = await ctx.service.dynamicForm.getChildDynamicFormDetailData(childTableList, childDynamicFormList);
+    //   await ctx.model.models.dynamicFormDetail.bulkCreate([ ...basicDynamicFormDetailData, ...childDynamicFormDetailData ]);
+    //
+    //   // 创建数据表
+    //   const createBasicFormSQL = await ctx.service.dynamicForm.getBasicSQL(formKey, basicFormFieldList);
+    //   const createChildTableSQLList = await ctx.service.dynamicForm.getChildTableSQLList(formKey, childTableList);
+    //   const SQLList = [ createBasicFormSQL, ...createChildTableSQLList ];
+    //   try {
+    //     for (let i = 0; i < SQLList.length; i++) {
+    //       await app.model.query(SQLList[i]);
+    //     }
+    //     ctx.success();
+    //   } catch (error) {
+    //     ctx.error(error);
+    //   }
+    //   ctx.success();
+    // }
+
     async create() {
       const { ctx } = this;
-      const { formKey, deploymentId, list, workflowName } = ctx.request.body;
-      const basicFormFieldList = [];
-      const childTableList = [];
-      JSON.parse(list)
-        .forEach(el => {
-          if (el.type === 'enum') {
-            childTableList.push(el);
-          } else {
-            basicFormFieldList.push(el);
-          }
-        });
-
-      // 记录表
-      // 父表
-      const basicDynamicForm = await ctx.model.models.dynamicForm.create({
-        deploymentId,
-        formKey,
-        workflowName,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-      // 子表
-      const childFormData = [];
-      childTableList.forEach(el => {
-        const model = {
-          parentId: basicDynamicForm.id,
-          formKey: el.id,
-          workflowName,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        };
-        childFormData.push(model);
-      });
-      const childDynamicFormList = await ctx.model.models.dynamicForm.bulkCreate(childFormData);
-
-      // 渲染表
-      const basicDynamicFormDetailData = await ctx.service.dynamicForm.getBasicDynamicFormDetailData(basicDynamicForm.id, basicFormFieldList);
-      const childDynamicFormDetailData = await ctx.service.dynamicForm.getChildDynamicFormDetailData(childTableList, childDynamicFormList);
-      await ctx.model.models.dynamicFormDetail.bulkCreate([ ...basicDynamicFormDetailData, ...childDynamicFormDetailData ]);
-
-      // 创建数据表
-      const createBasicFormSQL = await ctx.service.dynamicForm.getBasicSQL(formKey, basicFormFieldList);
-      const createChildTableSQLList = await ctx.service.dynamicForm.getChildTableSQLList(formKey, childTableList);
-      const SQLList = [ createBasicFormSQL, ...createChildTableSQLList ];
+      const { version, modelId, deploymentId } = ctx.request.body;
+      console.log(ctx.request.body);
+      console.log('============================');
+      // const version = 12;
+      // const modelId = 297501;
+      // const deploymentId = 12342;
+      const dynamicForm = await ctx.service.workflow.getVersion(modelId);
+      // 获取最新 dynamicForm
+      // 修改version
+      dynamicForm.deploymentId = deploymentId;
+      dynamicForm.version = version;
+      dynamicForm.save();
+      const childDynamicForm = await ctx.model.models.dynamicForm.findOne({ where: { parentId: dynamicForm.id } });
+      // const dynamicForm = await ctx.model.models.dynamicForm.findOne({ where: { modelId: 297501 } });
+      const basicFormFieldList = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: dynamicForm.id } });
+      const createBasicFormSQL = await ctx.service.dynamicForm.getBasicNewSQL(dynamicForm.formKey, basicFormFieldList, version);
+      console.log(createBasicFormSQL);
+      const SQLList = [ createBasicFormSQL ];
+      // const childDynamicForm = await ctx.model.models.dynamicForm.findOne({ where: { parentId: dynamicForm.id } });
+      if (childDynamicForm) {
+        childDynamicForm.deploymentId = deploymentId;
+        childDynamicForm.version = version;
+        childDynamicForm.save();
+        const childTableList = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: childDynamicForm.id } });
+        const createChildTableSQLList = await ctx.service.dynamicForm.getChildTableSQLChild(dynamicForm.formKey, childDynamicForm.formKey, childTableList, version);
+        SQLList.push(createChildTableSQLList);
+        console.log(createChildTableSQLList);
+      }
       try {
         for (let i = 0; i < SQLList.length; i++) {
           await app.model.query(SQLList[i]);
         }
+        // 强删除 version 为 -1 信息
+        await ctx.model.models.dynamicForm.destroy({ where: { version: -1, modelId }, force: true });
         ctx.success();
       } catch (error) {
         ctx.error(error);
       }
       ctx.success();
     }
+
 
     // async getDynamicForm() {
     //   const { ctx } = this;
@@ -275,9 +319,11 @@ module.exports = app => {
 
     async getDetailByKey() {
       const { ctx } = this;
-      const { formKey, formId } = ctx.query;
+      console.log(ctx.query);
+      console.log('==================================1');
+      const { formKey, formId, version } = ctx.query;
       if (!formKey || !formId) ctx.error();
-      const res = await ctx.service.dynamicForm.getDetailByKey(formKey, formId);
+      const res = await ctx.service.dynamicForm.getDetailByKey(formKey, version, formId);
       console.log(res);
       if (!res) ctx.error();
       else ctx.success(res);

@@ -152,4 +152,8 @@ module.exports = app => {
   router.put(`${prefix}/inventory/update`, controller.inventory.update);
   router.delete(`${prefix}/inventory/deleteMany`, controller.inventory.deleteMany);
   router.get(`${prefix}/inventory/checkIDExist`, controller.inventory.checkIDExist);
+
+  router.post(`${prefix}/workflow/create`, controller.workflow.create);
+  router.get(`${prefix}/workflow/detail`, controller.workflow.detail);
+  router.get(`${prefix}/workflow/createTable`, controller.workflow.createTable);
 };

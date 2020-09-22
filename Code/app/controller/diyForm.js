@@ -10,11 +10,12 @@ module.exports = app => {
         parentData,
         childDataList,
         processDefinitionId,
+        version,
       } = ctx.request.body;
       ctx.success();
 
       // 获取父表插入SQL
-      const parentInsertSQL = await ctx.service.diyForm.getParentFormInsetSQL(formKey, parentData);
+      const parentInsertSQL = await ctx.service.diyForm.getParentFormInsetSQL(formKey, version, parentData);
 
       // 获取子表插入SQL
       for (const childData of childDataList) {
@@ -25,7 +26,7 @@ module.exports = app => {
           label: dc,
         };
       }
-      const childInsertSQLList = await ctx.service.diyForm.getChildFormInsertSQLList(childFormKey, childDataList);
+      const childInsertSQLList = await ctx.service.diyForm.getChildFormInsertSQLList(childFormKey, version, childDataList);
 
       const insertSQLList = [ parentInsertSQL, ...childInsertSQLList ];
 
@@ -45,7 +46,7 @@ module.exports = app => {
       });
       childIdListString = childIdListString.substring(0, childIdListString.length - 1);
       if (childInsertSQLList.length) {
-        const SQL = `UPDATE ${childFormKey} SET parentId = ${parentId} where id IN (${childIdListString})`;
+        const SQL = `UPDATE ${childFormKey}${version} SET parentId = ${parentId} where id IN (${childIdListString})`;
         const updateRes = await ctx.service.sql.transaction([ SQL ]);
 
         if (!updateRes.success) {
@@ -74,11 +75,12 @@ module.exports = app => {
       };
       // 启动流程
       const datas = await ctx.service.syncActiviti.startProcess(activitiData, { headers: ctx.headers });
+      console.log(datas);
       // 保存 pid 同时更新子表 parentId
-      const parentUpdateSQL = `UPDATE ${formKey} SET pid = ${datas.data} where id = ${parentId}`;
+      const parentUpdateSQL = `UPDATE ${formKey}${version} SET pid = ${datas.data} where id = ${parentId}`;
       const updateSQL = [ parentUpdateSQL ];
       if (childInsertSQLList.length) {
-        const childUpdateSQL = `UPDATE ${childFormKey} SET pid = ${datas.data} where parentId = ${parentId}`;
+        const childUpdateSQL = `UPDATE ${childFormKey}${version} SET pid = ${datas.data} where parentId = ${parentId}`;
         updateSQL.push(childUpdateSQL);
       }
       const updateFormRes = await ctx.service.sql.transaction(updateSQL);
@@ -91,12 +93,16 @@ module.exports = app => {
 
     async detail() {
       const { ctx } = this;
-      const { pid } = ctx.query;
+      const { pid, deploymentId } = ctx.query;
       if (!pid) {
         ctx.error();
         return;
       }
-      const detail = await ctx.service.diyForm.getDIYFormDetail(pid, 'VMAllocation', 'VMList');
+      const dynamicForm = await ctx.model.models.dynamicForm.findOne({ where: { deploymentId, parentId: null } });
+      const childForm = await ctx.model.models.dynamicForm.findOne({ where: { parentId: dynamicForm.id } });
+      console.log(dynamicForm);
+      console.log(childForm);
+      const detail = await ctx.service.diyForm.getDIYFormDetail(pid, dynamicForm.formKey, childForm ? childForm.formKey : null, dynamicForm.version);
       // if (!detail) {
       //   ctx.error();
       //   return;
@@ -109,6 +115,7 @@ module.exports = app => {
       const {
         childFormKey,
         childDataList,
+        version,
         taskId,
       } = ctx.request.body;
       // 获取父表插入SQL
@@ -119,7 +126,7 @@ module.exports = app => {
       // }
 
       // 获取子表插入SQL
-      const childUpdateSQLList = await ctx.service.diyForm.getChildFormUpdateSQLList(childFormKey, childDataList);
+      const childUpdateSQLList = await ctx.service.diyForm.getChildFormUpdateSQLList(childFormKey, version, childDataList);
 
       const updateSQLList = [ ...childUpdateSQLList ];
       console.log(updateSQLList);

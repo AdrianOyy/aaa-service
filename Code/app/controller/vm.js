@@ -166,8 +166,8 @@ module.exports = app => {
       const { ctx } = this;
       let pass = true;
       let message = '';
-      const { formKey, formId } = ctx.request.body;
-      const dynamicForm = await ctx.service.dynamicForm.getDetailByKey(formKey, formId);
+      const { formKey, formId, version } = ctx.request.body;
+      const dynamicForm = await ctx.service.dynamicForm.getDetailByKey(formKey, version, formId);
       const { childFormKey, childTable, tenant } = dynamicForm;
       const tenantId = tenant.id;
       const tenantName = tenant.name;
@@ -238,7 +238,7 @@ module.exports = app => {
           const el = childTable[i];
           const columnList = `hostname = \"${el.hostname}\", vm_cluster= \"${el.vm_cluster}\", vm_master= \"${el.vm_master}\",os_ip= \"${el.os_ip}\",atl_ip= \"${el.atl_ip}\"`;
           try {
-            const updateSQL = `UPDATE \`${childFormKey}\` SET ${columnList} WHERE \`${childFormKey}\`.id = ${el.id}`;
+            const updateSQL = `UPDATE \`${childFormKey}${version}\` SET ${columnList} WHERE \`${childFormKey}${version}\`.id = ${el.id}`;
             await app.model.query(updateSQL);
           } catch (e) {
             console.log('e ================= e');
@@ -258,9 +258,9 @@ module.exports = app => {
 
     async check() {
       const { ctx } = this;
-      const { formKey, formId, childDataList } = ctx.request.body;
+      const { formKey, formId, version, childDataList } = ctx.request.body;
       const fileList = [];
-      const dynamicForm = await ctx.service.dynamicForm.getDetailByKey(formKey, formId);
+      const dynamicForm = await ctx.service.dynamicForm.getDetailByKey(formKey, version, formId);
       const { tenant } = dynamicForm;
       const tenantId = tenant.id;
       const tenantName = tenant.name;

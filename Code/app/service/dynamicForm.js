@@ -62,6 +62,62 @@ module.exports = app => {
       return childTableSQLList;
     }
 
+    async getBasicNewSQL(formKey, list, version) {
+      let fieldList = '`id` int unsigned not null auto_increment primary key, `pid` int,';
+      list.forEach(el => {
+        let fieldType = '';
+        switch (el.fieldType) {
+          case 'string':
+            fieldType = 'varchar(255)';
+            break;
+          case 'boolean':
+            fieldType = 'tinyint';
+            break;
+          case 'int':
+            fieldType = 'int';
+            break;
+          case 'date':
+            fieldType = 'datetime';
+            break;
+          default:
+            fieldType = 'varchar(255)';
+            break;
+        }
+        fieldList += `\`${el.fieldName.toLowerCase().replace(/\s+/g, '_')}\` ${fieldType},`;
+      });
+      fieldList += '`createdAt` datetime, `updatedAt` datetime, `deletedAt` datetime, `createBy` int, `updateBy` int, UNIQUE(pid)';
+      const basicFormSQL = `CREATE TABLE IF NOT EXISTS ${formKey}${version} (${fieldList})`;
+      return basicFormSQL;
+    }
+
+    async getChildTableSQLChild(parentFormKey, childFormKey, list, version) {
+      let fieldList = '`id` int unsigned not null auto_increment primary key, `pid` int, `parentId` int unsigned,';
+      list.forEach(el => {
+        let fieldType = '';
+        switch (el.fieldType) {
+          case 'string':
+            fieldType = 'varchar(255)';
+            break;
+          case 'boolean':
+            fieldType = 'tinyint';
+            break;
+          case 'int':
+            fieldType = 'int';
+            break;
+          case 'date':
+            fieldType = 'datetime';
+            break;
+          default:
+            fieldType = 'varchar(255)';
+            break;
+        }
+        fieldList += `\`${el.fieldName.toLowerCase().replace(/\s+/g, '_')}\` ${fieldType},`;
+      });
+      fieldList += `\`createdAt\` datetime, \`updatedAt\` datetime, \`deletedAt\` datetime, \`createBy\` int, \`updateBy\` int,FOREIGN KEY(parentId) REFERENCES ${parentFormKey}${version}(id) on delete cascade on update cascade`;
+      const basicFormSQL = `CREATE TABLE IF NOT EXISTS ${childFormKey}${version} (${fieldList})`;
+      return basicFormSQL;
+    }
+
     async getBasicDynamicFormDetailData(dynamicFormId, list) {
       const dataList = addForeign(list, dynamicFormId);
       return dataList;
@@ -146,11 +202,11 @@ module.exports = app => {
 
     async getDynamicForm(params) {
       const { ctx } = this;
-      const { formKey, deploymentId } = params;
+      const { formKey, version, deploymentId } = params;
       if (!formKey && !deploymentId) return false;
       // 基础数据
       const dynamicForm = await ctx.model.models.dynamicForm.findOne({
-        where: formKey ? { formKey } : { deploymentId },
+        where: formKey ? { formKey, version } : { deploymentId },
         include: [
           {
             model: ctx.model.models.dynamicForm,
@@ -172,14 +228,14 @@ module.exports = app => {
     async getDynamicFormWithForeignTable(deploymentId) {
       const dynamicForm = await this.getDynamicForm({ deploymentId });
       if (!dynamicForm) return false;
-      const { workflowName, formKey, dynamicFormDetail, childTable } = dynamicForm;
+      const { workflowName, formKey, dynamicFormDetail, childTable, version } = dynamicForm;
       let childFormKey = '';
       // 父表渲染表
       const parentFormDetail = [];
       for (let i = 0; i < dynamicFormDetail.length; i++) {
         let itemList = null;
         const el = dynamicFormDetail[i];
-        if (el.foreignTable !== null) {
+        if (el.foreignTable !== null && el.foreignTable !== '') {
           itemList = await this.getForeignData(el.foreignTable);
         }
         parentFormDetail.push(Object.assign(el.dataValues, { itemList, label: el.fieldDisplayName, type: el.inputType, labelField: el.foreignDisplayKey, valueField: el.foreignKey }));
@@ -191,7 +247,7 @@ module.exports = app => {
         for (let i = 0; i < childTable[0].dynamicFormDetail.length; i++) {
           let itemList = null;
           const el = childTable[0].dynamicFormDetail[i];
-          if (el.foreignTable !== null) {
+          if (el.foreignTable !== null && el.foreignTable !== '') {
             itemList = await this.getForeignData(el.foreignTable);
           }
           childFormDetail.push(Object.assign(el.dataValues, { itemList, label: el.fieldDisplayName, type: el.inputType, labelField: el.foreignDisplayKey, valueField: el.foreignKey }));
@@ -204,18 +260,19 @@ module.exports = app => {
         childFormKey,
         parentFormDetail,
         childFormDetail,
+        version,
       };
 
     }
 
     // 根据动态父表表名和数据表父表 id 获取数据
-    async getDetailByKey(formKey, formId) {
+    async getDetailByKey(formKey, version, formId) {
       // 基础数据
-      const dynamicForm = await this.getDynamicForm({ formKey });
+      const dynamicForm = await this.getDynamicForm({ formKey, version });
       if (!dynamicForm) return false;
 
       // 父表数据表
-      const basicSQL = `SELECT * FROM ${dynamicForm.formKey} where ${dynamicForm.formKey}.id = ${formId};`;
+      const basicSQL = `SELECT * FROM ${dynamicForm.formKey}${version} where ${dynamicForm.formKey}${version}.id = ${formId};`;
       const [[ basicTable ]] = await app.model.query(basicSQL);
       if (!basicTable) return {};
       for (let i = 0; i < dynamicForm.dynamicFormDetail.length; i++) {
@@ -231,7 +288,7 @@ module.exports = app => {
       const { childTable } = dynamicForm;
       const el = childTable[0].dataValues;
       basicTable.childFormKey = el.formKey;
-      const childSQL = `SELECT * FROM ${el.formKey} where ${el.formKey}.parentId = ${basicTable.id};`;
+      const childSQL = `SELECT * FROM ${el.formKey}${version} where ${el.formKey}${version}.parentId = ${basicTable.id};`;
       const [ childList ] = await app.model.query(childSQL);
       for (let j = 0; j < childList.length; j++) {
         const child = childList[j];
@@ -268,7 +325,7 @@ module.exports = app => {
     // 验证是否流程部署过
     /**
      * @param { string[] } formKeyList startForm's parent and child's formKey list
-     * @returns {Promise<boolean>} isExist
+     * @return {Promise<boolean>} isExist
      */
     async checkTableExist(formKeyList) {
       const { ctx } = this;

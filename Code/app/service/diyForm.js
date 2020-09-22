@@ -8,8 +8,8 @@ module.exports = app => {
      * @param {object} parentData parent table data
      * @return {Promise<string>} insetSQL parent table's insert SQL
      */
-    async getParentFormInsetSQL(formKey, parentData) {
-      return getInsertSQL(formKey, parentData);
+    async getParentFormInsetSQL(formKey, version, parentData) {
+      return getInsertSQL(formKey, version, parentData);
     }
 
     /**
@@ -18,10 +18,10 @@ module.exports = app => {
      * @param {object[]} childDataList child table data
      * @return {Promise<string[]>} insetSQL child table's insert SQL list
      */
-    async getChildFormInsertSQLList(childFormKey, childDataList) {
+    async getChildFormInsertSQLList(childFormKey, version, childDataList) {
       const SQLList = [];
       for (let i = 0; i < childDataList.length; i++) {
-        SQLList.push(getInsertSQL(childFormKey, childDataList[i]));
+        SQLList.push(getInsertSQL(childFormKey, version, childDataList[i]));
       }
       return SQLList;
     }
@@ -33,19 +33,27 @@ module.exports = app => {
     * @param {string} childFormKey
     * @return {Promise<{object}>}
     */
-    async getDIYFormDetail(pid, formKey, childFormKey) {
-      const parentSQL = `SELECT * FROM ${formKey} WHERE pid = ${pid}`;
+    async getDIYFormDetail(pid, formKey, childFormKey, version) {
+      const parentSQL = `SELECT * FROM ${formKey}${version} WHERE pid = ${pid}`;
       const [ parentDataList ] = await app.model.query(parentSQL);
       if (parentDataList.length === 0) return false;
       const parentData = parentDataList[0];
       const parentId = parentData.id;
-      const childSQL = `SELECT * FROM ${childFormKey} WHERE parentId = ${parentId}`;
-      const [ childDataList ] = await app.model.query(childSQL);
+      if (childFormKey) {
+        const childSQL = `SELECT * FROM ${childFormKey}${version} WHERE parentId = ${parentId}`;
+        const [ childDataList ] = await app.model.query(childSQL);
+        const model = {
+          parentData,
+          childDataList,
+        };
+        return model;
+      }
       const model = {
         parentData,
-        childDataList,
+        childDataList: null,
       };
       return model;
+
     }
 
     /**
@@ -54,9 +62,9 @@ module.exports = app => {
      * @param {object} parentData parent table data
      * @return {Promise<string>} insetSQL parent table's insert SQL
      */
-    async getParentFormUpdateSQL(formKey, parentData, pid) {
+    async getParentFormUpdateSQL(formKey, version, parentData, pid) {
       const whereSql = `pid = ${pid}`;
-      return getUpdateSQL(formKey, parentData, whereSql);
+      return getUpdateSQL(formKey, version, parentData, whereSql);
     }
 
     /**
@@ -65,13 +73,13 @@ module.exports = app => {
      * @param {object[]} childDataList child table data
      * @return {Promise<string[]>} insetSQL child table's insert SQL list
      */
-    async getChildFormUpdateSQLList(childFormKey, childDataList) {
+    async getChildFormUpdateSQLList(childFormKey, version, childDataList) {
       const SQLList = [];
       console.log(childDataList);
       for (let i = 0; i < childDataList.length; i++) {
         const id = childDataList[i].id.value;
         const whereSql = `id = ${id}`;
-        SQLList.push(getUpdateSQL(childFormKey, childDataList[i], whereSql));
+        SQLList.push(getUpdateSQL(childFormKey, version, childDataList[i], whereSql));
       }
       return SQLList;
     }
@@ -84,7 +92,7 @@ module.exports = app => {
  * @param {object} data  table data
  * @return {Promise<string>} insetSQL table's insert SQL
  */
-function getInsertSQL(formKey, data) {
+function getInsertSQL(formKey, version, data) {
   let fieldType = '';
   let fieldValue = '';
   for (const key in data) {
@@ -93,7 +101,7 @@ function getInsertSQL(formKey, data) {
   }
   fieldType += '\`createdAt\`,\`updatedAt\`';
   fieldValue += `\'${getNow()}\',\'${getNow()}\'`;
-  return `INSERT INTO ${formKey}(${fieldType}) VALUES (${fieldValue})`;
+  return `INSERT INTO ${formKey}${version}(${fieldType}) VALUES (${fieldValue})`;
 }
 
 /**
@@ -103,7 +111,7 @@ function getInsertSQL(formKey, data) {
  * @return {Promise<string>} insetSQL table's insert SQL
  */
 // eslint-disable-next-line no-unused-vars
-function getUpdateSQL(formKey, data, where) {
+function getUpdateSQL(formKey, version, data, where) {
   let fieldValue = '';
   for (const key in data) {
     if (key !== 'id' && key !== 'checkState') {
@@ -111,7 +119,7 @@ function getUpdateSQL(formKey, data, where) {
     }
   }
   fieldValue = fieldValue.substring(0, fieldValue.length - 1);
-  return `UPDATE  ${formKey} SET  ${fieldValue} WHERE ${where}`;
+  return `UPDATE  ${formKey}${version} SET  ${fieldValue} WHERE ${where}`;
 }
 
 function getNow() {
