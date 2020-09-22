@@ -33,6 +33,13 @@ module.exports = app => {
       ctx.success(result);
     }
 
+    async listEquipType() {
+      const { ctx } = this;
+
+      const result = await ctx.model.models.equipType.findAll({});
+      ctx.success(result);
+    }
+
     async detail() {
       const { ctx } = this;
       const { id } = ctx.query;
@@ -50,12 +57,28 @@ module.exports = app => {
             as: 'status',
           },
           {
+            model: ctx.model.models.equipType,
+            as: 'equipType',
+          },
+          {
             model: ctx.model.models.equipmentPort,
             as: 'equipPort',
             include: {
               model: ctx.model.models.portAssignment,
               as: 'portAssignment',
             },
+          },
+          {
+            model: ctx.model.models.policy,
+            as: 'policy',
+          },
+          {
+            model: ctx.model.models.powerInput,
+            as: 'powerInput',
+          },
+          {
+            model: ctx.model.models.powerOutput,
+            as: 'powerOutput',
           },
         ],
       });
@@ -67,7 +90,7 @@ module.exports = app => {
       const {
         _ID, UnitCode, AssetID, ModelCode, ModelDesc, ClosetID,
         Rack, RLU, ItemOwner, Status, Remark, UnitNo, PortQty, ReqNo,
-        DOB, DeliveryDate, DeliveryNoteReceivedDate, MaintID,
+        DOB, DeliveryDate, DeliveryNoteReceivedDate, MaintID, EquipType,
       } = ctx.request.body;
       if (!_ID) ctx.error();
       const inventory = Object.assign(
@@ -82,6 +105,7 @@ module.exports = app => {
         AssetID ? { AssetID } : undefined,
         ClosetID ? { ClosetID } : undefined,
         Status ? { Status } : undefined,
+        EquipType ? { EquipType } : undefined,
         DOB ? { DOB } : undefined,
         PortQty ? { PortQty } : undefined,
         DeliveryDate ? { DeliveryDate } : undefined,
@@ -102,7 +126,7 @@ module.exports = app => {
       const {
         _ID, UnitCode, AssetID, ModelCode, ModelDesc, ClosetID,
         Rack, RLU, ItemOwner, Status, Remark, UnitNo, PortQty, ReqNo,
-        DOB, DeliveryDate, DeliveryNoteReceivedDate, MaintID,
+        DOB, DeliveryDate, DeliveryNoteReceivedDate, MaintID, EquipType,
       } = ctx.request.body;
       if (!_ID) ctx.error();
       const oldModel = await ctx.model.models.inventory.findByPk(id);
@@ -118,6 +142,7 @@ module.exports = app => {
         AssetID ? { AssetID } : undefined,
         ClosetID ? { ClosetID } : undefined,
         Status ? { Status } : undefined,
+        EquipType ? { EquipType } : undefined,
         DOB ? { DOB } : undefined,
         PortQty ? { PortQty } : undefined,
         DeliveryDate ? { DeliveryDate } : undefined,

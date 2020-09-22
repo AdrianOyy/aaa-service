@@ -147,6 +147,7 @@ module.exports = app => {
 
   router.get(`${prefix}/inventory/list`, controller.inventory.list);
   router.get(`${prefix}/inventory/listStatus`, controller.inventory.listStatus);
+  router.get(`${prefix}/inventory/listEquipType`, controller.inventory.listEquipType);
   router.get(`${prefix}/inventory/detail`, controller.inventory.detail);
   router.post(`${prefix}/inventory/create`, controller.inventory.create);
   router.put(`${prefix}/inventory/update`, controller.inventory.update);

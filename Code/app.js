@@ -12,8 +12,9 @@ module.exports = app => {
       'vm_platform_type', 'vm_platform', 'vm_type', 'vm_cluster_applicationType',
       'vm_platform_applicationType', 'vm_type_zone_cdc',
       'resource_request_history', 'dynamicForm', 'dynamicFormDetail', 'vm_cluster_dc_mapping',
-      'tenant_hostname_reference', 'ip_assignment', 'inventoryStatus', 'inventory',
-      'policy', 'equipmentPort', 'portAssignment', 'power', 'powerInput', 'powerOutput',
+      'tenant_hostname_reference', 'ip_assignment', 'inventoryStatus', 'equipType',
+      'inventory', 'policy', 'equipmentPort', 'portAssignment', 'power', 'powerInput',
+      'powerOutput', 'inventoryLifeCycle',
     ];
     console.log('=============================================');
     console.log('Start syncing model');
@@ -34,6 +35,9 @@ module.exports = app => {
     }
     if (!await model.inventoryStatus.findOne()) {
       await sequelizeFixtures.loadFile(fixturesPath + 'inventoryStatus.js', model);
+    }
+    if (!await model.equipType.findOne()) {
+      await sequelizeFixtures.loadFile(fixturesPath + 'equipType.js', model);
     }
   });
 };

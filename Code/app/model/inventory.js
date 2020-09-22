@@ -18,7 +18,7 @@ module.exports = app => {
     ProjectOwner: { type: STRING },
     Status: { type: INTEGER },
     Remark: { type: STRING },
-    EquipType: { type: STRING },
+    EquipType: { type: INTEGER },
     UnitNo: { type: STRING, comment: 'standard name' },
     DisplayName: { type: STRING },
     PortQty: { type: FLOAT },
@@ -41,6 +41,7 @@ module.exports = app => {
   inventory.associate = function() {
     const ms = app.model.models;
     ms.inventory.belongsTo(ms.inventoryStatus, { as: 'status', foreignKey: 'Status', constraint: false });
+    ms.inventory.belongsTo(ms.equipType, { as: 'equipType', foreignKey: 'EquipType', constraint: false });
     ms.inventory.hasMany(ms.policy, { as: 'policy', foreignKey: 'InventoryID', sourceKey: '_ID', constraint: false });
     ms.inventory.hasMany(ms.equipmentPort, { as: 'equipPort', foreignKey: 'InventoryID', sourceKey: '_ID', constraint: false });
     ms.inventory.hasMany(ms.powerInput, { as: 'powerInput', foreignKey: 'InventoryID', sourceKey: '_ID', constraint: false });
