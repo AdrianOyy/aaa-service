@@ -62,39 +62,35 @@ module.exports = app => {
     async create() {
       const { ctx } = this;
       const { version, modelId, deploymentId } = ctx.request.body;
-      console.log(ctx.request.body);
-      console.log('============================');
       // const version = 12;
       // const modelId = 297501;
       // const deploymentId = 12342;
-      const dynamicForm = await ctx.service.workflow.getVersion(modelId);
+      const dynamicFormVersion = await ctx.service.workflow.getVersion(modelId);
+      const dynamicForm = await ctx.service.workflow.setPubilshDynamicForm(dynamicFormVersion, version, deploymentId);
       // 获取最新 dynamicForm
       // 修改version
-      dynamicForm.deploymentId = deploymentId;
-      dynamicForm.version = version;
-      dynamicForm.save();
+      // dynamicForm.deploymentId = deploymentId;
+      // dynamicForm.version = version;
+      // dynamicForm.save();
       const childDynamicForm = await ctx.model.models.dynamicForm.findOne({ where: { parentId: dynamicForm.id } });
       // const dynamicForm = await ctx.model.models.dynamicForm.findOne({ where: { modelId: 297501 } });
       const basicFormFieldList = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: dynamicForm.id } });
       const createBasicFormSQL = await ctx.service.dynamicForm.getBasicNewSQL(dynamicForm.formKey, basicFormFieldList, version);
-      console.log(createBasicFormSQL);
       const SQLList = [ createBasicFormSQL ];
       // const childDynamicForm = await ctx.model.models.dynamicForm.findOne({ where: { parentId: dynamicForm.id } });
       if (childDynamicForm) {
-        childDynamicForm.deploymentId = deploymentId;
-        childDynamicForm.version = version;
-        childDynamicForm.save();
+        // childDynamicForm.version = version;
+        // childDynamicForm.save();
         const childTableList = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: childDynamicForm.id } });
         const createChildTableSQLList = await ctx.service.dynamicForm.getChildTableSQLChild(dynamicForm.formKey, childDynamicForm.formKey, childTableList, version);
         SQLList.push(createChildTableSQLList);
-        console.log(createChildTableSQLList);
       }
       try {
         for (let i = 0; i < SQLList.length; i++) {
           await app.model.query(SQLList[i]);
         }
         // 强删除 version 为 -1 信息
-        await ctx.model.models.dynamicForm.destroy({ where: { version: -1, modelId }, force: true });
+        // await ctx.model.models.dynamicForm.destroy({ where: { version: -1, modelId }, force: true });
         ctx.success();
       } catch (error) {
         ctx.error(error);
@@ -256,7 +252,7 @@ module.exports = app => {
 
     async save() {
       const { ctx } = this;
-      const { formKey, processDefinitionId, startUser, formFieldList, childFormKey, sonFormList, sonDetailList } = ctx.request.body;
+      const { formKey, processDefinitionId, startUser, formFieldList, childFormKey, sonFormList, sonDetailList, version } = ctx.request.body;
       let parentsId = 0;
       let tenantCode = null;
       let tenantKey = null;
@@ -303,6 +299,7 @@ module.exports = app => {
         variables: {
           formId: parentsId,
           formKey,
+          version,
           manager_group_id: [ tenant.manager_group_id.toString() ],
         },
         startUser,
@@ -319,12 +316,9 @@ module.exports = app => {
 
     async getDetailByKey() {
       const { ctx } = this;
-      console.log(ctx.query);
-      console.log('==================================1');
       const { formKey, formId, version } = ctx.query;
       if (!formKey || !formId) ctx.error();
       const res = await ctx.service.dynamicForm.getDetailByKey(formKey, version, formId);
-      console.log(res);
       if (!res) ctx.error();
       else ctx.success(res);
     }

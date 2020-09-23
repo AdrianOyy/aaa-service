@@ -4,11 +4,11 @@ module.exports = app => {
   return class extends app.Controller {
     async updateStatus() {
       const { ctx } = this;
-      const { status, idList } = ctx.request.body;
+      const { status, idList, childFormKey, version } = ctx.request.body;
       if (!status || !idList || !idList.length) ctx.error();
       try {
         const idString = '(' + idList.join(',') + ')';
-        const updateSql = `update VMList set status = '${status}' where id in ${idString}`;
+        const updateSql = `update ${childFormKey}${version} set status = '${status}' where id in ${idString}`;
         const [ updateResults ] = await app.model.query(updateSql);
         ctx.success({ result: true, affectedRows: updateResults.affectedRows });
       } catch (error) {

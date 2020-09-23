@@ -171,7 +171,6 @@ module.exports = app => {
       const { childFormKey, childTable, tenant } = dynamicForm;
       const tenantId = tenant.id;
       const tenantName = tenant.name;
-
       // generate hostname
       for (let i = 0; i < childTable.length; i++) {
         const prefix = await ctx.service.hostname.getPrefix(childTable[i]);
@@ -223,10 +222,8 @@ module.exports = app => {
         const type = await ctx.service.defineVMType.defineVMType(el.network_zone.id, el.environment_type.id, el.data_storage_request_number);
         el.type = type;
       }
-
       // switch VM's type to define vm cluster with different route
       const data = await ctx.service.cluster.getClusterList(childTable);
-      console.log(data);
       if (!data.pass) {
         pass = false;
         message += data.message;
@@ -249,8 +246,6 @@ module.exports = app => {
           }
         }
       }
-      console.log(pass);
-      console.log(message);
       // return a map includes result and message to workflow service
       ctx.success({ pass, message });
     }

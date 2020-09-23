@@ -69,13 +69,13 @@ module.exports = app => {
         variables: {
           formId: parentId,
           formKey,
+          version,
           manager_group_id: [ manager_group_id.toString() ],
         },
         startUser: ctx.authUser.id,
       };
       // 启动流程
       const datas = await ctx.service.syncActiviti.startProcess(activitiData, { headers: ctx.headers });
-      console.log(datas);
       // 保存 pid 同时更新子表 parentId
       const parentUpdateSQL = `UPDATE ${formKey}${version} SET pid = ${datas.data} where id = ${parentId}`;
       const updateSQL = [ parentUpdateSQL ];
@@ -100,8 +100,6 @@ module.exports = app => {
       }
       const dynamicForm = await ctx.model.models.dynamicForm.findOne({ where: { deploymentId, parentId: null } });
       const childForm = await ctx.model.models.dynamicForm.findOne({ where: { parentId: dynamicForm.id } });
-      console.log(dynamicForm);
-      console.log(childForm);
       const detail = await ctx.service.diyForm.getDIYFormDetail(pid, dynamicForm.formKey, childForm ? childForm.formKey : null, dynamicForm.version);
       // if (!detail) {
       //   ctx.error();
@@ -129,13 +127,12 @@ module.exports = app => {
       const childUpdateSQLList = await ctx.service.diyForm.getChildFormUpdateSQLList(childFormKey, version, childDataList);
 
       const updateSQLList = [ ...childUpdateSQLList ];
-      console.log(updateSQLList);
       // console.log(updateSQLList);
       const res = await ctx.service.sql.transaction(updateSQLList);
       // 发送邮件
       await ctx.service.mailer.sentT3bySkile(childDataList);
       // 下一步启动
-      await ctx.service.syncActiviti.actionTask({ taskId, variables: { leaderCheck: true } }, { headers: ctx.headers });
+      await ctx.service.syncActiviti.actionTask({ taskId, variables: { pass: true } }, { headers: ctx.headers });
       ctx.success();
       if (!res.success) {
         ctx.error();

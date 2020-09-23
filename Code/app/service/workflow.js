@@ -49,5 +49,83 @@ module.exports = app => {
       }
       return dynamicModle;
     }
+
+    async setPubilshDynamicForm(dynamicModel, version, deploymentId) {
+      const { ctx } = this;
+      let isCreate = false;
+      if (dynamicModel.version !== -1) {
+        isCreate = true;
+      }
+      if (isCreate) {
+        const dynamicDetails = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: dynamicModel.id } });
+        const childDynamic = await ctx.model.models.dynamicForm.findOne({ where: { parentId: dynamicModel.id } });
+        const pmodel = {
+          modelId: dynamicModel.modelId,
+          deploymentId,
+          workflowName: dynamicModel.workflowName,
+          version,
+          childVersion: '1',
+          formKey: dynamicModel.formKey,
+        };
+        const newDynamic = await ctx.model.models.dynamicForm.create(pmodel);
+        for (const dydetail of dynamicDetails) {
+          const pdetail = {
+            dynamicFormId: newDynamic.id,
+            fieldName: dydetail.fieldName,
+            fieldDisplayName: dydetail.fieldDisplayName,
+            fieldType: dydetail.fieldType,
+            inputType: dydetail.inputType,
+            showOnRequest: dydetail.showOnRequest,
+            foreignTable: dydetail.foreignTable,
+            foreignKey: dydetail.foreignKey,
+            foreignDisplayKey: dydetail.foreignDisplayKey,
+            required: dydetail.required,
+            readable: dydetail.readable,
+            writable: dydetail.writable,
+          };
+          await ctx.model.models.dynamicFormDetail.create(pdetail);
+        }
+        if (childDynamic) {
+          const childDetails = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: childDynamic.id } });
+          const cmodel = {
+            modelId: childDynamic.modelId,
+            deploymentId,
+            workflowName: childDynamic.workflowName,
+            version,
+            childVersion: '1',
+            parentId: newDynamic.id,
+            formKey: childDynamic.formKey,
+          };
+          const newChildDynamic = await ctx.model.models.dynamicForm.create(cmodel);
+          for (const detail of childDetails) {
+            const cdetail = {
+              dynamicFormId: newChildDynamic.id,
+              fieldName: detail.fieldName,
+              fieldDisplayName: detail.fieldDisplayName,
+              fieldType: detail.fieldType,
+              inputType: detail.inputType,
+              showOnRequest: detail.showOnRequest,
+              foreignTable: detail.foreignTable,
+              foreignKey: detail.foreignKey,
+              foreignDisplayKey: detail.foreignDisplayKey,
+              required: detail.required,
+              readable: detail.readable,
+              writable: detail.writable,
+            };
+            await ctx.model.models.dynamicFormDetail.create(cdetail);
+          }
+        }
+        return newDynamic;
+      }
+      dynamicModel.version = version;
+      dynamicModel.deploymentId = deploymentId;
+      dynamicModel.save();
+      const childDynamic = await ctx.model.models.dynamicForm.findOne({ where: { parentId: dynamicModel.id } });
+      if (childDynamic) {
+        childDynamic.version = version;
+        childDynamic.save();
+      }
+      return dynamicModel;
+    }
   };
 };

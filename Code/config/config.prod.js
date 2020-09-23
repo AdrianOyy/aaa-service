@@ -23,6 +23,16 @@ module.exports = appInfo => {
     },
   };
 
+  config.mailer = {
+    host: process.env.npm_config_mailHost,
+    port: process.env.npm_config_mailPort,
+    secure: false, // true for 465, false for other ports
+    auth: {
+      user: process.env.npm_config_mailUser, // generated ethereal user
+      pass: process.env.npm_config_mailPass, // generated ethereal password
+    },
+  };
+
   // ===================================
   //             上传文件 设置
   // ===================================

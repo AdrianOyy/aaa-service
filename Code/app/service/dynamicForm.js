@@ -206,7 +206,7 @@ module.exports = app => {
       if (!formKey && !deploymentId) return false;
       // 基础数据
       const dynamicForm = await ctx.model.models.dynamicForm.findOne({
-        where: formKey ? { formKey, version } : { deploymentId },
+        where: formKey ? { formKey, version } : { deploymentId, parentId: null },
         include: [
           {
             model: ctx.model.models.dynamicForm,
