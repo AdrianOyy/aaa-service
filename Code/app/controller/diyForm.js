@@ -78,9 +78,8 @@ module.exports = app => {
       const datas = await ctx.service.syncActiviti.startProcess(activitiData, { headers: ctx.headers });
       if (formKey === 'moveIn'
         && parentData && parentData.text && parentData.text.value === 'send') {
-        const frontendUrl = process.env.npm_config_frontendUrl ? process.env.npm_config_frontendUrl + '/' : 'http://localhost:3000/';
         ctx.service.syncActiviti.sendTaskEmail(
-          { taskId: datas.data, frontendUrl }, { headers: ctx.headers });
+          { taskId: datas.data }, { headers: ctx.headers });
       }
       // 保存 pid 同时更新子表 parentId
       const parentUpdateSQL = `UPDATE ${formKey}${version} SET pid = ${datas.data} where id = ${parentId}`;
