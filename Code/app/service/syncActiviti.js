@@ -71,6 +71,18 @@ module.exports = app => {
       });
       return auth;
     }
+    async sendTaskEmail(data, options) {
+      const url = app.config.activiti.url;
+      const result = await axios.post(url + '/runtime/sendTaskEmail', data, options
+      ).then(function(response) {
+        return new Promise(resolve => {
+          resolve(response.data);
+        });
+      }).catch(function(error) {
+        console.log(error);
+      });
+      return result;
+    }
   };
 };
 
