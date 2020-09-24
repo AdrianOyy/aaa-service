@@ -76,11 +76,11 @@ module.exports = app => {
       };
       // 启动流程
       const datas = await ctx.service.syncActiviti.startProcess(activitiData, { headers: ctx.headers });
-      if (formKey === 'moveIn'
-        && parentData && parentData.text && parentData.text.value === 'send') {
-        ctx.service.syncActiviti.sendTaskEmail(
-          { taskId: datas.data }, { headers: ctx.headers });
-      }
+      // if (formKey === 'moveIn'
+      //   && parentData && parentData.text && parentData.text.value === 'send') {
+      //   ctx.service.syncActiviti.sendTaskEmail(
+      //     { taskId: datas.data }, { headers: ctx.headers });
+      // }
       // 保存 pid 同时更新子表 parentId
       const parentUpdateSQL = `UPDATE ${formKey}${version} SET pid = ${datas.data} where id = ${parentId}`;
       const updateSQL = [ parentUpdateSQL ];
