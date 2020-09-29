@@ -3,7 +3,7 @@
 module.exports = app => {
 
   return class extends app.Service {
-    async loadUser(auth) {
+    async loadUser(auth, username) {
       const { ctx } = this;
       if (!auth) {
         return;
@@ -71,6 +71,7 @@ module.exports = app => {
         }
       }
       user.groups = groups;
+      user.username = username;
       await ctx.service.syncActiviti.loadUser(user, { headers: { Authorization: 'Bearer ' + auth.token } });
       return user;
     }
