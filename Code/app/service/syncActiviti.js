@@ -35,7 +35,7 @@ module.exports = app => {
     async deleteGroup(groupIds, headers) {
       const url = app.config.activiti.url;
       const auth = await axios
-        .delete(url + '/user/deleteGroup', { data: groupIds, headers })
+        .delete(url + '/user/deleteGroup', { headers, data: groupIds })
         .then(function(response) {
           return new Promise(resolve => {
             resolve(response.data);
