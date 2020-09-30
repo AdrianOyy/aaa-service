@@ -35,5 +35,23 @@ module.exports = app => {
       });
       return axiosResult;
     }
+    async userExistsMany(usernames) {
+      const app = this;
+      const config = app.config.adService;
+      const url = `${config.url}/adService/userExistsMany`;
+      const axiosResult = await axios.post(url, { usernames }
+      ).then(function(response) {
+        return new Promise(resolve => {
+          const data = response.data.data;
+          resolve(data);
+        });
+      }).catch(function(error) {
+        console.log(error);
+        return new Promise(resolve => {
+          resolve(null);
+        });
+      });
+      return axiosResult;
+    }
   };
 };
