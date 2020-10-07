@@ -83,6 +83,19 @@ module.exports = app => {
       });
       return result;
     }
+    async getUsersByEmails(data, options) {
+      const url = app.config.activiti.url;
+      const auth = await axios
+        .post(url + '/user/getUsers', data, options)
+        .then(function(response) {
+          return new Promise(resolve => {
+            resolve(response.data);
+          });
+        }).catch(function(error) {
+          console.log(error);
+        });
+      return auth;
+    }
   };
 };
 
