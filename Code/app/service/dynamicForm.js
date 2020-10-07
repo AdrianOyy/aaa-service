@@ -286,24 +286,26 @@ module.exports = app => {
 
       // 子表数据表
       const { childTable } = dynamicForm;
-      const el = childTable[0].dataValues;
-      basicTable.childFormKey = el.formKey;
-      const childSQL = `SELECT * FROM ${el.formKey}${version} where ${el.formKey}${version}.parentId = ${basicTable.id};`;
-      const [ childList ] = await app.model.query(childSQL);
-      for (let j = 0; j < childList.length; j++) {
-        const child = childList[j];
-        if (child) {
-          for (let i = 0; i < el.dynamicFormDetail.length; i++) {
-            const it = el.dynamicFormDetail[i].dataValues;
-            if (it.foreignTable && it.foreignKey && it.inputType !== 'checkbox') {
-              const SQL = `SELECT * FROM \`${it.foreignTable}\` where ${it.foreignTable}.${it.foreignKey} = ${child[it.fieldName]}`;
-              const [[ basicForeign ]] = await app.model.query(SQL);
-              child[it.fieldName] = basicForeign;
+      if (childTable) {
+        const el = childTable[0].dataValues;
+        basicTable.childFormKey = el.formKey;
+        const childSQL = `SELECT * FROM ${el.formKey}${version} where ${el.formKey}${version}.parentId = ${basicTable.id};`;
+        const [ childList ] = await app.model.query(childSQL);
+        for (let j = 0; j < childList.length; j++) {
+          const child = childList[j];
+          if (child) {
+            for (let i = 0; i < el.dynamicFormDetail.length; i++) {
+              const it = el.dynamicFormDetail[i].dataValues;
+              if (it.foreignTable && it.foreignKey && it.inputType !== 'checkbox') {
+                const SQL = `SELECT * FROM \`${it.foreignTable}\` where ${it.foreignTable}.${it.foreignKey} = ${child[it.fieldName]}`;
+                const [[ basicForeign ]] = await app.model.query(SQL);
+                child[it.fieldName] = basicForeign;
+              }
             }
           }
         }
+        basicTable.childTable = childList;
       }
-      basicTable.childTable = childList;
       return basicTable;
     }
 
