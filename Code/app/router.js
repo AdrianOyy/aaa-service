@@ -159,4 +159,5 @@ module.exports = app => {
   router.get(`${prefix}/workflow/createTable`, controller.workflow.createTable);
 
   router.post(`${prefix}/accountManagement/userExistsMany`, controller.accountManagement.userExistsMany);
+  router.post(`${prefix}/accountManagement/getUsersByEmails`, controller.accountManagement.getUsersByEmails);
 };

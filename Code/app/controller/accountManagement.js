@@ -14,5 +14,17 @@ module.exports = app => {
         throw { status: 500, message: 'service busy' };
       }
     }
+
+    async getUsersByEmails() {
+      const { ctx } = this;
+      const { emails } = ctx.request.body;
+      if (!emails) ctx.error();
+      try {
+        const result = await ctx.service.syncActiviti.getUsersByEmails({ emails }, { headers: ctx.headers });
+        ctx.success(result.data);
+      } catch (error) {
+        throw { status: 500, message: 'service busy' };
+      }
+    }
   };
 };
