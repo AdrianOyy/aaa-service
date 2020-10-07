@@ -277,7 +277,7 @@ module.exports = app => {
       if (!basicTable) return {};
       for (let i = 0; i < dynamicForm.dynamicFormDetail.length; i++) {
         const el = dynamicForm.dynamicFormDetail[i].dataValues;
-        if (el.foreignTable && el.foreignKey) {
+        if (el.foreignTable && el.foreignKey && el.inputType !== 'checkbox') {
           const SQL = `SELECT * FROM \`${el.foreignTable}\` where ${el.foreignTable}.${el.foreignKey} = ${basicTable[el.fieldName]}`;
           const [[ basicForeign ]] = await app.model.query(SQL);
           basicTable[el.fieldName] = basicForeign;
@@ -295,7 +295,7 @@ module.exports = app => {
         if (child) {
           for (let i = 0; i < el.dynamicFormDetail.length; i++) {
             const it = el.dynamicFormDetail[i].dataValues;
-            if (it.foreignTable && it.foreignKey) {
+            if (it.foreignTable && it.foreignKey && it.inputType !== 'checkbox') {
               const SQL = `SELECT * FROM \`${it.foreignTable}\` where ${it.foreignTable}.${it.foreignKey} = ${child[it.fieldName]}`;
               const [[ basicForeign ]] = await app.model.query(SQL);
               child[it.fieldName] = basicForeign;
