@@ -286,7 +286,7 @@ module.exports = app => {
 
       // 子表数据表
       const { childTable } = dynamicForm;
-      if (childTable) {
+      if (childTable.length > 0) {
         const el = childTable[0].dataValues;
         basicTable.childFormKey = el.formKey;
         const childSQL = `SELECT * FROM ${el.formKey}${version} where ${el.formKey}${version}.parentId = ${basicTable.id};`;
