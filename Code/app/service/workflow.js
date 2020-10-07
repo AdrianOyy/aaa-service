@@ -16,7 +16,7 @@ module.exports = app => {
       for (const form of formList) {
         console.log(form);
         const dynamicFormDetail = {
-          fieldName: form.fieldName ? form.fieldName.value : null,
+          fieldName: form.fieldName ? form.fieldName.value.toLowerCase() : null,
           fieldDisplayName: form.fieldDisplayName ? form.fieldDisplayName.value : null,
           fieldType: form.fieldType ? form.fieldType.value : null,
           inputType: form.inputType ? form.inputType.value : null,
@@ -71,7 +71,7 @@ module.exports = app => {
         for (const dydetail of dynamicDetails) {
           const pdetail = {
             dynamicFormId: newDynamic.id,
-            fieldName: dydetail.fieldName,
+            fieldName: dydetail.fieldName.toString().toLowerCase(),
             fieldDisplayName: dydetail.fieldDisplayName,
             fieldType: dydetail.fieldType,
             inputType: dydetail.inputType,
@@ -100,7 +100,7 @@ module.exports = app => {
           for (const detail of childDetails) {
             const cdetail = {
               dynamicFormId: newChildDynamic.id,
-              fieldName: detail.fieldName,
+              fieldName: detail.fieldName.toString().toLowerCase(),
               fieldDisplayName: detail.fieldDisplayName,
               fieldType: detail.fieldType,
               inputType: detail.inputType,
