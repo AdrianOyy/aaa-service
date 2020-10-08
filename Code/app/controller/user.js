@@ -51,6 +51,9 @@ module.exports = app => {
       const { username, password } = ctx.request.body;
       const auth = await ctx.service.adService.authenticate(username, password);
       if (auth) {
+        if (auth.user && auth.user.userPrincipalName === 'shenchengan@apj.com') {
+          auth.user.userPrincipalName = 'rexshen@apjcorp.com';
+        }
         const user = await ctx.service.user.loadUser(auth, username);
         if (user) {
           const groupList = [];
