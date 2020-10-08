@@ -75,6 +75,10 @@ module.exports = app => {
         },
         startUser: ctx.authUser.id,
       };
+      if (formKey === 'accountManagement') {
+        const result = await ctx.service.syncActiviti.getUsersByEmails({ emails: [ parentData.supervisoremailaccount.value.toString() ] }, { headers: ctx.headers });
+        result.data && result.data[0] ? activitiData.variables.manager_user_id = [ result.data[0].id.toString() ] : undefined;
+      }
       // 启动流程
       const datas = await ctx.service.syncActiviti.startProcess(activitiData, { headers: ctx.headers });
       // if (formKey === 'moveIn'
