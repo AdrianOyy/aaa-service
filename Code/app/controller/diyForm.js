@@ -117,29 +117,38 @@ module.exports = app => {
     async update() {
       const { ctx } = this;
       const {
+        formKey,
+        pid,
+        parentData,
         childFormKey,
         childDataList,
         version,
         taskId,
       } = ctx.request.body;
       // 获取父表插入SQL
-      // let parentUpdateSQL = null;
-      // console.log(parentData);
-      // if (parentData.tenant) {
-      //   parentUpdateSQL = await ctx.service.diyForm.getParentFormUpdateSQL(formKey, parentData, pid);
-      // }
+      let parentUpdateSQL = [];
+      console.log(parentData);
+      if (parentData) {
+        console.log('================================12');
+        parentUpdateSQL = await ctx.service.diyForm.getParentFormUpdateSQL(formKey, version, parentData, pid);
+      }
+      console.log(parentUpdateSQL);
+      let childUpdateSQLList = [];
+      if (childDataList) {
+        // 获取子表插入SQL
+        console.log('================================34');
+        childUpdateSQLList = await ctx.service.diyForm.getChildFormUpdateSQLList(childFormKey, version, childDataList);
+      }
 
-      // 获取子表插入SQL
-      const childUpdateSQLList = await ctx.service.diyForm.getChildFormUpdateSQLList(childFormKey, version, childDataList);
-
-      const updateSQLList = [ ...childUpdateSQLList ];
+      const updateSQLList = [ parentUpdateSQL, ...childUpdateSQLList ];
+      console.log(updateSQLList);
       // console.log(updateSQLList);
       const res = await ctx.service.sql.transaction(updateSQLList);
       // 发送邮件
-      await ctx.service.mailer.sentT3bySkile(childDataList);
+      // await ctx.service.mailer.sentT3bySkile(childDataList);
       // 下一步启动
-      await ctx.service.syncActiviti.actionTask({ taskId, variables: { pass: true } }, { headers: ctx.headers });
-      ctx.success();
+      // await ctx.service.syncActiviti.actionTask({ taskId, variables: { pass: true } }, { headers: ctx.headers });
+      // ctx.success();
       if (!res.success) {
         ctx.error();
       } else {

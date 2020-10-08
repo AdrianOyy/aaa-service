@@ -11,7 +11,6 @@ module.exports = app => {
         transaction = await this.ctx.model.transaction();
         // 生成dynamicForm
         const data = await this.ctx.service.workflow.setDynamic(parentFormKey, parentValues, modelId, null, workflowName, childVersion);
-        console.log(data);
         // 生成dynamicFormDetail
         const dynamicForm = await ctx.model.models.dynamicForm.create(data.dynamicFormModel, { transaction });
         for (const detalModel of data.detailList) {
@@ -21,7 +20,6 @@ module.exports = app => {
         // 生成childForm
         if (selectChild) {
           const childData = await this.ctx.service.workflow.setDynamic(childFormKey, childValues, modelId, dynamicForm.id, workflowName, 0);
-          console.log(data);
           const childForm = await ctx.model.models.dynamicForm.create(childData.dynamicFormModel, { transaction });
           for (const detalModel of childData.detailList) {
             detalModel.dynamicFormId = childForm.id;
@@ -38,11 +36,22 @@ module.exports = app => {
       ctx.success('success');
     }
 
+    async setForeginTabele() {
+      const { ctx } = this;
+      const { foreignTable, foreignKey, foreignDisplayKey } = ctx.request.body;
+      const sql = `SELECT ${foreignKey}, ${foreignDisplayKey} FROM ${foreignTable}`;
+      try {
+        await app.model.query(sql);
+        ctx.success('success');
+      } catch (error) {
+        ctx.success('error');
+      }
+    }
+
     async detail() {
       const { ctx } = this;
       const { modelId } = ctx.request.query;
       const dynamicForm = await ctx.service.workflow.getVersion(modelId);
-      console.log(dynamicForm);
       const data = { dynamicForm };
       if (dynamicForm) {
         const parentTableList = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: dynamicForm.id } });
