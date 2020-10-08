@@ -70,6 +70,7 @@ module.exports = app => {
           formId: parentId,
           formKey,
           version,
+          manager_user_id: [ ctx.authUser.id.toString() ],
           manager_group_id: [ manager_group_id.toString() ],
         },
         startUser: ctx.authUser.id,
