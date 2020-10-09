@@ -54,6 +54,12 @@ module.exports = app => {
         if (auth.user && auth.user.userPrincipalName === 'shenchengan@apj.com') {
           auth.user.userPrincipalName = 'rexshen@apjcorp.com';
         }
+        if (auth.user && auth.user.userPrincipalName === 'Qiwei@apj.com') {
+          auth.user.userPrincipalName = 'tomqi@apjcorp.com';
+        }
+        if (auth.user && auth.user.userPrincipalName === 'yangzhihong@apj.com') {
+          auth.user.userPrincipalName = 'morseyang@apjcorp.com';
+        }
         const user = await ctx.service.user.loadUser(auth, username);
         if (user) {
           const groupList = [];
