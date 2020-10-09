@@ -75,7 +75,6 @@ module.exports = app => {
      */
     async getChildFormUpdateSQLList(childFormKey, version, childDataList) {
       const SQLList = [];
-      console.log(childDataList);
       for (let i = 0; i < childDataList.length; i++) {
         const id = childDataList[i].id.value;
         const whereSql = `id = ${id}`;
@@ -97,7 +96,7 @@ function getInsertSQL(formKey, version, data) {
   let fieldValue = '';
   for (const key in data) {
     fieldType += `\`${key}\`,`;
-    fieldValue += !data[key] || !data[key].value ? 'null,' : `\'${data[key].value}\',`;
+    fieldValue += !data[key] || !data[key].value ? 'null,' : data[key].value !== '' ? `\'${data[key].value}\',` : 'null,';
   }
   fieldType += '\`createdAt\`,\`updatedAt\`';
   fieldValue += `\'${getNow()}\',\'${getNow()}\'`;
@@ -115,7 +114,7 @@ function getUpdateSQL(formKey, version, data, where) {
   let fieldValue = '';
   for (const key in data) {
     if (key !== 'id' && key !== 'checkState') {
-      fieldValue += !data[key] || !data[key].value ? ` ${key} = null,` : ` ${key} = '${data[key].value}',`;
+      fieldValue += !data[key] || !data[key].value ? ` ${key} = null,` : data[key].value !== '' ? ` ${key} = '${data[key].value}',` : ` ${key} = null,`;
     }
   }
   fieldValue = fieldValue.substring(0, fieldValue.length - 1);
