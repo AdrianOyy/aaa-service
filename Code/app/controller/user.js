@@ -100,5 +100,13 @@ module.exports = app => {
         ctx.success(auth);
       }
     }
+
+    async findUser() {
+      const { ctx } = this;
+      const { username } = ctx.request.body;
+      const user = await ctx.service.adService.findUser(username);
+      console.log(user);
+      ctx.success(user);
+    }
   };
 };
