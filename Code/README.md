@@ -39,5 +39,9 @@ docker run -dit \
 -e jwtExpiresIn=10m \
 -e jwtSecret=1234567abc \
 -e jwtIss=SENSEPLATFORM \
+-e mailHost=smtp.mxhichina.com \
+-e mailPort=25 \
+-e mailUser=gitlab@apjcorp.com \
+-e mailPass=apj.com666 \
 aaa-service
 ````
