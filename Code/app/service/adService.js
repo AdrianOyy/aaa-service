@@ -53,5 +53,22 @@ module.exports = app => {
       });
       return axiosResult;
     }
+    async findUser(username) {
+      const app = this;
+      const config = app.config.adService;
+      const url = `${config.url}/adService/findUser`;
+      const axiosResult = await axios.get(url + '?username=' + username).then(function(response) {
+        return new Promise(resolve => {
+          const data = response.data.data;
+          resolve(data);
+        });
+      }).catch(function(error) {
+        console.log(error);
+        return new Promise(resolve => {
+          resolve(null);
+        });
+      });
+      return axiosResult;
+    }
   };
 };

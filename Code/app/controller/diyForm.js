@@ -14,7 +14,6 @@ module.exports = app => {
         workflowName,
       } = ctx.request.body;
       ctx.success();
-      console.log(parentData);
       // 获取父表插入SQL
       const parentInsertSQL = await ctx.service.diyForm.getParentFormInsetSQL(formKey, version, parentData);
 
@@ -77,8 +76,11 @@ module.exports = app => {
         startUser: ctx.authUser.id,
       };
       if (workflowName === 'Account management') {
-        const result = await ctx.service.syncActiviti.getUsersByEmails({ emails: [ parentData.supervisoremailaccount.value.toString() ] }, { headers: ctx.headers });
-        result.data && result.data[0] ? activitiData.variables.manager_user_id = [ result.data[0].id.toString() ] : undefined;
+        const emails = parentData.supervisoremailaccount.value.split(',');
+        const result = await ctx.service.syncActiviti.getUsersByEmails({ emails }, { headers: ctx.headers });
+        let userIds = [];
+        result && result.data && result.data.length > 0 ? userIds = result.data.map(_ => { return _.id; }) : undefined;
+        userIds && userIds.length > 0 ? activitiData.variables.manager_user_id = userIds : undefined;
       }
       // 启动流程
       const datas = await ctx.service.syncActiviti.startProcess(activitiData, { headers: ctx.headers });
