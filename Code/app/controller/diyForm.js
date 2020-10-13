@@ -70,12 +70,15 @@ module.exports = app => {
           formId: parentId,
           formKey,
           version,
+          displayTree: '',
           manager_user_id: [ ctx.authUser.id.toString() ],
           manager_group_id: [ manager_group_id.toString() ],
         },
         startUser: ctx.authUser.id,
       };
       if (workflowName === 'Account management') {
+        console.log(parentData.account_type);
+        activitiData.variables.displayTree = parentData.account_type ? parentData.account_type.value : '';
         const emails = parentData.supervisoremailaccount.value.split(',');
         const result = await ctx.service.syncActiviti.getUsersByEmails({ emails }, { headers: ctx.headers });
         let userIds = [];
@@ -152,7 +155,7 @@ module.exports = app => {
         await ctx.service.mailer.sentT3bySkile(childDataList);
       }
       // 下一步启动
-      await ctx.service.syncActiviti.actionTask({ taskId, variables: { pass: true } }, { headers: ctx.headers });
+      ctx.service.syncActiviti.actionTask({ taskId, variables: { pass: true } }, { headers: ctx.headers });
       // ctx.success();
       if (!res.success) {
         ctx.error();
