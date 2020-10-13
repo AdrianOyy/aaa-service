@@ -26,6 +26,18 @@ module.exports = app => {
         throw { status: 500, message: 'service busy' };
       }
     }
+    async findUsers() {
+      const { ctx } = this;
+      const { email } = ctx.request.body;
+      console.log('email', email);
+      if (!email) ctx.error();
+      try {
+        const result = await ctx.service.adService.findUsers(email);
+        ctx.success(result);
+      } catch (error) {
+        throw { status: 500, message: 'service busy' };
+      }
+    }
     async checkUsers() {
       const { ctx } = this;
       const { emails } = ctx.request.body;
