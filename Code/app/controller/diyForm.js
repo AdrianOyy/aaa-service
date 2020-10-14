@@ -155,7 +155,7 @@ module.exports = app => {
         await ctx.service.mailer.sentT3bySkile(childDataList);
       }
       // 下一步启动
-      ctx.service.syncActiviti.actionTask({ taskId, variables: { pass: true } }, { headers: ctx.headers });
+      await ctx.service.syncActiviti.actionTask({ taskId, variables: { pass: true } }, { headers: ctx.headers });
       // ctx.success();
       if (!res.success) {
         ctx.error();

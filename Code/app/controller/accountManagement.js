@@ -29,11 +29,14 @@ module.exports = app => {
     async findUsers() {
       const { ctx } = this;
       const { email } = ctx.request.body;
-      console.log('email', email);
       if (!email) ctx.error();
       try {
         const result = await ctx.service.adService.findUsers(email);
-        ctx.success(result);
+        const emails = [];
+        for (const data of result) {
+          emails.push(data.userPrincipalName);
+        }
+        ctx.success(emails);
       } catch (error) {
         throw { status: 500, message: 'service busy' };
       }
