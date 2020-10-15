@@ -33,6 +33,31 @@ module.exports = app => {
       return { dynamicFormModel, detailList };
     }
 
+    async setUpdateType(parentData, startValues, deploymentId) {
+      const { ctx } = this;
+      const updateType = [];
+      const dynamicForm = await ctx.model.models.dynamicForm.findOne({ where: { deploymentId } });
+      const dynamicDetalList = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: dynamicForm.id } });
+      for (const dynamicDetail of dynamicDetalList) {
+        if ((parentData[dynamicDetail.fieldName] && parentData[dynamicDetail.fieldName].value) || startValues[dynamicDetail.fieldName]) {
+          if (parentData[dynamicDetail.fieldName].value !== startValues[dynamicDetail.fieldName]) {
+            let cost = 0;
+            if (dynamicDetail.remark === 'Internet Account Application') {
+              cost = 2;
+            } else if (dynamicDetail.remark === 'IBRA Account Application') {
+              cost = 3;
+            } else {
+              cost = 1;
+            }
+            if (updateType.indexOf(cost) === -1) {
+              updateType.push(cost);
+            }
+          }
+        }
+      }
+      return updateType;
+    }
+
     async getVersion(modelId) {
       const { ctx } = this;
       // 获取当前是否有测试版本

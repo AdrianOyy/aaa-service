@@ -11,7 +11,9 @@ module.exports = app => {
         childDataList,
         processDefinitionId,
         version,
+        startValues,
         workflowName,
+        deploymentId,
       } = ctx.request.body;
       ctx.success();
       // 获取父表插入SQL
@@ -71,14 +73,15 @@ module.exports = app => {
           formKey,
           version,
           displayTree: '',
+          updateTree: [],
           manager_user_id: [ ctx.authUser.id.toString() ],
           manager_group_id: [ manager_group_id.toString() ],
         },
         startUser: ctx.authUser.id,
       };
       if (workflowName === 'Account management') {
-        console.log(parentData.account_type);
         activitiData.variables.displayTree = parentData.account_type ? parentData.account_type.value : '';
+        activitiData.variables.updateTree = await ctx.service.workflow.setUpdateType(parentData, startValues, deploymentId);
         const emails = parentData.supervisoremailaccount.value.split(',');
         const result = await ctx.service.syncActiviti.getUsersByEmails({ emails }, { headers: ctx.headers });
         let userIds = [];

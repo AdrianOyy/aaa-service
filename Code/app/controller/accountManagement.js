@@ -53,7 +53,6 @@ module.exports = app => {
           }
           return false;
         });
-        console.log(data);
         ctx.success(data);
       } catch (error) {
         throw { status: 500, message: 'service busy' };
