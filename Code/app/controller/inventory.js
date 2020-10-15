@@ -115,7 +115,7 @@ module.exports = app => {
         await ctx.model.models.inventory.create(inventory);
         ctx.success();
       } catch (error) {
-        console.log(error);
+        console.log(error.message);
         throw { status: 500, message: 'service busy' };
       }
     }
@@ -153,7 +153,7 @@ module.exports = app => {
         ctx.success();
       } catch (error) {
         console.log('error==========================error');
-        console.log(error);
+        console.log(error.message);
         console.log('error==========================error');
         ctx.error('service busy');
       }
@@ -173,7 +173,7 @@ module.exports = app => {
         ctx.success();
       } catch (error) {
         console.log('error==========================error');
-        console.log(error);
+        console.log(error.message);
         console.log('error==========================error');
         ctx.error('service busy');
       }
