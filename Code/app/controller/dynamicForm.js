@@ -186,6 +186,8 @@ module.exports = app => {
         form.foreignKey = formDetail.foreignKey;
         form.labelField = formDetail.foreignDisplayKey;
         form.valueField = formDetail.foreignKey;
+        form.indexOf = formDetail.indexOf;
+        form.remark = formDetail.remark;
         form.readOnly = false;
         form.disable = true;
         if (formDetail.inputType === 'select') {
@@ -221,6 +223,8 @@ module.exports = app => {
           form.foreignKey = sonDetail.foreignKey;
           form.labelField = sonDetail.foreignDisplayKey;
           form.valueField = sonDetail.foreignKey;
+          form.indexOf = formDetail.indexOf;
+          form.remark = formDetail.remark;
           form.readOnly = false;
           form.value = '';
           if (sonDetail.inputType === 'select') {

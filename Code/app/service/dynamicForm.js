@@ -214,11 +214,15 @@ module.exports = app => {
             include: {
               model: ctx.model.models.dynamicFormDetail,
               as: 'dynamicFormDetail',
+              limit: 999,
+              order: [[ 'indexOf', 'asc' ], [ 'id', 'asc' ]],
             },
           },
           {
             model: ctx.model.models.dynamicFormDetail,
             as: 'dynamicFormDetail',
+            limit: 999,
+            order: [[ 'indexOf', 'asc' ], [ 'id', 'asc' ]],
           },
         ],
       });
@@ -272,7 +276,7 @@ module.exports = app => {
       if (!dynamicForm) return false;
 
       // 父表数据表
-      const basicSQL = `SELECT * FROM ${dynamicForm.formKey}${version} where ${dynamicForm.formKey}${version}.id = ${formId};`;
+      const basicSQL = `SELECT * FROM ${dynamicForm.formKey}${version} where ${dynamicForm.formKey}${version}.id = ${formId} ;`;
       const [[ basicTable ]] = await app.model.query(basicSQL);
       if (!basicTable) return {};
       for (let i = 0; i < dynamicForm.dynamicFormDetail.length; i++) {
