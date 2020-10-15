@@ -23,6 +23,16 @@ module.exports = appInfo => {
     },
   };
 
+  config.mailer = {
+    host: 'smtp.mxhichina.com',
+    port: 25,
+    secure: false, // true for 465, false for other ports
+    auth: {
+      user: 'gitlab@apjcorp.com', // generated ethereal user
+      pass: 'apj.com666', // generated ethereal password
+    },
+  };
+
   // ===================================
   //             上传文件 设置
   // ===================================
@@ -61,7 +71,8 @@ module.exports = appInfo => {
   };
 
   config.activiti = {
-    url: 'http://10.231.131.123:3004',
+    url: 'http://localhost:8888',
+    // url: 'http://10.231.131.123:3004',
   };
 
   // ===================================
