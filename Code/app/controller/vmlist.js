@@ -13,7 +13,7 @@ module.exports = app => {
         ctx.success({ result: true, affectedRows: updateResults.affectedRows });
       } catch (error) {
         console.log('error==========================error');
-        console.log(error);
+        console.log(error.message);
         console.log('error==========================error');
         ctx.error('service busy');
       }
@@ -30,7 +30,7 @@ module.exports = app => {
         ctx.success(result);
       } catch (error) {
         console.log('error==========================error');
-        console.log(error);
+        console.log(error.message);
         console.log('error==========================error');
         ctx.error('service busy');
       }
@@ -45,7 +45,7 @@ module.exports = app => {
         ctx.success({ type });
       } catch (error) {
         console.log('error==========================error');
-        console.log(error);
+        console.log(error.message);
         console.log('error==========================error');
         ctx.error('service busy');
       }

@@ -19,7 +19,7 @@ module.exports = app => {
         return { success: true, idList };
       } catch (error) {
         console.log('error ================= error');
-        console.log(error);
+        console.log(error.message);
         console.log('error ================= error');
         await app.model.query('ROLLBACK');
         return { success: false, idList: [] };

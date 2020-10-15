@@ -660,7 +660,7 @@ module.exports = app => {
             resolve(response.data);
           });
         }).catch(function(error) {
-          console.log(error);
+          console.log(error.message);
           return new Promise(resolve => {
             resolve(null);
           });
@@ -677,7 +677,7 @@ module.exports = app => {
             resolve(response.data);
           });
         }).catch(function(error) {
-          console.log(error);
+          console.log(error.message);
           return new Promise(resolve => {
             resolve(null);
           });

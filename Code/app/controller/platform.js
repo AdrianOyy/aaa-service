@@ -28,7 +28,7 @@ module.exports = app => {
         ctx.success(res);
       } catch (error) {
         console.log('error==========================error');
-        console.log(error);
+        console.log(error.message);
         console.log('error==========================error');
         ctx.error();
       }
@@ -99,7 +99,7 @@ module.exports = app => {
         ctx.success();
       } catch (error) {
         console.log('error==========================error');
-        console.log(error);
+        console.log(error.message);
         console.log('error==========================error');
         ctx.error('service busy');
       }
@@ -118,7 +118,7 @@ module.exports = app => {
         ctx.success();
       } catch (error) {
         console.log('error==========================error');
-        console.log(error);
+        console.log(error.message);
         console.log('error==========================error');
         ctx.error('service busy');
       }
@@ -159,7 +159,7 @@ module.exports = app => {
         ctx.success(res);
       } catch (error) {
         console.log('error==========================error');
-        console.log(error);
+        console.log(error.message);
         console.log('error==========================error');
         ctx.error();
       }

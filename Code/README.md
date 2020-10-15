@@ -43,5 +43,6 @@ docker run -dit \
 -e mailPort=25 \
 -e mailUser=gitlab@apjcorp.com \
 -e mailPass=apj.com666 \
+-e transitionHost=10.231.131.123:3000 \
 aaa-service
 ````

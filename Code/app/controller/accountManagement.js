@@ -28,15 +28,27 @@ module.exports = app => {
     }
     async findUsers() {
       const { ctx } = this;
-      const { email } = ctx.request.body;
+      const { email, returnType } = ctx.request.body;
       if (!email) ctx.error();
       try {
-        const result = await ctx.service.adService.findUsers(email);
-        const emails = [];
-        for (const data of result) {
-          emails.push(data.userPrincipalName);
+        const returnResult = [];
+        if (!returnType || returnType.toLowerCase() === 'user') {
+          const result = await ctx.service.adService.findUsers(email);
+          for (const data of result) {
+            returnResult.push(data.userPrincipalName);
+          }
+        } else if (returnType.toLowerCase() === 'userordistribution') {
+          const result = await ctx.service.adService.findUsers(email);
+          for (const data of result) {
+            returnResult.push(data.userPrincipalName);
+          }
+        } else if (returnType.toLowerCase() === 'distribution') {
+          const result = await ctx.service.adService.findUsers(email);
+          for (const data of result) {
+            returnResult.push(data.userPrincipalName);
+          }
         }
-        ctx.success(emails);
+        ctx.success(returnResult);
       } catch (error) {
         throw { status: 500, message: 'service busy' };
       }

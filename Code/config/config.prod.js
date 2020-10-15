@@ -77,9 +77,12 @@ module.exports = appInfo => {
   // ===================================
   //           全局 中间件 设置
   // ===================================
-  config.middleware = [ 'auth' ];
+  config.middleware = [ 'log', 'auth' ];
   config.auth = {
     ignore: [ '/user/login' ],
+  };
+  config.log = {
+    tsHost: process.env.npm_config_transitionHost,
   };
 
   config.jwt = {

@@ -13,7 +13,7 @@ module.exports = app => {
             resolve(response.data);
           });
         }).catch(function(error) {
-          console.log(error);
+          console.log(error.message);
         });
       return auth;
     }
@@ -27,7 +27,7 @@ module.exports = app => {
             resolve(response.data);
           });
         }).catch(function(error) {
-          console.log(error);
+          console.log(error.message);
         });
       return auth;
     }
@@ -41,7 +41,7 @@ module.exports = app => {
             resolve(response.data);
           });
         }).catch(function(error) {
-          console.log(error);
+          console.log(error.message);
         });
       return auth;
     }
@@ -54,7 +54,7 @@ module.exports = app => {
           resolve(response.data);
         });
       }).catch(function(error) {
-        console.log(error);
+        console.log(error.message);
       });
       return auth;
     }
@@ -67,7 +67,7 @@ module.exports = app => {
           resolve(response.data);
         });
       }).catch(function(error) {
-        console.log(error);
+        console.log(error.message);
       });
       return auth;
     }
@@ -79,7 +79,7 @@ module.exports = app => {
           resolve(response.data);
         });
       }).catch(function(error) {
-        console.log(error);
+        console.log(error.message);
       });
       return result;
     }
@@ -92,7 +92,7 @@ module.exports = app => {
             resolve(response.data);
           });
         }).catch(function(error) {
-          console.log(error);
+          console.log(error.message);
         });
       return auth;
     }

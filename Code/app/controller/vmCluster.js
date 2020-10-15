@@ -26,7 +26,7 @@ module.exports = app => {
         ctx.success(res);
       } catch (error) {
         console.log('error==========================error');
-        console.log(error);
+        console.log(error.message);
         console.log('error==========================error');
         ctx.error();
       }
@@ -93,7 +93,7 @@ module.exports = app => {
         }
         ctx.success(true);
       } catch (error) {
-        console.log(error);
+        console.log(error.message);
         throw { status: 500, message: 'service busy' };
       }
     }
@@ -177,7 +177,7 @@ module.exports = app => {
         await ctx.model.models.vm_guest.bulkCreate(vmGuests);
         ctx.success(true);
       } catch (error) {
-        console.log(error);
+        console.log(error.message);
         throw { status: 500, message: 'service busy' };
       }
     }
