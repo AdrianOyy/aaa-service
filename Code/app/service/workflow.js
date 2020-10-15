@@ -12,9 +12,7 @@ module.exports = app => {
         parentId,
       };
       const detailList = [];
-      console.log(formList);
       for (const form of formList) {
-        console.log(form);
         const dynamicFormDetail = {
           fieldName: form.fieldName ? form.fieldName.value.toLowerCase() : null,
           fieldDisplayName: form.fieldDisplayName ? form.fieldDisplayName.value : null,
@@ -23,6 +21,8 @@ module.exports = app => {
           showOnRequest: form.showOnRequest.value === '1',
           foreignTable: form.foreignTable ? form.foreignTable.value : null,
           foreignKey: form.foreignKey ? form.foreignKey.value : null,
+          indexOf: form.indexOf ? form.indexOf.value : null,
+          remark: form.remark ? form.remark.value : null,
           foreignDisplayKey: form.foreignDisplayKey ? form.foreignDisplayKey.value : null,
           required: form.required.value === '1',
           readable: form.readable.value === '1',
@@ -79,6 +79,8 @@ module.exports = app => {
             foreignTable: dydetail.foreignTable,
             foreignKey: dydetail.foreignKey,
             foreignDisplayKey: dydetail.foreignDisplayKey,
+            indexOf: dydetail.indexOf,
+            remark: dydetail.remark,
             required: dydetail.required,
             readable: dydetail.readable,
             writable: dydetail.writable,
@@ -108,6 +110,8 @@ module.exports = app => {
               foreignTable: detail.foreignTable,
               foreignKey: detail.foreignKey,
               foreignDisplayKey: detail.foreignDisplayKey,
+              indexOf: detail.indexOf,
+              remark: detail.remark,
               required: detail.required,
               readable: detail.readable,
               writable: detail.writable,

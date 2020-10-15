@@ -161,5 +161,6 @@ module.exports = app => {
 
   router.post(`${prefix}/accountManagement/userExistsMany`, controller.accountManagement.userExistsMany);
   router.post(`${prefix}/accountManagement/getUsersByEmails`, controller.accountManagement.getUsersByEmails);
+  router.post(`${prefix}/accountManagement/findUsers`, controller.accountManagement.findUsers);
   router.post(`${prefix}/accountManagement/checkUsers`, controller.accountManagement.checkUsers);
 };

@@ -26,6 +26,33 @@ module.exports = app => {
         throw { status: 500, message: 'service busy' };
       }
     }
+    async findUsers() {
+      const { ctx } = this;
+      const { email, returnType } = ctx.request.body;
+      if (!email) ctx.error();
+      try {
+        const returnResult = [];
+        if (!returnType || returnType.toLowerCase() === 'user') {
+          const result = await ctx.service.adService.findUsers(email);
+          for (const data of result) {
+            returnResult.push(data.userPrincipalName);
+          }
+        } else if (returnType.toLowerCase() === 'userordistribution') {
+          const result = await ctx.service.adService.findUsers(email);
+          for (const data of result) {
+            returnResult.push(data.userPrincipalName);
+          }
+        } else if (returnType.toLowerCase() === 'distribution') {
+          const result = await ctx.service.adService.findUsers(email);
+          for (const data of result) {
+            returnResult.push(data.userPrincipalName);
+          }
+        }
+        ctx.success(returnResult);
+      } catch (error) {
+        throw { status: 500, message: 'service busy' };
+      }
+    }
     async checkUsers() {
       const { ctx } = this;
       const { emails } = ctx.request.body;
