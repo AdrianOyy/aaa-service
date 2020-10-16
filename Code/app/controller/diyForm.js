@@ -73,7 +73,7 @@ module.exports = app => {
           formKey,
           version,
           displayTree: '',
-          updateTree: [],
+          updateTree: '',
           manager_user_id: [ ctx.authUser.id.toString() ],
           manager_group_id: [ manager_group_id.toString() ],
         },
@@ -81,7 +81,9 @@ module.exports = app => {
       };
       if (workflowName === 'Account management') {
         activitiData.variables.displayTree = parentData.account_type ? parentData.account_type.value : '';
-        activitiData.variables.updateTree = await ctx.service.workflow.setUpdateType(parentData, startValues, deploymentId);
+        if (startValues) {
+          activitiData.variables.updateTree = await ctx.service.workflow.setUpdateType(parentData, startValues, deploymentId);
+        }
         const emails = parentData.supervisoremailaccount.value.split(',');
         const result = await ctx.service.syncActiviti.getUsersByEmails({ emails }, { headers: ctx.headers });
         let userIds = [];

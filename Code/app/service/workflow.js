@@ -55,7 +55,8 @@ module.exports = app => {
           }
         }
       }
-      return updateType;
+      const data = updateType.join(',')
+      return data;
     }
 
     async getVersion(modelId) {
