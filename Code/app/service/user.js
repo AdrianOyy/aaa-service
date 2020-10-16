@@ -83,5 +83,58 @@ module.exports = app => {
       const tenants = await ctx.model.models.tenant.findAll({ where });
       return tenants;
     }
+
+    /**
+     *  get group type list by userId
+     * @param {number|string} userId user id
+     * @returns {Promise<string[]>} group type list
+     */
+    async getGroupTypeList(userId) {
+      const { ctx } = this;
+      const groupTypeList = [];
+      const user = await ctx.model.models.user.findOne({
+        where: {
+          id: userId,
+        },
+        include: {
+          model: ctx.model.models.user_group_mapping,
+          as: 'userGroupMapping',
+          required: true,
+          include: {
+            model: ctx.model.models.ad_group,
+            as: 'ad_group',
+            required: true,
+            include: {
+              model: ctx.model.models.groupType,
+              as: 'groupType',
+              required: true,
+            },
+          },
+        },
+      });
+      const {
+        userGroupMapping,
+      } = user;
+      const adGroupMap = new Map();
+      userGroupMapping.forEach(el => {
+        const { ad_group } = el;
+        const { id } = ad_group;
+        if (!adGroupMap.get(id)) {
+          adGroupMap.set(id, ad_group);
+        }
+      });
+      const groupTypeMap = new Map();
+      adGroupMap.forEach(v => {
+        const { groupType } = v;
+        groupType.forEach(e => {
+          if (!groupTypeMap.get(e.id)) {
+            groupTypeMap.set(e.id, e.type);
+          }
+        });
+        groupTypeMap.forEach(v => groupTypeList.push(v));
+      });
+
+      return groupTypeList;
+    }
   };
 };
