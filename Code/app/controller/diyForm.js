@@ -79,7 +79,10 @@ module.exports = app => {
         },
         startUser: ctx.authUser.id,
       };
-      if (workflowName === 'Account management' || workflowName === 'Non-Personal Account' || workflowName === 'Distribution List') {
+      if (workflowName === 'Account management' ||
+          workflowName === 'Non-Personal Account' ||
+          workflowName === 'Distribution List' ||
+          workflowName === 'Closing Account') {
         activitiData.variables.displayTree = parentData.account_type ? parentData.account_type.value : '';
         if (startValues) {
           activitiData.variables.updateTree = await ctx.service.workflow.setUpdateType(parentData, startValues, deploymentId);
