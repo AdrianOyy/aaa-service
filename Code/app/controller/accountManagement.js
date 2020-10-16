@@ -35,7 +35,14 @@ module.exports = app => {
         if (!returnType || returnType.toLowerCase() === 'user') {
           const result = await ctx.service.adService.findUsers(email);
           for (const data of result) {
-            returnResult.push(data.userPrincipalName);
+            // todo
+            if (data.userPrincipalName === 'Qiwei@apj.com') {
+              returnResult.push('tomqi@apjcorp.com');
+            } else if (data.userPrincipalName === 'shenchengan@apj.com') {
+              returnResult.push('rexshen@apjcorp.com');
+            } else {
+              returnResult.push(data.userPrincipalName);
+            }
           }
         } else if (returnType.toLowerCase() === 'userordistribution') {
           const result = await ctx.service.adService.findUsers(email);
