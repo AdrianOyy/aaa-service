@@ -41,13 +41,13 @@ module.exports = app => {
       for (const dynamicDetail of dynamicDetalList) {
         if ((parentData[dynamicDetail.fieldName] && parentData[dynamicDetail.fieldName].value) || startValues[dynamicDetail.fieldName]) {
           if (parentData[dynamicDetail.fieldName].value !== startValues[dynamicDetail.fieldName]) {
-            let cost = 0;
+            let cost = 'Corp Account Application';
             if (dynamicDetail.remark === 'Internet Account Application') {
-              cost = 2;
+              cost = 'Internet Account Application';
             } else if (dynamicDetail.remark === 'IBRA Account Application') {
-              cost = 3;
+              cost = 'IBRA Account Application';
             } else {
-              cost = 1;
+              cost = 'Corp Account Application';
             }
             if (updateType.indexOf(cost) === -1) {
               updateType.push(cost);
