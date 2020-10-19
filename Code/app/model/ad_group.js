@@ -19,6 +19,7 @@ module.exports = app => {
     ad_group.hasMany(ms.tenant_group_mapping, { as: 'tenantGroupMapping', foreignKey: 'ad_groupId', constraint: false });
     ad_group.hasMany(ms.clinical_group, { as: 'clinicalGroupMapping', foreignKey: 'manage_group_id', constraint: false });
     ad_group.hasMany(ms.clinical_group, { as: 'approvalGroupMapping', foreignKey: 'approval_group_id', constraint: false });
+    ad_group.hasMany(ms.groupType, { as: 'groupType', foreignKey: 'adGroupId', constraints: false });
   };
 
   return ad_group;

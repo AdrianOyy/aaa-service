@@ -71,30 +71,11 @@ module.exports = app => {
               groupList.push('0');
             }
           }
+          user.groupTypeList = await ctx.service.user.getGroupTypeList(user.id);
           user.groupList = groupList;
           user.groups = auth.groups;
           auth.user = user;
         }
-        // const auth = {
-        //   token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJTRU5TRVBMQVRGT1JNIiwiZXhwIjoxNjAwNjYwOTU3LCJ1c2VybmFtZSI6InNoZW5jaGVuZ2FuIn0.zHdqlwuYbLrOUcIqUji7x4rtncLUGhQcD-428hObAAs',
-        //   user: {
-        //     cn: 'shenchengan',
-        //     displayName: 'shenchengan',
-        //     distinguishedName: 'CN=shenchengan,OU=EEL,OU=Employees,DC=apj,DC=com',
-        //     dn: 'CN=shenchengan,OU=EEL,OU=Employees,DC=apj,DC=com',
-        //     givenName: 'chengan',
-        //     groupList: [ '0' ],
-        //     groups: [{ dn: 'CN=IOS.ISMS,OU=APJ,OU=Groups,DC=apj,DC=com', cn: 'IOS.ISMS' }],
-        //     id: 1,
-        //     lockoutTime: '0',
-        //     pwdLastSet: '131886269639898322',
-        //     sAMAccountName: 'shenchengan',
-        //     sn: 'shen',
-        //     userAccountControl: '66048',
-        //     userPrincipalName: 'shenchengan@apj.com',
-        //     whenCreated: '20141201053009.0Z',
-        //   },
-        // };
         ctx.success(auth);
       } else {
         ctx.success(auth);
