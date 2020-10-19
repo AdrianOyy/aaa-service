@@ -71,10 +71,10 @@ module.exports = app => {
         const clinicalData = parentData.clinical_applications;
         const nonclinicalData = parentData.nonclinical_applications;
         if (clinicalData) {
-          data = clinicalData.split('!@#$');
+          data = clinicalData.split('!@#');
         }
         if (nonclinicalData) {
-          data = data.concat(nonclinicalData.split('!@#$'));
+          data = data.concat(nonclinicalData.split('!@#'));
         }
         const where = {
           name: { [Op.in]: data },
