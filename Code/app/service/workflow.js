@@ -55,6 +55,9 @@ module.exports = app => {
           }
         }
       }
+      if (updateType.indexOf('Corp Account Application') > -1) {
+        updateType.push('Wireless LAN (WLAN) Application');
+      }
       const data = updateType.join(',');
       return data;
     }
