@@ -45,14 +45,20 @@ module.exports = app => {
             }
           }
         } else if (returnType.toLowerCase() === 'userordistribution') {
-          const result = await ctx.service.adService.findUsers(email);
-          for (const data of result) {
+          const users = await ctx.service.adService.findUsers(email);
+          for (const data of users) {
             returnResult.push(data.userPrincipalName);
           }
+          const dn = 'OU=APJ,OU=Groups,DC=apj,DC=com'; // OU=HO-ITD,OU=Hositals,DC=corp,DC=ha,DC=org,DC=hk
+          const groups = await ctx.service.adService.findGroups('cn=*' + email + '*', dn);
+          for (const data of groups) {
+            returnResult.push(data.cn);
+          }
         } else if (returnType.toLowerCase() === 'distribution') {
-          const result = await ctx.service.adService.findUsers(email);
+          const dn = 'OU=APJ,OU=Groups,DC=apj,DC=com'; // OU=HO-ITD,OU=Hositals,DC=corp,DC=ha,DC=org,DC=hk
+          const result = await ctx.service.adService.findGroups('cn=*' + email + '*', dn);
           for (const data of result) {
-            returnResult.push(data.userPrincipalName);
+            returnResult.push(data.cn);
           }
         }
         ctx.success(returnResult);

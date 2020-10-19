@@ -7,7 +7,7 @@ module.exports = app => {
       const { Op } = app.Sequelize;
       const limit = parseInt(ctx.query.limit) || 10;
       const offset = (parseInt(ctx.query.page || 1) - 1) * limit;
-      const { createdAt, updatedAt, prop, order } = ctx.query;
+      const { isNetwork, createdAt, updatedAt, prop, order } = ctx.query;
       let Order = [[ 'createdAt', 'DESC' ]];
       if (order && prop) {
         Order = [[ prop, order ]];
@@ -22,6 +22,14 @@ module.exports = app => {
         offset,
         limit,
       };
+      findAdParams.include = [{
+        model: ctx.model.models.equipType,
+        as: 'equipType',
+        where: Object.assign(
+          {},
+          isNetwork ? { Type: { [Op.ne]: 'EqServer' } } : { Type: { [Op.eq]: 'EqServer' } }
+        ),
+      }];
       const result = await ctx.model.models.inventory.findAndCountAll(findAdParams);
       ctx.success(result);
     }
