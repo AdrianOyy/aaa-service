@@ -55,8 +55,34 @@ module.exports = app => {
           }
         }
       }
-      const data = updateType.join(',')
+      const data = updateType.join(',');
       return data;
+    }
+
+    async getIbra(parentData) {
+      const { ctx } = this;
+      const { Op } = app.Sequelize;
+      let data = [];
+      const ibraGroupId = [];
+      const clinicalData = parentData.clinical_applications;
+      const nonclinicalData = parentData.nonclinical_applications;
+      if (clinicalData && clinicalData.value) {
+        data = clinicalData.value.split('!@#$');
+      }
+      if (nonclinicalData && nonclinicalData.value) {
+        data = data.concat(nonclinicalData.value.split('!@#$'));
+      }
+      const where = {
+        name: { [Op.in]: data },
+        manage_group_id: 1,
+      };
+      const clGroup = await ctx.model.models.clinical_group.findAll({ where });
+      for (const cli of clGroup) {
+        if (ibraGroupId.indexOf(cli.approval_group_id) === -1) {
+          ibraGroupId.push(cli.approval_group_id);
+        }
+      }
+      return ibraGroupId;
     }
 
     async getVersion(modelId) {

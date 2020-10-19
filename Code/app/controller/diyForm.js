@@ -80,7 +80,8 @@ module.exports = app => {
         startUser: ctx.authUser.id,
       };
       if (workflowName === 'Account management' || workflowName === 'Non-Personal Account' || workflowName === 'Distribution List') {
-        activitiData.variables.displayTree = parentData.account_type ? parentData.account_type.value : '';
+        activitiData.variables.displayTree = parentData.account_type ? parentData.account_type.value.replace('!@#$', ',') : '';
+        await ctx.service.workflow.getIbra(parentData);
         if (startValues) {
           activitiData.variables.updateTree = await ctx.service.workflow.setUpdateType(parentData, startValues, deploymentId);
         }
