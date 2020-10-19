@@ -17,7 +17,7 @@ module.exports = app => {
 
   groupType.associate = function() {
     const ms = app.model.models;
-    ms.inventory.belongsTo(ms.ad_group, { as: 'adGroup', foreignKey: 'adGroupId', constraint: false });
+    ms.groupType.belongsTo(ms.ad_group, { as: 'adGroup', foreignKey: 'adGroupId', constraint: false });
   };
 
   return groupType;
