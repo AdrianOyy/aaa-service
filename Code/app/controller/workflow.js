@@ -66,12 +66,21 @@ module.exports = app => {
       ctx.success(data);
     }
 
+    async optionalApproval() {
+      const { ctx } = this;
+      const { formKey, formId, version } = ctx.request.body;
+      if (!formKey || !formId) ctx.error();
+      const res = await ctx.service.dynamicForm.getDetailByKey(formKey, version, formId);
+      const ibraGroupId = await ctx.service.workflow.getIbra(res);
+      ctx.success(ibraGroupId);
+    }
+
     async createTable() {
       const { ctx } = this;
-      // const { version, modelId, deploymentId } = ctx.request.body;
-      const version = 12;
-      const modelId = 297501;
-      const deploymentId = 12342;
+      const { version, modelId, deploymentId } = ctx.request.body;
+      // const version = 12;
+      // const modelId = 297501;
+      // const deploymentId = 12342;
       const dynamicForm = await ctx.service.workflow.getVersion(modelId);
       // 获取最新 dynamicForm
       // 修改version

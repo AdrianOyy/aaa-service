@@ -158,6 +158,7 @@ module.exports = app => {
   router.post(`${prefix}/workflow/create`, controller.workflow.create);
   router.get(`${prefix}/workflow/detail`, controller.workflow.detail);
   router.get(`${prefix}/workflow/createTable`, controller.workflow.createTable);
+  router.post(`${prefix}/workflow/optionalApproval`, controller.workflow.optionalApproval);
 
   router.post(`${prefix}/accountManagement/userExistsMany`, controller.accountManagement.userExistsMany);
   router.post(`${prefix}/accountManagement/getUsersByEmails`, controller.accountManagement.getUsersByEmails);
