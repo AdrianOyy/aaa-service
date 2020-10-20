@@ -120,6 +120,7 @@ module.exports = app => {
   router.post(`${prefix}/vmGuest/create`, controller.vmGuest.create);
   router.delete(`${prefix}/vmGuest/deleteMany`, controller.vmGuest.deleteMany);
   router.get(`${prefix}/vmGuest/checkSerialNumber`, controller.vmGuest.checkSerialNumber);
+  router.get(`${prefix}/vmGuest/export`, controller.vmGuest.export);
 
   router.get(`${prefix}/hostname/getReferenceList`, controller.hostname.getReferenceList);
   router.get(`${prefix}/hostname/getHostNameLastCharList`, controller.hostname.getHostNameLastCharList);
