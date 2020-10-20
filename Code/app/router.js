@@ -155,6 +155,14 @@ module.exports = app => {
   router.delete(`${prefix}/inventory/deleteMany`, controller.inventory.deleteMany);
   router.get(`${prefix}/inventory/checkIDExist`, controller.inventory.checkIDExist);
 
+  router.get(`${prefix}/inventoryLifeCycle/list`, controller.inventoryLifeCycle.list);
+  router.get(`${prefix}/inventoryLifeCycle/detail`, controller.inventoryLifeCycle.detail);
+  router.post(`${prefix}/inventoryLifeCycle/create`, controller.inventoryLifeCycle.create);
+  router.put(`${prefix}/inventoryLifeCycle/update`, controller.inventoryLifeCycle.update);
+  router.delete(`${prefix}/inventoryLifeCycle/deleteMany`, controller.inventoryLifeCycle.deleteMany);
+  router.get(`${prefix}/inventoryLifeCycle/checkIDExist`, controller.inventoryLifeCycle.checkIDExist);
+  router.get(`${prefix}/inventoryLifeCycle/listInventorys`, controller.inventoryLifeCycle.listInventorys);
+
   router.post(`${prefix}/workflow/create`, controller.workflow.create);
   router.get(`${prefix}/workflow/detail`, controller.workflow.detail);
   router.get(`${prefix}/workflow/createTable`, controller.workflow.createTable);
