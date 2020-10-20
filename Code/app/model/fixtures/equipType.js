@@ -36,4 +36,12 @@ module.exports = [
       updatedAt: new Date(),
     },
   },
+  {
+    model: 'equipType',
+    data: {
+      Type: 'EqServer',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+  },
 ];

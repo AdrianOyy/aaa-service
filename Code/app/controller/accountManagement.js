@@ -45,14 +45,18 @@ module.exports = app => {
             }
           }
         } else if (returnType.toLowerCase() === 'userordistribution') {
-          const result = await ctx.service.adService.findUsers(email);
-          for (const data of result) {
+          const users = await ctx.service.adService.findUsers(email);
+          for (const data of users) {
             returnResult.push(data.userPrincipalName);
           }
+          const groups = await ctx.service.adService.findGroups('cn=*' + email + '*');
+          for (const data of groups) {
+            returnResult.push(data.cn);
+          }
         } else if (returnType.toLowerCase() === 'distribution') {
-          const result = await ctx.service.adService.findUsers(email);
+          const result = await ctx.service.adService.findGroups('cn=*' + email + '*');
           for (const data of result) {
-            returnResult.push(data.userPrincipalName);
+            returnResult.push(data.cn);
           }
         }
         ctx.success(returnResult);

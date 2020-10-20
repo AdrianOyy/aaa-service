@@ -7,6 +7,7 @@ module.exports = app => {
     id: { type: INTEGER, autoIncrement: true, primaryKey: true },
     _ID: { type: INTEGER, unique: true },
     InventoryID: { type: INTEGER },
+    IPAddress: { type: STRING },
     DefGateway: { type: STRING },
     SubnetMask: { type: STRING },
     ConfigFile: { type: STRING },

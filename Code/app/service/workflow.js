@@ -55,6 +55,9 @@ module.exports = app => {
           }
         }
       }
+      if (updateType.indexOf('Corp Account Application') > -1) {
+        updateType.push('Wireless LAN (WLAN) Application');
+      }
       const data = updateType.join(',');
       return data;
     }
@@ -64,22 +67,24 @@ module.exports = app => {
       const { Op } = app.Sequelize;
       let data = [];
       const ibraGroupId = [];
-      const clinicalData = parentData.clinical_applications;
-      const nonclinicalData = parentData.nonclinical_applications;
-      if (clinicalData && clinicalData.value) {
-        data = clinicalData.value.split('!@#$');
-      }
-      if (nonclinicalData && nonclinicalData.value) {
-        data = data.concat(nonclinicalData.value.split('!@#$'));
-      }
-      const where = {
-        name: { [Op.in]: data },
-        manage_group_id: 1,
-      };
-      const clGroup = await ctx.model.models.clinical_group.findAll({ where });
-      for (const cli of clGroup) {
-        if (ibraGroupId.indexOf(cli.approval_group_id) === -1) {
-          ibraGroupId.push(cli.approval_group_id);
+      if (parentData.account_type && parentData.account_type.indexOf('IBRA Account Application') > -1) {
+        const clinicalData = parentData.clinical_applications;
+        const nonclinicalData = parentData.nonclinical_applications;
+        if (clinicalData) {
+          data = clinicalData.split('!@#');
+        }
+        if (nonclinicalData) {
+          data = data.concat(nonclinicalData.split('!@#'));
+        }
+        const where = {
+          name: { [Op.in]: data },
+          manage_group_id: { [Op.in]: app.Sequelize.literal(`(select groupId from user_group_mapping where userId = ${ctx.authUser.id} and deletedAt is null)`) },
+        };
+        const clGroup = await ctx.model.models.clinical_group.findAll({ where });
+        for (const cli of clGroup) {
+          if (ibraGroupId.indexOf(cli.approval_group_id.toString()) === -1) {
+            ibraGroupId.push(cli.approval_group_id.toString());
+          }
         }
       }
       return ibraGroupId;
