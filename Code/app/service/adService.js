@@ -87,11 +87,11 @@ module.exports = app => {
       });
       return axiosResult;
     }
-    async findGroups(groupName, dn) {
+    async findGroups(groupName) {
       const app = this;
       const config = app.config.adService;
       const url = `${config.url}/adService/findGroups`;
-      const axiosResult = await axios.get(url + '?groupName=' + groupName + '&dn=' + dn).then(function(response) {
+      const axiosResult = await axios.get(url + '?groupName=' + groupName).then(function(response) {
         return new Promise(resolve => {
           const data = response.data.data;
           resolve(data);

@@ -49,14 +49,12 @@ module.exports = app => {
           for (const data of users) {
             returnResult.push(data.userPrincipalName);
           }
-          const dn = 'OU=APJ,OU=Groups,DC=apj,DC=com'; // OU=HO-ITD,OU=Hositals,DC=corp,DC=ha,DC=org,DC=hk
-          const groups = await ctx.service.adService.findGroups('cn=*' + email + '*', dn);
+          const groups = await ctx.service.adService.findGroups('cn=*' + email + '*');
           for (const data of groups) {
             returnResult.push(data.cn);
           }
         } else if (returnType.toLowerCase() === 'distribution') {
-          const dn = 'OU=APJ,OU=Groups,DC=apj,DC=com'; // OU=HO-ITD,OU=Hositals,DC=corp,DC=ha,DC=org,DC=hk
-          const result = await ctx.service.adService.findGroups('cn=*' + email + '*', dn);
+          const result = await ctx.service.adService.findGroups('cn=*' + email + '*');
           for (const data of result) {
             returnResult.push(data.cn);
           }
