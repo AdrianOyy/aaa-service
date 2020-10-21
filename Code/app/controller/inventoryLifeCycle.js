@@ -73,7 +73,6 @@ module.exports = app => {
           updatedAt: new Date(),
         },
         InventoryID ? { InventoryID } : undefined,
-        AssetID ? { AssetID } : undefined,
         RecordCreatedOn ? { RecordCreatedOn } : undefined,
         ActionDate ? { ActionDate } : undefined
       );
