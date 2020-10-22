@@ -223,7 +223,23 @@ module.exports = app => {
     }
     async export() {
       const { ctx } = this;
-      const vmList = await ctx.model.models.vm_guest.findAll();
+      const { Op } = app.Sequelize;
+      const { serialNumber, createdAt, updatedAt } = ctx.request.body;
+      const vmList = await ctx.model.models.vm_guest.findAll({
+        where: Object.assign({},
+          serialNumber ? { serialNumber: { [Op.like]: `%${serialNumber}%` } } : undefined, {
+            createdAt: {
+              [Op.and]: [
+                { [Op.gt]: new Date(createdAt[0] ? createdAt[0] : 0) },
+                { [Op.lte]: createdAt[1] ? new Date(createdAt[1]) : new Date(new Date() - (-8.64e7)) }],
+            },
+            updatedAt: {
+              [Op.and]: [
+                { [Op.gt]: new Date(updatedAt[0] ? updatedAt[0] : 0) },
+                { [Op.lte]: updatedAt[1] ? new Date(updatedAt[1]) : new Date(new Date() - (-8.64e7)) }],
+            },
+          }),
+      });
       const dataList = [];
       vmList.forEach(el => {
         const model = Object.assign(el.dataValues, {
