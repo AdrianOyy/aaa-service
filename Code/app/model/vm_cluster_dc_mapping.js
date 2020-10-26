@@ -23,7 +23,8 @@ module.exports = app => {
   });
 
   vm_cluster_dc_mapping.associate = function() {
-    // const ms = app.model.models;
+    const ms = app.model.models;
+    ms.vm_cluster_dc_mapping.belongsTo(ms.vm_cdc, { as: 'vm_cdc', foreignKey: 'cdcId', constraints: false });
     // ms.vm_cluster_applicationType.belongsTo(ms.vm_applicationType, { as: 'applicationType', foreignKey: 'applicationTypeId', constraint: false });
   };
 

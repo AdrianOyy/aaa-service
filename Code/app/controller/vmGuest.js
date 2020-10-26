@@ -47,10 +47,13 @@ module.exports = app => {
     async create() {
       const { ctx } = this;
       const {
+        rid,
+        dataPortIP,
         serialNumber,
         model,
         assignedMemory,
         assignedCPUCores,
+        CPUType,
         diskVolumeName,
         CSVName,
         diskSize,
@@ -79,8 +82,11 @@ module.exports = app => {
       });
       if (existNum > 0) ctx.error();
       const newModel = {
+        rid,
+        dataPortIP,
         serialNumber,
         model,
+        CPUType,
         assignedMemory,
         assignedCPUCores,
         diskVolumeName,
@@ -120,10 +126,13 @@ module.exports = app => {
       const { id } = ctx.query;
       const { Op } = app.Sequelize;
       const {
+        rid,
+        dataPortIP,
         serialNumber,
         model,
         assignedMemory,
         assignedCPUCores,
+        CPUType,
         diskVolumeName,
         CSVName,
         diskSize,
@@ -155,10 +164,13 @@ module.exports = app => {
       const oldModel = await ctx.model.models.vm_guest.findByPk(id);
       if (!oldModel) ctx.error();
       const newModel = {
+        rid,
+        dataPortIP,
         serialNumber,
         model,
         assignedMemory,
         assignedCPUCores,
+        CPUType,
         diskVolumeName,
         CSVName,
         diskSize,
@@ -239,14 +251,23 @@ module.exports = app => {
                 { [Op.lte]: updatedAt[1] ? new Date(updatedAt[1]) : new Date(new Date() - (-8.64e7)) }],
             },
           }),
+        include: {
+          model: ctx.model.models.vm_cluster_dc_mapping,
+          as: 'vm_cluster_dc_mapping',
+          include: {
+            model: ctx.model.models.vm_cdc,
+            as: 'vm_cdc',
+          },
+        },
       });
+      // const dataList = Object.assign(vmList.dataValues, { extend: vmList.vm_cluster_dc_mapping });
       const dataList = [];
-      vmList.forEach(el => {
-        const model = Object.assign(el.dataValues, {
-          createdAt: dayjs(el.createdAt).format('DD-MMM-YYYY HH:mm'),
-          updatedAt: dayjs(el.updatedAt).format('DD-MMM-YYYY HH:mm'),
-        });
-        dataList.push(model);
+      vmList.forEach(vm => {
+        const { vm_cluster_dc_mapping: { vm_cdc: { name } } } = vm;
+        const rawData = vm.dataValues;
+        delete rawData.vm_cluster_dc_mapping;
+        Object.assign(rawData, { dataCenterName: name });
+        dataList.push(rawData);
       });
       const data = {
         len: vmList.length,
