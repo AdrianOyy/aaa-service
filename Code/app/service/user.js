@@ -87,7 +87,7 @@ module.exports = app => {
     /**
      *  get group type list by userId
      * @param {number|string} userId user id
-     * @returns {Promise<string[]>} group type list
+     * @return {Promise<string[]>} group type list
      */
     async getGroupTypeList(userId) {
       const { ctx } = this;
@@ -112,6 +112,9 @@ module.exports = app => {
           },
         },
       });
+      if (!user) {
+        return [];
+      }
       const {
         userGroupMapping,
       } = user;
