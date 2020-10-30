@@ -70,7 +70,7 @@ module.exports = appInfo => {
   const outboundUrl = 'http://10.231.131.123:3010';
 
   config.adService = {
-    url: outboundUrl + '/adService',
+    url: outboundUrl + '',
   };
 
   config.activiti = {
