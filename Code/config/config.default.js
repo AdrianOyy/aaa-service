@@ -66,8 +66,11 @@ module.exports = appInfo => {
       enable: false,
     },
   };
+
+  const outboundUrl = 'http://10.231.131.123:3010';
+
   config.adService = {
-    url: 'http://10.231.131.123:3010',
+    url: outboundUrl + '/adService',
   };
 
   config.activiti = {

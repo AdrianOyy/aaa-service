@@ -34,7 +34,7 @@ docker run -dit \
 -e dbPort=3306 \
 -e dbUser=admin \
 -e dbPassword=APJ@com123 \
--e adServiceUrl=http://10.231.131.123:3010 \
+-e outboundUrl=http://10.231.131.123:7000 \
 -e activitiUrl=http://10.231.131.123:3004 \
 -e jwtExpiresIn=10m \
 -e jwtSecret=1234567abc \

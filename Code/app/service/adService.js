@@ -8,7 +8,7 @@ module.exports = app => {
     async authenticate(username, password) {
       const app = this;
       const config = app.config.adService;
-      const url = `${config.url}/adService/authenticate`;
+      const url = `${config.url}/authenticate`;
       const axiosResult = await axios.post(url, { username, password }
       ).then(function(response) {
         return new Promise(resolve => {
@@ -38,7 +38,7 @@ module.exports = app => {
     async userExistsMany(usernames) {
       const app = this;
       const config = app.config.adService;
-      const url = `${config.url}/adService/userExistsMany`;
+      const url = `${config.url}/userExistsMany`;
       const axiosResult = await axios.post(url, { usernames }
       ).then(function(response) {
         return new Promise(resolve => {
@@ -56,7 +56,7 @@ module.exports = app => {
     async findUser(username) {
       const app = this;
       const config = app.config.adService;
-      const url = `${config.url}/adService/findUser`;
+      const url = `${config.url}/findUser`;
       const axiosResult = await axios.get(url + '?username=' + username).then(function(response) {
         return new Promise(resolve => {
           const data = response.data.data;
@@ -73,7 +73,7 @@ module.exports = app => {
     async findUsers(email) {
       const app = this;
       const config = app.config.adService;
-      const url = `${config.url}/adService/findUsers`;
+      const url = `${config.url}/findUsers`;
       const axiosResult = await axios.get(url + '?email=' + email).then(function(response) {
         return new Promise(resolve => {
           const data = response.data.data;
@@ -90,7 +90,7 @@ module.exports = app => {
     async findGroups(groupName) {
       const app = this;
       const config = app.config.adService;
-      const url = `${config.url}/adService/findGroups`;
+      const url = `${config.url}/findGroups`;
       const axiosResult = await axios.get(url + '?groupName=' + groupName).then(function(response) {
         return new Promise(resolve => {
           const data = response.data.data;

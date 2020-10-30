@@ -66,8 +66,10 @@ module.exports = appInfo => {
       enable: false,
     },
   };
+  const outboundUrl = process.env.npm_config_outboundUrl;
+
   config.adService = {
-    url: process.env.npm_config_adServiceUrl,
+    url: outboundUrl + '/adService',
   };
 
   config.activiti = {
