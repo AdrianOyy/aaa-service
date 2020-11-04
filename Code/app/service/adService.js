@@ -8,6 +8,7 @@ module.exports = app => {
     async authenticate(username, password) {
       const app = this;
       const config = app.config.adService;
+      const expiresIn = app.config.jwt.expiresIn;
       const url = `${config.url}/authenticate`;
       const axiosResult = await axios.post(url, { username, password }
       ).then(function(response) {
@@ -19,7 +20,7 @@ module.exports = app => {
             const groups = data.groups;
             result.user = user;
             result.groups = groups;
-            const options = { content: { username: user.sAMAccountName }, expiresIn: '1440m' };
+            const options = { content: { username: user.sAMAccountName }, expiresIn };
             const token = app.service.jwtUtils.getToken(options);
             result.token = token;
             resolve(result);

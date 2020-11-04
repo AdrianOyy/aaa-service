@@ -17,7 +17,7 @@ module.exports = (options, app) => {
       if ((new Date() - 0) / 1000 - exp > 0) ctx.throw(401);
       const user = await ctx.model.models.user.findOne({
         where: {
-          displayname: username,
+          sAMAccountName: username,
         },
       });
       if (!user) ctx.throw(401);
