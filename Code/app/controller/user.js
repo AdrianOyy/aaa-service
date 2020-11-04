@@ -61,7 +61,7 @@ module.exports = app => {
           if (auth.user && auth.user.userPrincipalName === 'yangzhihong@apj.com') {
             auth.user.userPrincipalName = 'morseyang@apjcorp.com';
           }
-          const user = await ctx.service.user.loadUser(auth, username);
+          const user = await ctx.service.user.loadUser(auth);
           if (user) {
             const groupList = [];
             // const userGroup = await ctx.model.models.user_group_mapping.findAll({ where: { userId: user.id } });
