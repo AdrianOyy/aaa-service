@@ -30,6 +30,7 @@ module.exports = app => {
       });
       if (userModel !== null) {
         await userModel.update({
+          sAMAccountName: user.sAMAccountName,
           surname: user.sn,
           givenname: user.givenName,
           displayname: user.displayName,
@@ -38,6 +39,7 @@ module.exports = app => {
         });
       } else {
         userModel = await ctx.model.models.user.create({
+          sAMAccountName: user.sAMAccountName,
           surname: user.sn,
           givenname: user.givenName,
           displayname: user.displayName,

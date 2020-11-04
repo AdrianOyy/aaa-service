@@ -8,6 +8,7 @@ module.exports = app => {
     id: { type: INTEGER, autoIncrement: true, primaryKey: true, cnName: 'ID' },
     corpId: { type: STRING(128), allowNull: true, cnName: 'CORP ID', comment: 'CORP ID' },
     alias: { type: STRING(128), allowNull: true, cnName: 'Alias', comment: 'Alias' },
+    sAMAccountName: { type: STRING(128), allowNull: true, cnName: 'sAMAccountName', comment: 'sAMAccountName' },
     surname: { type: STRING(128), allowNull: true, cnName: 'Surname', comment: 'Surname' },
     givenname: { type: STRING(128), allowNull: true, cnName: 'Given Name', comment: 'Given Name' },
     title: { type: STRING(128), allowNull: true, cnName: 'Title', comment: 'Title' },
