@@ -95,5 +95,9 @@ module.exports = appInfo => {
     iss: 'SENSEPLATFORM',
   };
 
+  config.schedule = {
+    interval: '60s',
+  };
+
   return config;
 };

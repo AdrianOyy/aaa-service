@@ -5,17 +5,19 @@ const axios = require('axios');
 module.exports = app => {
   return class extends app.Service {
     async loadUser(user, options) {
-      const url = app.config.activiti.url;
-      const auth = await axios
-        .post(url + '/user/loadUser', user, options)
-        .then(function(response) {
-          return new Promise(resolve => {
-            resolve(response.data);
-          });
-        }).catch(function(error) {
-          console.log(error.message);
-        });
-      return auth;
+      const { ctx } = this;
+      const url = app.config.activiti.url + '/user/loadUser';
+      options.data = user;
+      const result = await curl(url, options, ctx);
+      return result.data;
+    }
+
+    async getEmailFolder(data, options) {
+      const { ctx } = this;
+      const url = app.config.activiti.url + '/email/getEmailFolder';
+      options.data = data;
+      const result = await curl(url, options, ctx);
+      return result.data;
     }
 
     async actionTask(data, options) {
@@ -99,3 +101,15 @@ module.exports = app => {
   };
 };
 
+async function curl(url, options, ctx) {
+  const result = await ctx.curl(url,
+    {
+      method: options.method ? options.method : 'POST',
+      headers: options.headers,
+      contentType: options.contentType ? options.contentType : 'json',
+      data: options.data,
+      dataType: options.dataType ? options.dataType : 'json',
+    }
+  );
+  return result;
+}

@@ -93,5 +93,9 @@ module.exports = appInfo => {
     iss: process.env.npm_config_jwtIss,
   };
 
+  config.schedule = {
+    interval: '60s',
+  };
+
   return config;
 };
