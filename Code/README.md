@@ -43,7 +43,7 @@ docker run -dit \
 -e mailPort=25 \
 -e mailUser=gitlab@apjcorp.com \
 -e mailPass=apj.com666 \
--e imapHost=imtp.mxhichina.com \
+-e imapHost=imap.mxhichina.com \
 -e imapPort=993 \
 -e imapUser=gitlab@apjcorp.com \
 -e imapPass=apj.com666 \
