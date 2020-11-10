@@ -4,10 +4,10 @@ const jwt = require('jsonwebtoken');
 const Imap = require('imap');
 
 // const inspect = require('util').inspect;
-const user = process.env.npm_config_imapUser ? process.env.npm_config_imapUser : 'tomqi@apjcorp.com';
-const password = process.env.npm_config_imapPass ? process.env.npm_config_imapPass : '891212Qiwei';
-const host = process.env.npm_config_imapHost ? process.env.npm_config_imapHost : 'imap.mxhichina.com';
-const port = process.env.npm_config_imapPort ? process.env.npm_config_imapPort : 993;
+const user = process.env.npm_config_imapUser;
+const password = process.env.npm_config_imapPass;
+const host = process.env.npm_config_imapHost;
+const port = process.env.npm_config_imapPort;
 const impaConfig = {
   user,
   password,
