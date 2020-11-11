@@ -1,109 +1,63 @@
 'use strict';
 
-const axios = require('axios');
-
 module.exports = app => {
 
   return class extends app.Service {
     async authenticate(username, password) {
-      const app = this;
+      const { ctx } = this;
       const config = app.config.adService;
       const expiresIn = app.config.jwt.expiresIn;
       const url = `${config.url}/authenticate`;
-      const axiosResult = await axios.post(url, { username, password }
-      ).then(function(response) {
-        return new Promise(resolve => {
-          const data = response.data.data;
-          const result = {};
-          if (data.auth) {
-            const user = data.user;
-            const groups = data.groups;
-            result.user = user;
-            result.groups = groups;
-            const options = { content: { username: user.sAMAccountName }, expiresIn };
-            const token = app.service.jwtUtils.getToken(options);
-            result.token = token;
-            resolve(result);
-          } else {
-            resolve(false);
-          }
-        });
-      }).catch(function(error) {
-        console.log(error.message);
-        return new Promise(resolve => {
-          resolve(null);
-        });
-      });
-      return axiosResult;
+      const response = await ctx.service.syncActiviti.curl(url, { data: { username, password } }, ctx);
+      const data = response.data.data;
+      let result = {};
+      if (data.auth) {
+        const user = data.user;
+        const groups = data.groups;
+        result.user = user;
+        result.groups = groups;
+        const options = { content: { username: user.sAMAccountName }, expiresIn };
+        const token = ctx.service.jwtUtils.getToken(options);
+        result.token = token;
+      } else {
+        result = false;
+      }
+      return result;
     }
     async userExistsMany(usernames) {
-      const app = this;
+      const { ctx } = this;
       const config = app.config.adService;
       const url = `${config.url}/userExistsMany`;
-      const axiosResult = await axios.post(url, { usernames }
-      ).then(function(response) {
-        return new Promise(resolve => {
-          const data = response.data.data;
-          resolve(data);
-        });
-      }).catch(function(error) {
-        console.log(error.message);
-        return new Promise(resolve => {
-          resolve(null);
-        });
-      });
-      return axiosResult;
+      const response = await ctx.service.syncActiviti.curl(url, { data: { usernames } }, ctx);
+      const data = response.data.data;
+      return data;
     }
+
     async findUser(username) {
-      const app = this;
+      const { ctx } = this;
       const config = app.config.adService;
-      const url = `${config.url}/findUser`;
-      const axiosResult = await axios.get(url + '?username=' + username).then(function(response) {
-        return new Promise(resolve => {
-          const data = response.data.data;
-          resolve(data);
-        });
-      }).catch(function(error) {
-        console.log(error.message);
-        return new Promise(resolve => {
-          resolve(null);
-        });
-      });
-      return axiosResult;
+      const url = `${config.url}/findUser?username=${username}`;
+      const response = await ctx.service.syncActiviti.curl(url, { method: 'GET' }, ctx);
+      const data = response.data.data;
+      return data;
     }
+
     async findUsers(email) {
-      const app = this;
+      const { ctx } = this;
       const config = app.config.adService;
-      const url = `${config.url}/findUsers`;
-      const axiosResult = await axios.get(url + '?email=' + email).then(function(response) {
-        return new Promise(resolve => {
-          const data = response.data.data;
-          resolve(data);
-        });
-      }).catch(function(error) {
-        console.log(error);
-        return new Promise(resolve => {
-          resolve(null);
-        });
-      });
-      return axiosResult;
+      const url = `${config.url}/findUsers?email=${email}`;
+      const response = await ctx.service.syncActiviti.curl(url, { method: 'GET' }, ctx);
+      const data = response.data.data;
+      return data;
     }
+
     async findGroups(groupName) {
-      const app = this;
+      const { ctx } = this;
       const config = app.config.adService;
-      const url = `${config.url}/findGroups`;
-      const axiosResult = await axios.get(url + '?groupName=' + groupName).then(function(response) {
-        return new Promise(resolve => {
-          const data = response.data.data;
-          resolve(data);
-        });
-      }).catch(function(error) {
-        console.log(error);
-        return new Promise(resolve => {
-          resolve(null);
-        });
-      });
-      return axiosResult;
+      const url = `${config.url}/findGroups?groupName=${groupName}`;
+      const response = await ctx.service.syncActiviti.curl(url, { method: 'GET' }, ctx);
+      const data = response.data.data;
+      return data;
     }
   };
 };

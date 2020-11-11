@@ -1,5 +1,7 @@
 'use strict';
 
+const imapFlag = process.env.npm_config_imapFlag ? process.env.npm_config_imapFlag : 'N';
+
 module.exports = app => {
   return {
     schedule: {
@@ -8,6 +10,9 @@ module.exports = app => {
       type: 'all',
     },
     async task(ctx) {
+      if (imapFlag !== 'Y') {
+        return;
+      }
       await ctx.service.imap.createBox();
       const messages = await ctx.service.imap.fetchMessages();
       if (!messages || messages.length <= 0) {
