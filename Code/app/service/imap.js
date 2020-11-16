@@ -16,7 +16,10 @@ const impaConfig = {
   tls: true,
   tlsOptions: { rejectUnauthorized: false },
 };
-console.log(impaConfig);
+const imapFlag = process.env.npm_config_imapFlag;
+if (imapFlag && imapFlag === 'Y') {
+  console.log(impaConfig);
+}
 
 module.exports = app => {
   return class extends app.Service {
