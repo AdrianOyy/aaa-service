@@ -8,10 +8,12 @@ module.exports = app => {
       const { Op } = app.Sequelize;
       const limit = parseInt(ctx.query.limit) || 10;
       const offset = (parseInt(ctx.query.page || 1) - 1) * limit;
-      const { surname, prop, order } = ctx.query;
+      const { surname, createdAt, updatedAt, prop, order } = ctx.query;
       const where = Object.assign(
         {},
-        surname ? { surname: { [Op.like]: `%${surname}%` } } : undefined
+        surname ? { surname: { [Op.like]: `%${surname}%` } } : undefined,
+        createdAt ? { createdAt: { [Op.and]: [{ [Op.gte]: new Date(createdAt) }, { [Op.lt]: new Date(new Date(createdAt) - (-8.64e7)) }] } } : undefined,
+        updatedAt ? { updatedAt: { [Op.and]: [{ [Op.gte]: new Date(updatedAt) }, { [Op.lt]: new Date(new Date(updatedAt) - (-8.64e7)) }] } } : undefined
       );
 
       // 过滤无用条件
