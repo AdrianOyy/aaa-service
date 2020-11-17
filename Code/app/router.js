@@ -147,6 +147,8 @@ module.exports = app => {
   router.post(`${prefix}/diyForm/update`, controller.diyForm.update);
   router.get(`${prefix}/diyForm/detail`, controller.diyForm.detail);
 
+  router.get(`${prefix}/haDynamicForm/getInitData`, controller.haDynamicForm.getInitData);
+
   router.get(`${prefix}/inventory/list`, controller.inventory.list);
   router.get(`${prefix}/inventory/listStatus`, controller.inventory.listStatus);
   router.get(`${prefix}/inventory/listEquipType`, controller.inventory.listEquipType);

@@ -33,6 +33,7 @@ module.exports = app => {
       return { dynamicFormModel, detailList };
     }
 
+    // TODO: UPDATE
     async setUpdateType(parentData, startValues, deploymentId) {
       const { ctx } = this;
       const updateType = [];

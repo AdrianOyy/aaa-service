@@ -15,7 +15,7 @@ module.exports = app => {
         workflowName,
         deploymentId,
       } = ctx.request.body;
-      ctx.success();
+      // ctx.success();
       // 获取父表插入SQL
       const parentInsertSQL = await ctx.service.diyForm.getParentFormInsetSQL(formKey, version, parentData);
 
@@ -61,7 +61,9 @@ module.exports = app => {
       const tenant = await ctx.model.models.tenant.findByPk(parentData && parentData.tenant ? parentData.tenant.value : 0);
       // todo 暂时使用1
       let manager_group_id = 1;
-
+      console.log('222=========================222');
+      console.log(222);
+      console.log('222=========================222');
       if (tenant) {
         manager_group_id = tenant.manager_group_id;
       }
@@ -79,10 +81,10 @@ module.exports = app => {
         },
         startUser: ctx.authUser.id,
       };
-      if (workflowName === 'Account management' ||
-          workflowName === 'Non-Personal Account' ||
-          workflowName === 'Distribution List' ||
-          workflowName === 'Closing Account') {
+      if (workflowName === 'Account management'
+        || workflowName === 'Non-Personal Account'
+        || workflowName === 'Distribution List'
+        || workflowName === 'Closing Account') {
         activitiData.variables.displayTree = parentData.account_type ? parentData.account_type.value.replace('!@#', ',') : '';
         if (startValues) {
           activitiData.variables.updateTree = await ctx.service.workflow.setUpdateType(parentData, startValues, deploymentId);
@@ -94,17 +96,17 @@ module.exports = app => {
         userIds && userIds.length > 0 ? activitiData.variables.manager_user_id = userIds : undefined;
       }
       // 启动流程
-      const datas = await ctx.service.syncActiviti.startProcess(activitiData, { headers: ctx.headers });
-      // if (formKey === 'moveIn'
-      //   && parentData && parentData.text && parentData.text.value === 'send') {
-      //   ctx.service.syncActiviti.sendTaskEmail(
-      //     { taskId: datas.data }, { headers: ctx.headers });
-      // }
+      const { pid, message, error } = await ctx.service.syncActiviti.startProcess(activitiData, { headers: ctx.headers });
+      if (error) {
+        ctx.error(message);
+        return;
+      }
+
       // 保存 pid 同时更新子表 parentId
-      const parentUpdateSQL = `UPDATE ${formKey}${version} SET pid = ${datas.data} where id = ${parentId}`;
+      const parentUpdateSQL = `UPDATE ${formKey}${version} SET pid = ${pid} where id = ${parentId}`;
       const updateSQL = [ parentUpdateSQL ];
       if (childInsertSQLList.length) {
-        const childUpdateSQL = `UPDATE ${childFormKey}${version} SET pid = ${datas.data} where parentId = ${parentId}`;
+        const childUpdateSQL = `UPDATE ${childFormKey}${version} SET pid = ${pid} where parentId = ${parentId}`;
         updateSQL.push(childUpdateSQL);
       }
       const updateFormRes = await ctx.service.sql.transaction(updateSQL);
@@ -125,13 +127,9 @@ module.exports = app => {
       const dynamicForm = await ctx.model.models.dynamicForm.findOne({ where: { deploymentId, parentId: null } });
       const childForm = await ctx.model.models.dynamicForm.findOne({ where: { parentId: dynamicForm.id } });
       const detail = await ctx.service.diyForm.getDIYFormDetail(pid, dynamicForm.formKey, childForm ? childForm.formKey : null, dynamicForm.version);
-      // if (!detail) {
-      //   ctx.error();
-      //   return;
-      // }
       ctx.success(detail);
     }
-    //
+
     async update() {
       const { ctx } = this;
       const {
@@ -171,14 +169,6 @@ module.exports = app => {
         ctx.success();
       }
     }
-    //
-    // async delete() {
-    //
-    // }
-    //
-    // async deleteMayn() {
-    //
-    // }
   };
 };
 

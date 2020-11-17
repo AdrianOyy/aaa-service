@@ -46,8 +46,17 @@ module.exports = app => {
       const { ctx } = this;
       const url = app.config.activiti.url + '/process/startProcess';
       options.data = data;
-      const result = await this.curl(url, options, ctx);
-      return result.data;
+      let res;
+      try {
+        res = await this.curl(url, options, ctx);
+      } catch (e) {
+        throw new Error(e.message);
+      }
+      const { pid, error } = res.data.data;
+      return {
+        pid,
+        error,
+      };
     }
 
     async sendTaskEmail(data, options) {

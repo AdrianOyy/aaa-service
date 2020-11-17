@@ -18,7 +18,10 @@ module.exports = app => {
     async getUsersByEmails() {
       const { ctx } = this;
       const { emails } = ctx.request.body;
-      if (!emails) ctx.error();
+      if (!emails) {
+        ctx.error();
+        return;
+      }
       try {
         const result = await ctx.service.syncActiviti.getUsersByEmails({ emails }, { headers: ctx.headers });
         ctx.success(result.data);

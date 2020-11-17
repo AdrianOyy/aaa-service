@@ -114,6 +114,12 @@ function getUpdateSQL(formKey, version, data, where) {
   let fieldValue = '';
   for (const key in data) {
     if (key !== 'id' && key !== 'checkState') {
+      if ((key === 'createdAt' || key === 'updatedAt') && data[key].value) {
+        const [ date, time ] = data[key].value.split('T');
+        const [ f ] = time.split('.');
+        fieldValue += !data[key] || !data[key].value ? ` ${key} = null,` : data[key].value !== '' ? ` ${key} = '${date} ${f}',` : ` ${key} = null,`;
+        continue;
+      }
       fieldValue += !data[key] || !data[key].value ? ` ${key} = null,` : data[key].value !== '' ? ` ${key} = '${data[key].value}',` : ` ${key} = null,`;
     }
   }

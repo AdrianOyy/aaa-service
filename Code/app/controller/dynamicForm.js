@@ -2,85 +2,17 @@
 
 module.exports = app => {
   return class extends app.Controller {
-    // async create() {
-    //   const { ctx } = this;
-    //   const { formKey, deploymentId, list, workflowName } = ctx.request.body;
-    //   const basicFormFieldList = [];
-    //   const childTableList = [];
-    //   JSON.parse(list)
-    //     .forEach(el => {
-    //       if (el.type === 'enum') {
-    //         childTableList.push(el);
-    //       } else {
-    //         basicFormFieldList.push(el);
-    //       }
-    //     });
-    //
-    //   // 记录表
-    //   // 父表
-    //   const basicDynamicForm = await ctx.model.models.dynamicForm.create({
-    //     deploymentId,
-    //     formKey,
-    //     workflowName,
-    //     createdAt: new Date(),
-    //     updatedAt: new Date(),
-    //   });
-    //   // 子表
-    //   const childFormData = [];
-    //   childTableList.forEach(el => {
-    //     const model = {
-    //       parentId: basicDynamicForm.id,
-    //       formKey: el.id,
-    //       workflowName,
-    //       createdAt: new Date(),
-    //       updatedAt: new Date(),
-    //     };
-    //     childFormData.push(model);
-    //   });
-    //   const childDynamicFormList = await ctx.model.models.dynamicForm.bulkCreate(childFormData);
-    //
-    //   // 渲染表
-    //   const basicDynamicFormDetailData = await ctx.service.dynamicForm.getBasicDynamicFormDetailData(basicDynamicForm.id, basicFormFieldList);
-    //   const childDynamicFormDetailData = await ctx.service.dynamicForm.getChildDynamicFormDetailData(childTableList, childDynamicFormList);
-    //   await ctx.model.models.dynamicFormDetail.bulkCreate([ ...basicDynamicFormDetailData, ...childDynamicFormDetailData ]);
-    //
-    //   // 创建数据表
-    //   const createBasicFormSQL = await ctx.service.dynamicForm.getBasicSQL(formKey, basicFormFieldList);
-    //   const createChildTableSQLList = await ctx.service.dynamicForm.getChildTableSQLList(formKey, childTableList);
-    //   const SQLList = [ createBasicFormSQL, ...createChildTableSQLList ];
-    //   try {
-    //     for (let i = 0; i < SQLList.length; i++) {
-    //       await app.model.query(SQLList[i]);
-    //     }
-    //     ctx.success();
-    //   } catch (error) {
-    //     ctx.error(error);
-    //   }
-    //   ctx.success();
-    // }
-
     async create() {
       const { ctx } = this;
       const { version, modelId, deploymentId } = ctx.request.body;
-      // const version = 12;
-      // const modelId = 297501;
-      // const deploymentId = 12342;
       const dynamicFormVersion = await ctx.service.workflow.getVersion(modelId);
       const dynamicForm = await ctx.service.workflow.setPubilshDynamicForm(dynamicFormVersion, version, deploymentId);
       // 获取最新 dynamicForm
-      // 修改version
-      // dynamicForm.deploymentId = deploymentId;
-      // dynamicForm.version = version;
-      // dynamicForm.save();
       const childDynamicForm = await ctx.model.models.dynamicForm.findOne({ where: { parentId: dynamicForm.id } });
-      // const dynamicForm = await ctx.model.models.dynamicForm.findOne({ where: { modelId: 297501 } });
       const basicFormFieldList = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: dynamicForm.id } });
       const createBasicFormSQL = await ctx.service.dynamicForm.getBasicNewSQL(dynamicForm.formKey, basicFormFieldList, version);
       const SQLList = [ createBasicFormSQL ];
-      // const childDynamicForm = await ctx.model.models.dynamicForm.findOne({ where: { parentId: dynamicForm.id } });
       if (childDynamicForm) {
-        // childDynamicForm.version = version;
-        // childDynamicForm.save();
         const childTableList = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: childDynamicForm.id } });
         const createChildTableSQLList = await ctx.service.dynamicForm.getChildTableSQLChild(dynamicForm.formKey, childDynamicForm.formKey, childTableList, version);
         SQLList.push(createChildTableSQLList);
@@ -89,83 +21,12 @@ module.exports = app => {
         for (let i = 0; i < SQLList.length; i++) {
           await app.model.query(SQLList[i]);
         }
-        // 强删除 version 为 -1 信息
-        // await ctx.model.models.dynamicForm.destroy({ where: { version: -1, modelId }, force: true });
         ctx.success();
       } catch (error) {
         ctx.error(error);
       }
       ctx.success();
     }
-
-
-    // async getDynamicForm() {
-    //   const { ctx } = this;
-    //   const { deploymentId, userId } = ctx.request.query;
-    //   const dynamicForm = await ctx.model.models.dynamicForm.findOne({ where: { deploymentId } });
-    //   if (!dynamicForm) ctx.error();
-    //   const dynamicFormDetail = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: dynamicForm.id } });
-    //   const detailList = [];
-    //   for (const formDetail of dynamicFormDetail) {
-    //     const form = {};
-    //     form.id = formDetail.fieldName;
-    //     form.label = formDetail.fieldName;
-    //     form.fileType = formDetail.fileType;
-    //     form.type = formDetail.inputType;
-    //     form.showOnRequest = formDetail.showOnRequest;
-    //     form.foreignTable = formDetail.foreignTable;
-    //     form.foreignDisplayKey = formDetail.foreignDisplayKey;
-    //     form.foreignKey = formDetail.foreignKey;
-    //     form.labelField = formDetail.foreignDisplayKey;
-    //     form.valueField = formDetail.foreignKey;
-    //     form.readOnly = !formDetail.writable;
-    //     form.disabled = true;
-    //     form.value = '';
-    //     if (formDetail.inputType === 'select') {
-    //       if (formDetail.foreignTable === 'tenant') {
-    //         const itemList = await ctx.service.user.getTenants(userId);
-    //         form.itemList = itemList;
-    //       } else {
-    //         const itemList = await ctx.model.models[formDetail.foreignTable].findAll({});
-    //         form.itemList = itemList;
-    //       }
-    //     }
-    //     detailList.push(form);
-    //   }
-    //   // 获取子流程
-    //   const sonFormList = [];
-    //   const sonDetailList = [];
-    //   const sonForm = await ctx.model.models.dynamicForm.findOne({ where: { parentId: dynamicForm.id } });
-    //   if (sonForm) {
-    //     const sonFormDetail = await ctx.model.models.dynamicFormDetail.findAll({ where: { dynamicFormId: sonForm.id, readable: true } });
-    //     for (const sonDetail of sonFormDetail) {
-    //       const form = {};
-    //       form.id = sonDetail.fieldName;
-    //       form.label = sonDetail.fieldName;
-    //       form.fileType = sonDetail.fileType;
-    //       form.type = sonDetail.inputType === 'long' ? 'number' : sonDetail.inputType;
-    //       form.showOnRequest = sonDetail.showOnRequest;
-    //       form.foreignTable = sonDetail.foreignTable;
-    //       form.foreignDisplayKey = sonDetail.foreignDisplayKey;
-    //       form.foreignKey = sonDetail.foreignKey;
-    //       form.labelField = sonDetail.foreignDisplayKey;
-    //       form.valueField = sonDetail.foreignKey;
-    //       form.readOnly = false;
-    //       form.value = '';
-    //       if (sonDetail.inputType === 'select') {
-    //         if (sonDetail.foreignTable === 'tenant') {
-    //           const itemList = await ctx.service.user.getTenants(userId);
-    //           form.itemList = itemList;
-    //         } else {
-    //           const itemList = await ctx.model.models[sonDetail.foreignTable].findAll({});
-    //           form.itemList = itemList;
-    //         }
-    //       }
-    //       sonFormList.push(form);
-    //     }
-    //   }
-    //   ctx.success({ dynamicForm, detailList, sonForm, sonFormList, sonDetailList });
-    // }
 
     async getDynamicFormDetail() {
       const { ctx } = this;
@@ -355,11 +216,5 @@ module.exports = app => {
       }
     }
 
-    // async getDynamicForm() {
-    //   const { ctx } = this;
-    //   const { deploymentId } = ctx.query;
-    //   const dynamicForm = await ctx.service.dynamicForm.getDynamicForm({ deploymentId });
-    //   ctx.success(dynamicForm ? dynamicForm : undefined);
-    // }
   };
 };

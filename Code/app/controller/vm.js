@@ -253,21 +253,28 @@ module.exports = app => {
 
     async check() {
       const { ctx } = this;
-      const { formKey, formId, version, childDataList } = ctx.request.body;
+      const { formKey, parentData, version, childData } = ctx.request.body;
+      if (!formKey || !parentData || !version || !childData) {
+        ctx.error();
+        return;
+      }
+      let formId = 0;
+      if (parentData) {
+        formId = parentData.id.value;
+      }
       const fileList = [];
       const dynamicForm = await ctx.service.dynamicForm.getDetailByKey(formKey, version, formId);
       const { tenant } = dynamicForm;
       const tenantId = tenant.id;
       const tenantName = tenant.name;
-      const applicationType = childDataList.application_type.value;
-      const hostname = childDataList.hostname.value;
-      const environment_type = childDataList.environment_type.value;
-      const network_zone = childDataList.network_zone.value;
-      const data_storage_request_number = childDataList.data_storage_request_number.value;
-
+      const applicationType = childData.application_type.value;
+      const hostname = childData.hostname.value;
+      const environment_type = childData.environment_type.value;
+      const network_zone = childData.network_zone.value;
+      const data_storage_request_number = childData.data_storage_request_number.value;
       // TODO 1. 根据新的 application type 计算新的 hostname 列表
       const hostname_prefix = await ctx.service.hostname.getPrefixByTypeZone(environment_type, network_zone);
-      const applicationTypelabel = childDataList.application_type.label;
+      const applicationTypelabel = childData.application_type.label;
       const typeCount = {
         applicationType: applicationTypelabel,
         hostname_prefix,
@@ -287,7 +294,7 @@ module.exports = app => {
       if (list && hostname) {
         if (list.indexOf(hostname) === -1) {
           appResult.error = true;
-          appResult.message = `Tenant \`${tenantName}\` with Application type  hostname is not find in hostnameList`;
+          appResult.message = `Tenant \`${tenantName}\` with Application type  hostname is not found in hostnameList`;
         }
       }
       fileList.push(appResult);
@@ -302,7 +309,7 @@ module.exports = app => {
         const hostResult = {
           fieldName: 'hostname',
           error: true,
-          message: 'hostname is user',
+          message: 'hostname is used',
         };
         fileList.push(hostResult);
       }
@@ -314,8 +321,8 @@ module.exports = app => {
       }
       fileList.push(dcResult);
       // T0D0 2.1 验证新ip是否在
-      const os_ip = childDataList.os_ip.value;
-      const atl_ip = childDataList.atl_ip.value;
+      const os_ip = childData.os_ip.value;
+      const atl_ip = childData.atl_ip.value;
       const opResult = await ctx.service.ipAssign.checkAssign(dc, os_ip, 'Cat C - OS');
       const atlResult = await ctx.service.ipAssign.checkAssign(dc, atl_ip, 'Cat F - ATL');
       if (opResult) {
@@ -350,17 +357,16 @@ module.exports = app => {
           message: 'atl_ip is not found ip assign',
         });
       }
-
       // TODO 3. 确定新的 vm type
       const type = await ctx.service.defineVMType.defineVMType(network_zone, environment_type, data_storage_request_number);
       // TODO 4. 根据 data center 验证 vm cluster 和 vm master 的正确性
       const clusterList = await ctx.service.cluster.checkClusterList(dc, applicationType);
-      const vm_cluster = childDataList.vm_cluster.value;
+      const vm_cluster = childData.vm_cluster.value;
       const cluster = clusterList.indexOf(vm_cluster);
       if (cluster > -1) {
-        const vm_master = childDataList.vm_master.value;
-        const ram_request_number = childDataList.ram_request_number.value;
-        const cpu_request_number = childDataList.cpu_request_number.value;
+        const vm_master = childData.vm_master.value;
+        const ram_request_number = childData.ram_request_number.value;
+        const cpu_request_number = childData.cpu_request_number.value;
         const vmResult = await ctx.service.cluster.getCheck(vm_cluster, vm_master, data_storage_request_number, ram_request_number, cpu_request_number, type);
         fileList.push(vmResult);
       } else {
