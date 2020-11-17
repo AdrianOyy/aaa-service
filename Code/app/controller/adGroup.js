@@ -102,11 +102,19 @@ module.exports = app => {
       const { idList } = ctx.request.body;
       if (!idList || !idList.length) ctx.error();
       try {
-        await ctx.model.models.ad_group.destroy({
-          where: {
-            id: { [Op.in]: idList },
-          },
+        await ctx.model.transaction(async t => {
+          await ctx.model.models.ad_group.destroy({
+            where: {
+              id: { [Op.in]: idList },
+            },
+          }, { transaction: t });
+          await ctx.model.models.tenant_group_mapping.destroy({
+            where: {
+              ad_groupId: { [Op.in]: idList },
+            },
+          }, { transaction: t });
         });
+
         ctx.service.syncActiviti.deleteGroup(idList.join(','), ctx.headers);
         ctx.success();
       } catch (error) {
