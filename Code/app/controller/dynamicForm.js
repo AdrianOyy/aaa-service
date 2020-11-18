@@ -21,6 +21,9 @@ module.exports = app => {
         for (let i = 0; i < SQLList.length; i++) {
           await app.model.query(SQLList[i]);
         }
+
+        // 强删除 version 为 -1 信息
+        await ctx.model.models.dynamicForm.destroy({ where: { version: -1, modelId }, force: true });
         ctx.success();
       } catch (error) {
         ctx.error(error);

@@ -96,12 +96,14 @@ module.exports = app => {
       const { ctx } = this;
       // 获取当前是否有测试版本
       let dynamicModle = null;
-      const dynamicFormAll = await ctx.model.models.dynamicForm.findAll({ where: { modelId, version: -1, parentId: null }, order: [[ 'childVersion', 'DESC' ]] });
+      let dynamicFormAll = await ctx.model.models.dynamicForm.findAll({ where: { modelId, version: -1, parentId: null }, order: [[ 'childVersion', 'DESC' ]] });
+      // eslint-disable-next-line no-const-assign
+      dynamicFormAll = dynamicFormAll.sort((a, b) => { return parseInt(b.childVersion) - parseInt(a.childVersion); });
       if (dynamicFormAll.length > 0) {
-        // eslint-disable-next-line no-unused-vars
         dynamicModle = dynamicFormAll[0];
       } else {
-        const dynamicFormModelAll = await ctx.model.models.dynamicForm.findAll({ where: { modelId, parentId: null }, order: [[ 'version', 'DESC' ], [ 'childVersion', 'DESC' ]] });
+        let dynamicFormModelAll = await ctx.model.models.dynamicForm.findAll({ where: { modelId, parentId: null }, order: [[ 'version', 'DESC' ], [ 'childVersion', 'DESC' ]] });
+        dynamicFormModelAll = dynamicFormModelAll.sort((a, b) => { return parseInt(b.version) - parseInt(a.version); });
         if (dynamicFormModelAll.length > 0) {
           dynamicModle = dynamicFormModelAll[0];
         }
