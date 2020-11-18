@@ -80,6 +80,7 @@ module.exports = app => {
         const where = {
           name: { [Op.in]: data },
           manage_group_id: { [Op.in]: app.Sequelize.literal(`(select groupId from user_group_mapping where userId = ${ctx.authUser.id} and deletedAt is null)`) },
+          approval_group_id: { [Op.in]: app.Sequelize.literal('(select id from ad_group where deletedAt is null)') },
         };
         const clGroup = await ctx.model.models.clinical_group.findAll({ where });
         for (const cli of clGroup) {

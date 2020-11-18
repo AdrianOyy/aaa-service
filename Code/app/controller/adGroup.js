@@ -113,6 +113,11 @@ module.exports = app => {
               ad_groupId: { [Op.in]: idList },
             },
           }, { transaction: t });
+          await ctx.model.models.user_group_mapping.destroy({
+            where: {
+              groupId: { [Op.in]: idList },
+            },
+          }, { transaction: t });
         });
 
         ctx.service.syncActiviti.deleteGroup(idList.join(','), ctx.headers);
