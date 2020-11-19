@@ -1,5 +1,4 @@
 'use strict';
-const dayjs = require('dayjs');
 
 module.exports = app => {
   return class extends app.Controller {
@@ -237,20 +236,20 @@ module.exports = app => {
       const { ctx } = this;
       const { Op } = app.Sequelize;
       const { serialNumber, createdAt, updatedAt } = ctx.request.body;
+
       const vmList = await ctx.model.models.vm_guest.findAll({
         where: Object.assign({},
-          serialNumber ? { serialNumber: { [Op.like]: `%${serialNumber}%` } } : undefined, {
-            createdAt: {
-              [Op.and]: [
-                { [Op.gt]: new Date(createdAt[0] ? createdAt[0] : 0) },
-                { [Op.lte]: createdAt[1] ? new Date(createdAt[1]) : new Date(new Date() - (-8.64e7)) }],
-            },
-            updatedAt: {
-              [Op.and]: [
-                { [Op.gt]: new Date(updatedAt[0] ? updatedAt[0] : 0) },
-                { [Op.lte]: updatedAt[1] ? new Date(updatedAt[1]) : new Date(new Date() - (-8.64e7)) }],
-            },
-          }),
+          serialNumber ? { serialNumber: { [Op.like]: `%${serialNumber}%` } } : undefined,
+          !createdAt || (!createdAt[0] && !createdAt[1]) ? undefined : { createdAt: {
+            [Op.and]: [
+              { [Op.gte]: new Date(createdAt[0] ? createdAt[0] : 0) },
+              { [Op.lt]: createdAt[1] ? new Date(new Date(createdAt[1]) - (-8.64e7)) : new Date(new Date() - (-8.64e7)) }],
+          } },
+          !updatedAt || (!updatedAt[0] && !updatedAt[1]) ? undefined : { updatedAt: {
+            [Op.and]: [
+              { [Op.gte]: new Date(updatedAt[0] ? updatedAt[0] : 0) },
+              { [Op.lt]: updatedAt[1] ? new Date(new Date(updatedAt[1]) - (-8.64e7)) : new Date(new Date() - (-8.64e7)) }],
+          } }),
         include: {
           model: ctx.model.models.vm_cluster_dc_mapping,
           as: 'vm_cluster_dc_mapping',

@@ -134,13 +134,12 @@ module.exports = app => {
     async update() {
       const { ctx } = this;
       const { id } = ctx.query;
-      const { assignId, roleId } = ctx.request.body;
-      if (!id || assignId || roleId) ctx.error();
+      const { expiryDate } = ctx.request.body;
+      if (!id || !expiryDate) ctx.error();
       const oldModel = await ctx.model.models.expiry.findByPk(id);
       if (!oldModel) ctx.error();
       const newModel = {
-        assignId,
-        roleId,
+        expiryDate,
         updatedAt: new Date(),
       };
       try {
