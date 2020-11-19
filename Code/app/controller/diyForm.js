@@ -48,15 +48,17 @@ module.exports = app => {
       });
       childIdListString = childIdListString.substring(0, childIdListString.length - 1);
       if (childInsertSQLList.length) {
-        const SQL = `UPDATE ${childFormKey}${version} SET parentId = ${parentId} where id IN (${childIdListString})`;
+        const SQL = `UPDATE ${childFormKey}${version} SET parentId = ${parentId} where id IN (${childIdListString}, 0)`;
         const updateRes = await ctx.service.sql.transaction([ SQL ]);
-
         if (!updateRes.success) {
           ctx.error();
           return;
         }
 
       }
+      console.log('111=========================111');
+      console.log(111);
+      console.log('111=========================111');
 
       const tenant = await ctx.model.models.tenant.findByPk(parentData && parentData.tenant ? parentData.tenant.value : 0);
       // todo 暂时使用1
