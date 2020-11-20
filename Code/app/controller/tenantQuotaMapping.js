@@ -197,6 +197,15 @@ module.exports = app => {
       }
       if (!isInt(number)) {
         ctx.error('Bad params "Number"');
+        return;
+      }
+      if (!isInt(year)) {
+        ctx.error('Bad params "Year"');
+        return;
+      }
+      if (!isInt(tenantId)) {
+        ctx.error('Bad Params "Tenant Id"');
+        return;
       }
       const transaction = await this.ctx.model.transaction();
       try {
