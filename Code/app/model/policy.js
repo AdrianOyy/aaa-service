@@ -5,7 +5,7 @@ module.exports = app => {
 
   const policy = app.model.define('policy', {
     id: { type: INTEGER, autoIncrement: true, primaryKey: true },
-    _ID: { type: INTEGER, unique: true },
+    _ID: { type: INTEGER },
     InventoryID: { type: INTEGER },
     IPAddress: { type: STRING },
     DefGateway: { type: STRING },
