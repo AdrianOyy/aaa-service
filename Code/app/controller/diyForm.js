@@ -38,7 +38,7 @@ module.exports = app => {
         ctx.error();
         return;
       }
-      // 构造activiti 需要癨数据结构并调用接口发起流程
+      // 构造 activiti 需要癨数据结构并调用接口发起流程
       const parentId = res.idList[0];
       const childIdList = res.idList.slice(1);
 

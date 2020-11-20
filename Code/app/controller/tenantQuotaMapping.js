@@ -1,5 +1,5 @@
 'use strict';
-
+const { isInt } = require('../utils/regexp');
 
 module.exports = app => {
   return class extends app.Controller {
@@ -186,6 +186,37 @@ module.exports = app => {
         });
       }
       ctx.success({ pass: res });
+    }
+
+    async quotaDeduction() {
+      const { ctx } = this;
+      const { type, number, year, tenantId } = ctx.request.body;
+      if (!type || !number || !year || !tenantId) {
+        ctx.error();
+        return;
+      }
+      if (!isInt(number)) {
+        ctx.error('Bad params "Number"');
+      }
+      const transaction = await this.ctx.model.transaction();
+      try {
+        const oldModel = await ctx.model.models.tenant_quota_mapping.findOne({
+          where: {
+            type,
+            year,
+            tenantId,
+          },
+        });
+        if (!oldModel) throw new Error('Can not find data');
+        const { quota } = oldModel;
+        if (!quota || parseInt(quota) < parseInt(number)) throw new Error('request number is greater than quota');
+        await oldModel.update({ quota: quota - number }, { transaction });
+      } catch (error) {
+        await transaction.rollback();
+        ctx.error(error.message);
+      }
+
+
     }
   };
 };
