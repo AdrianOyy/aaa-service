@@ -6,6 +6,8 @@ module.exports = app => {
       const { ctx } = this;
       const { Op } = app.Sequelize;
       const { IP, DCId, hostname, projectTeam } = ctx.query;
+      const limit = parseInt(ctx.query.limit) || 10;
+      const offset = (parseInt(ctx.query.page || 1) - 1) * limit;
       const IPList = await ctx.model.models.ip_assignment.findAndCountAll({
         where: Object.assign(
           {},
@@ -14,6 +16,8 @@ module.exports = app => {
           hostname ? { hostname: { [Op.like]: `%${hostname}%` } } : undefined,
           projectTeam ? { projectTeam: { [Op.like]: `%${projectTeam}%` } } : undefined
         ),
+        offset,
+        limit,
         include: {
           model: ctx.model.models.vm_cdc,
           as: 'DC',
