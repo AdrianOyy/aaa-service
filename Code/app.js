@@ -39,5 +39,8 @@ module.exports = app => {
     if (!await model.equipType.findOne()) {
       await sequelizeFixtures.loadFile(fixturesPath + 'equipType.js', model);
     }
+    if (!await model.vm_cdc.findOne()) {
+      await sequelizeFixtures.loadFile(fixturesPath + 'vm_cdc.js', model);
+    }
   });
 };

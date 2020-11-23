@@ -7,7 +7,7 @@ module.exports = app => {
     id: { type: INTEGER, autoIncrement: true, primaryKey: true, cnName: 'ID' },
     name: { type: STRING(256), allowNull: false, cnName: 'name', comment: 'name' },
   }, {
-    timestamps: false,
+    paranoid: true,
     tableName: 'vm_cdc',
     tableCnName: 'CDC (Data Centre)',
   });

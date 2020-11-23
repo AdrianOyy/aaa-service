@@ -56,16 +56,10 @@ module.exports = app => {
         }
 
       }
-      console.log('111=========================111');
-      console.log(111);
-      console.log('111=========================111');
 
       const tenant = await ctx.model.models.tenant.findByPk(parentData && parentData.tenant ? parentData.tenant.value : 0);
       // todo 暂时使用1
       let manager_group_id = 1;
-      console.log('222=========================222');
-      console.log(222);
-      console.log('222=========================222');
       if (tenant) {
         manager_group_id = tenant.manager_group_id;
       }

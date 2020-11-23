@@ -323,7 +323,7 @@ module.exports = app => {
           // foreignList = await ctx.service.tenant.getUserTenantList(ctx.authUser.id);
           break;
         default:
-          foreignList = (await app.model.query(`SELECT * FROM \`${tableName}\``))[0];
+          foreignList = (await app.model.query(`SELECT * FROM \`${tableName}\` WHERE deletedAt IS NULL`))[0];
       }
       return foreignList;
     }

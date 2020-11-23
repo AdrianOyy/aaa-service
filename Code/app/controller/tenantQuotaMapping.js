@@ -86,9 +86,6 @@ module.exports = app => {
     async create() {
       const { ctx } = this;
       const { tenantId, type, quota, year } = ctx.request.body;
-      console.log('ctx.request.body=========================ctx.request.body');
-      console.log(ctx.request.body);
-      console.log('ctx.request.body=========================ctx.request.body');
       if (!tenantId || !type || !quota || !year) {
         ctx.error();
         return;
