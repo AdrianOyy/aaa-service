@@ -64,18 +64,22 @@ module.exports = app => {
         Reason, CaseRef,
       } = ctx.request.body;
       if (!_ID) ctx.error();
-      const inventoryLifeCycle = Object.assign(
-        {
-          _ID, AssetID, ActionType, ActionDetails,
-          SuccessorInventoryID, RespStaff, RespStaffDisplayName,
-          Reason, CaseRef,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        InventoryID ? { InventoryID } : undefined,
-        RecordCreatedOn ? { RecordCreatedOn } : undefined,
-        ActionDate ? { ActionDate } : undefined
-      );
+      const inventoryLifeCycle = {
+        _ID,
+        InventoryID: InventoryID ? InventoryID : null,
+        RecordCreatedOn: RecordCreatedOn ? RecordCreatedOn : null,
+        ActionDate: ActionDate ? ActionDate : null,
+        AssetID,
+        ActionType,
+        ActionDetails,
+        SuccessorInventoryID,
+        RespStaff,
+        RespStaffDisplayName,
+        Reason,
+        CaseRef,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
       try {
         await ctx.model.models.inventoryLifeCycle.create(inventoryLifeCycle);
         ctx.success();
@@ -96,19 +100,22 @@ module.exports = app => {
       if (!_ID) ctx.error();
       const oldModel = await ctx.model.models.inventoryLifeCycle.findByPk(id);
       if (!oldModel) ctx.error();
-      const newModel = Object.assign(
-        {
-          _ID, AssetID, ActionType, ActionDetails,
-          SuccessorInventoryID, RespStaff, RespStaffDisplayName,
-          Reason, CaseRef,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        InventoryID ? { InventoryID } : undefined,
-        AssetID ? { AssetID } : undefined,
-        RecordCreatedOn ? { RecordCreatedOn } : undefined,
-        ActionDate ? { ActionDate } : undefined
-      );
+      const newModel = {
+        _ID,
+        InventoryID: InventoryID ? InventoryID : null,
+        RecordCreatedOn: RecordCreatedOn ? RecordCreatedOn : null,
+        ActionDate: ActionDate ? ActionDate : null,
+        AssetID,
+        ActionType,
+        ActionDetails,
+        SuccessorInventoryID,
+        RespStaff,
+        RespStaffDisplayName,
+        Reason,
+        CaseRef,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
       try {
         await oldModel.update(newModel);
         ctx.success();
