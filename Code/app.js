@@ -15,6 +15,8 @@ module.exports = app => {
       'tenant_hostname_reference', 'ip_assignment', 'inventoryStatus', 'equipType',
       'inventory', 'policy', 'equipmentPort', 'portAssignment', 'power', 'powerInput',
       'powerOutput', 'inventoryLifeCycle', 'clinical_group',
+      'account_type', 'apply_for', 'authentication_method', 'clinical_applications',
+      'is_same', 'owa_webmail', 'yes_no', 'staff_type', 'non_clinical_applications',
     ];
     console.log('=============================================');
     console.log('Start syncing model');
