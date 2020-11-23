@@ -5,9 +5,13 @@ module.exports = app => {
     async list() {
       const { ctx } = this;
       const { Op } = app.Sequelize;
-      const { IP, DCId, hostname, projectTeam } = ctx.query;
+      const { IP, DCId, hostname, projectTeam, prop, order } = ctx.query;
       const limit = parseInt(ctx.query.limit) || 10;
       const offset = (parseInt(ctx.query.page || 1) - 1) * limit;
+      let Order = [[ 'createdAt', 'desc' ]];
+      if (order && prop) {
+        Order = [[ prop, order ]];
+      }
       const IPList = await ctx.model.models.ip_assignment.findAndCountAll({
         where: Object.assign(
           {},
@@ -18,6 +22,7 @@ module.exports = app => {
         ),
         offset,
         limit,
+        order: Order,
         include: {
           model: ctx.model.models.vm_cdc,
           as: 'DC',

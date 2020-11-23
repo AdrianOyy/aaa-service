@@ -101,31 +101,29 @@ module.exports = app => {
         DOB, DeliveryDate, DeliveryNoteReceivedDate, MaintID, EquipType,
       } = ctx.request.body;
       if (!_ID || !EquipType) ctx.error();
-      const inventory = Object.assign(
-        {
-          _ID,
-          EquipType,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        ModelCode ? { ModelCode } : undefined,
-        ModelDesc ? { ModelDesc } : undefined,
-        Rack ? { Rack } : undefined,
-        RLU ? { RLU } : undefined,
-        ItemOwner ? { ItemOwner } : undefined,
-        Remark ? { Remark } : undefined,
-        UnitNo ? { UnitNo } : undefined,
-        ReqNo ? { ReqNo } : undefined,
-        MaintID ? { MaintID } : undefined,
-        UnitCode ? { UnitCode } : undefined,
-        AssetID ? { AssetID } : undefined,
-        ClosetID ? { ClosetID } : undefined,
-        Status ? { Status } : undefined,
-        DOB ? { DOB } : undefined,
-        PortQty ? { PortQty } : undefined,
-        DeliveryDate ? { DeliveryDate } : undefined,
-        DeliveryNoteReceivedDate ? { DeliveryNoteReceivedDate } : undefined
-      );
+      const inventory = {
+        _ID,
+        EquipType,
+        AssetID: AssetID ? AssetID : null,
+        ClosetID: ClosetID ? ClosetID : null,
+        DeliveryDate: DeliveryDate ? DeliveryDate : null,
+        Status: Status ? Status : null,
+        PortQty: PortQty ? PortQty : null,
+        DeliveryNoteReceivedDate: DeliveryNoteReceivedDate ? DeliveryNoteReceivedDate : null,
+        ModelCode,
+        ModelDesc,
+        Rack,
+        RLU,
+        ItemOwner,
+        Remark,
+        UnitNo,
+        ReqNo,
+        MaintID,
+        UnitCode,
+        DOB: DOB ? DOB : null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
       try {
         await ctx.model.models.inventory.create(inventory);
         ctx.success();
@@ -146,31 +144,29 @@ module.exports = app => {
       if (!_ID) ctx.error();
       const oldModel = await ctx.model.models.inventory.findByPk(id);
       if (!oldModel) ctx.error();
-      const newModel = Object.assign(
-        {
-          _ID,
-          EquipType,
-          ModelCode,
-          ModelDesc,
-          Rack,
-          RLU,
-          ItemOwner,
-          Remark,
-          UnitNo,
-          ReqNo,
-          MaintID,
-          UnitCode,
-          DOB,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        AssetID ? { AssetID } : undefined,
-        ClosetID ? { ClosetID } : undefined,
-        PortQty ? { PortQty } : undefined,
-        Status ? { Status } : undefined,
-        DeliveryDate ? { DeliveryDate } : undefined,
-        DeliveryNoteReceivedDate ? { DeliveryNoteReceivedDate } : undefined
-      );
+      const newModel = {
+        _ID,
+        EquipType,
+        AssetID: AssetID ? AssetID : null,
+        ClosetID: ClosetID ? ClosetID : null,
+        DeliveryDate: DeliveryDate ? DeliveryDate : null,
+        Status: Status ? Status : null,
+        PortQty: PortQty ? PortQty : null,
+        DeliveryNoteReceivedDate: DeliveryNoteReceivedDate ? DeliveryNoteReceivedDate : null,
+        ModelCode,
+        ModelDesc,
+        Rack,
+        RLU,
+        ItemOwner,
+        Remark,
+        UnitNo,
+        ReqNo,
+        MaintID,
+        UnitCode,
+        DOB: DOB ? DOB : null,
+        updatedAt: new Date(),
+      };
+      console.log(newModel);
       try {
         await oldModel.update(newModel);
         ctx.success();
