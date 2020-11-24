@@ -167,85 +167,92 @@ module.exports = app => {
       let pass = true;
       let message = '';
       const { formKey, formId, version } = ctx.request.body;
-      const dynamicForm = await ctx.service.dynamicForm.getDetailByKey(formKey, version, formId);
-      const { childFormKey, childTable, tenant } = dynamicForm;
-      const tenantId = tenant.id;
-      const tenantName = tenant.name;
-      // generate hostname
-      for (let i = 0; i < childTable.length; i++) {
-        const prefix = await ctx.service.hostname.getPrefix(childTable[i]);
-        childTable[i].hostnamePrefix = prefix;
-      }
-      const typeCountList = await ctx.service.hostname.countByType(childTable);
-      const hostnameMap = new Map();
-      for (let i = 0; i < typeCountList.length; i++) {
-        const list = await ctx.service.hostname.generateHostname(tenantId, typeCountList[i]);
-        if (!list) {
-          pass = false;
-          message += `Tenant \`${tenantName}\` with Application type \`${typeCountList[i].applicationType}\` hostname is not enough\n`;
-        }
-        hostnameMap.set(typeCountList[i].applicationType, new Map().set(typeCountList[i].hostname_prefix, list));
-      }
-      // TODO assign IP (delay function, verify IP  in this tern)
-      const CIPMap = new Map();
-      const FIPMap = new Map();
-      const DCCountList = await ctx.service.ipAssign.countByDC(childTable);
-      for (let i = 0; i < DCCountList.length; i++) {
-        const list = await ctx.service.ipAssign.assign(DCCountList[i].dataCenter, DCCountList[i].requestNum);
-        if (!list) {
-          pass = false;
-          message += 'IP is not enough\n';
-        } else {
-          const [ CList, FList ] = list;
-          CIPMap.set(DCCountList[i].dataCenter, CList);
-          FIPMap.set(DCCountList[i].dataCenter, FList);
-        }
-      }
-
-      for (let i = 0; i < childTable.length; i++) {
-        const el = childTable[i];
-        if (el.application_type && el.application_type.name && pass) {
-          const list = hostnameMap.get(el.application_type.name).get(el.hostnamePrefix);
-          el.hostname = list[0];
-          hostnameMap.get(el.application_type.name).set(el.hostnamePrefix, list.slice(1));
-        }
-        if (el.data_center && el.data_center.id && pass) {
-          const CList = CIPMap.get(el.data_center.id);
-          const FList = FIPMap.get(el.data_center.id);
-          el.os_ip = CList[0].IP;
-          el.atl_ip = FList[0].IP;
-          CIPMap.set(el.data_center.id, CList.slice(1));
-          FIPMap.set(el.data_center.id, FList.slice(1));
-        }
-        // define VM's type
-
-        const type = await ctx.service.defineVMType.defineVMType(el.network_zone.id, el.environment_type.id, el.data_storage_request_number);
-        el.type = type;
-      }
-      // switch VM's type to define vm cluster with different route
-      const data = await ctx.service.cluster.getClusterList(childTable);
-      if (!data.pass) {
-        pass = false;
-        message += data.message;
-      }
-
-      // TODO save new VM list(childTable)
-      if (pass) {
+      try {
+        const dynamicForm = await ctx.service.dynamicForm.getDetailByKey(formKey, version, formId);
+        const { childFormKey, childTable, tenant } = dynamicForm;
+        const tenantId = tenant.id;
+        const tenantName = tenant.name;
+        // generate hostname
         for (let i = 0; i < childTable.length; i++) {
-          const el = childTable[i];
-          const columnList = `hostname = \"${el.hostname}\", vm_cluster= \"${el.vm_cluster}\", vm_master= \"${el.vm_master}\",os_ip= \"${el.os_ip}\",atl_ip= \"${el.atl_ip}\"`;
-          try {
-            const updateSQL = `UPDATE \`${childFormKey}${version}\` SET ${columnList} WHERE \`${childFormKey}${version}\`.id = ${el.id}`;
-            await app.model.query(updateSQL);
-          } catch (e) {
-            console.log('e ================= e');
-            console.log(e);
-            console.log('e ================= e');
-            message = 'System busy';
+          const prefix = await ctx.service.hostname.getPrefix(childTable[i]);
+          childTable[i].hostnamePrefix = prefix;
+        }
+        const typeCountList = await ctx.service.hostname.countByType(childTable);
+        const hostnameMap = new Map();
+        for (let i = 0; i < typeCountList.length; i++) {
+          const list = await ctx.service.hostname.generateHostname(tenantId, typeCountList[i]);
+          if (!list) {
             pass = false;
+            message += `Tenant \`${tenantName}\` with Application type \`${typeCountList[i].applicationType}\` hostname is not enough\n`;
+          }
+          hostnameMap.set(typeCountList[i].applicationType, new Map().set(typeCountList[i].hostname_prefix, list));
+        }
+        // TODO assign IP (delay function, verify IP  in this tern)
+        const CIPMap = new Map();
+        const FIPMap = new Map();
+        const DCCountList = await ctx.service.ipAssign.countByDC(childTable);
+        for (let i = 0; i < DCCountList.length; i++) {
+          const list = await ctx.service.ipAssign.assign(DCCountList[i].dataCenter, DCCountList[i].requestNum);
+          if (!list) {
+            pass = false;
+            message += 'IP is not enough\n';
+          } else {
+            const [ CList, FList ] = list;
+            CIPMap.set(DCCountList[i].dataCenter, CList);
+            FIPMap.set(DCCountList[i].dataCenter, FList);
           }
         }
+
+        for (let i = 0; i < childTable.length; i++) {
+          const el = childTable[i];
+          if (el.application_type && el.application_type.name && pass) {
+            const list = hostnameMap.get(el.application_type.name).get(el.hostnamePrefix);
+            el.hostname = list[0];
+            hostnameMap.get(el.application_type.name).set(el.hostnamePrefix, list.slice(1));
+          }
+          if (el.data_center && el.data_center.id && pass) {
+            const CList = CIPMap.get(el.data_center.id);
+            const FList = FIPMap.get(el.data_center.id);
+            el.os_ip = CList[0].IP;
+            el.atl_ip = FList[0].IP;
+            CIPMap.set(el.data_center.id, CList.slice(1));
+            FIPMap.set(el.data_center.id, FList.slice(1));
+          }
+          // define VM's type
+
+          const type = await ctx.service.defineVMType.defineVMType(el.network_zone.id, el.environment_type.id, el.data_storage_request_number);
+          el.type = type;
+        }
+        // switch VM's type to define vm cluster with different route
+        const data = await ctx.service.cluster.getClusterList(childTable);
+        if (!data.pass) {
+          pass = false;
+          message += data.message;
+        }
+
+        // TODO save new VM list(childTable)
+        if (pass) {
+          for (let i = 0; i < childTable.length; i++) {
+            const el = childTable[i];
+            const columnList = `hostname = \"${el.hostname}\", vm_cluster= \"${el.vm_cluster}\", vm_master= \"${el.vm_master}\",os_ip= \"${el.os_ip}\",atl_ip= \"${el.atl_ip}\"`;
+            try {
+              const updateSQL = `UPDATE \`${childFormKey}${version}\` SET ${columnList} WHERE \`${childFormKey}${version}\`.id = ${el.id}`;
+              await app.model.query(updateSQL);
+            } catch (e) {
+              console.log('e ================= e');
+              console.log(e);
+              console.log('e ================= e');
+              message = 'System busy';
+              pass = false;
+            }
+          }
+        }
+      } catch (error) {
+        console.log(error);
+        message = 'Predefine fail';
+        pass = false;
       }
+      
       // return a map includes result and message to workflow service
       ctx.success({ pass, message });
     }
