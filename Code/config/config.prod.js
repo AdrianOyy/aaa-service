@@ -81,7 +81,7 @@ module.exports = appInfo => {
   // ===================================
   config.middleware = [ 'log', 'auth' ];
   config.auth = {
-    ignore: [ '/user/login' ],
+    ignore: [ '/user/login', '/tenant/getCps', '/tenant/testCps' ],
   };
   config.log = {
     tsHost: process.env.npm_config_transitionHost,
