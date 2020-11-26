@@ -234,7 +234,7 @@ module.exports = app => {
         if (pass) {
           for (let i = 0; i < childTable.length; i++) {
             const el = childTable[i];
-            const columnList = `hostname = \"${el.hostname}\", vm_cluster= \"${el.vm_cluster}\", vm_master= \"${el.vm_master}\",os_ip= \"${el.os_ip}\",atl_ip= \"${el.atl_ip}\"`;
+            const columnList = `hostname = \"${el.hostname}\", vm_cluster= \"${el.vm_cluster}\", vm_master= \"${el.vm_master}\",os_ip= \"${el.os_ip}\",atl_ip= \"${el.atl_ip}\",csv=\"${el.csv}\"`;
             try {
               const updateSQL = `UPDATE \`${childFormKey}${version}\` SET ${columnList} WHERE \`${childFormKey}${version}\`.id = ${el.id}`;
               await app.model.query(updateSQL);
