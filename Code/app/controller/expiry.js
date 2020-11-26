@@ -9,7 +9,7 @@ module.exports = app => {
         expiryDate, prop, order, createdAt, updatedAt } = ctx.query;
       const limit = parseInt(ctx.query.limit) || 10;
       const offset = (parseInt(ctx.query.page || 1) - 1) * limit;
-      let Order = [[ 'assignId', 'DESC' ]];
+      let Order = [[ 'createdAt', 'DESC' ]];
       if (order && prop) {
         Order = [[ prop, order ]];
       }
