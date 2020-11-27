@@ -22,7 +22,7 @@ module.exports = app => {
           delete where[k];
         }
       });
-      let Order = [[ 'surname', 'DESC' ]];
+      let Order = [[ 'createdAt', 'DESC' ]];
       if (order && prop) {
         Order = [[ `${prop}`, `${order}` ]];
       }

@@ -61,6 +61,8 @@ module.exports = app => {
   router.post(`${prefix}/tenant/create`, controller.tenant.create);
   router.delete(`${prefix}/tenant/deleteMany`, controller.tenant.deleteMany);
   router.get(`${prefix}/tenant/checkExist`, controller.tenant.checkExist);
+  router.get(`${prefix}/tenant/getCps`, controller.tenant.getCps);
+  router.get(`${prefix}/tenant/testCps`, controller.tenant.testCps);
 
   router.get(`${prefix}/tenant_group_mapping/list`, controller.tenantGroupMapping.list);
   router.get(`${prefix}/tenant_group_mapping/detail`, controller.tenantGroupMapping.detail);
