@@ -1,7 +1,6 @@
 'use strict';
 
 const _ = require('lodash');
-const axios = require('axios');
 
 module.exports = app => {
   return class extends app.Service {
@@ -150,7 +149,6 @@ module.exports = app => {
 
     async getClusterList(vmlist) {
       const { ctx } = this;
-      const { Op } = app.Sequelize;
       const inCluster = [];
       const data = {
         pass: true,
@@ -651,38 +649,59 @@ module.exports = app => {
       return msg;
     }
 
-    async getAnsibleHCI(params, options) {
-      const url = app.config.activiti.url;
-      const hci = await axios
-        .get(url + '/getAnsibleHCIResource', params, options)
-        .then(function(response) {
-          return new Promise(resolve => {
-            resolve(response.data);
-          });
-        }).catch(function(error) {
-          console.log(error.message);
-          return new Promise(resolve => {
-            resolve(null);
-          });
-        });
-      return hci;
+    async getAnsibleHCI(data) {
+      const url = app.config.activiti.url + '/getAnsibleHCIResource';
+      // action task
+      const { ctx } = this;
+      const token = await ctx.service.jwtUtils.getToken({ content: { username: '' }, expiresIn: app.config.jwt.expiresIn });
+      const options = {
+        method: 'GET',
+        dataType: 'text',
+        headers: { Authorization: 'Bearer ' + token },
+        data,
+      };
+      const hci = await ctx.service.syncActiviti.curl(url, options, ctx);
+      // const hci = await axios
+      //   .get(url + '/getAnsibleHCIResource', params, options)
+      //   .then(function(response) {
+      //     return new Promise(resolve => {
+      //       resolve(response.data);
+      //     });
+      //   }).catch(function(error) {
+      //     console.log(error.message);
+      //     return new Promise(resolve => {
+      //       resolve(null);
+      //     });
+      //   });
+      return hci.data;
     }
 
-    async getAnsibleVMWare(params, options) {
-      const url = app.config.activiti.url;
-      const hci = await axios
-        .get(url + '/getAnsibleVMWareResource', params, options)
-        .then(function(response) {
-          return new Promise(resolve => {
-            resolve(response.data);
-          });
-        }).catch(function(error) {
-          console.log(error.message);
-          return new Promise(resolve => {
-            resolve(null);
-          });
-        });
-      return hci;
+    async getAnsibleVMWare(data) {
+      const url = app.config.activiti.url + '/getAnsibleVMWareResource';
+
+      const { ctx } = this;
+      const token = await ctx.service.jwtUtils.getToken({ content: { username: '' }, expiresIn: app.config.jwt.expiresIn });
+      const options = {
+        method: 'GET',
+        dataType: 'text',
+        headers: { Authorization: 'Bearer ' + token },
+        data,
+      };
+      const hci = await ctx.service.syncActiviti.curl(url, options, ctx);
+
+      // const hci = await axios
+      //   .get(url + '/getAnsibleVMWareResource', params, options)
+      //   .then(function(response) {
+      //     return new Promise(resolve => {
+      //       resolve(response.data);
+      //     });
+      //   }).catch(function(error) {
+      //     console.log(error.message);
+      //     return new Promise(resolve => {
+      //       resolve(null);
+      //     });
+      //   });
+      return hci.data;
     }
 
     async getVMMare() {
