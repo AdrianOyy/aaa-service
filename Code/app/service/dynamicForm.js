@@ -214,15 +214,11 @@ module.exports = app => {
             include: {
               model: ctx.model.models.dynamicFormDetail,
               as: 'dynamicFormDetail',
-              limit: 999,
-              order: [[ 'indexOf', 'asc' ], [ 'id', 'asc' ]],
             },
           },
           {
             model: ctx.model.models.dynamicFormDetail,
             as: 'dynamicFormDetail',
-            limit: 999,
-            order: [[ 'indexOf', 'asc' ], [ 'id', 'asc' ]],
           },
         ],
       });

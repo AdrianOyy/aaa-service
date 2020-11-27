@@ -87,8 +87,8 @@ module.exports = app => {
           form.foreignKey = sonDetail.foreignKey;
           form.labelField = sonDetail.foreignDisplayKey;
           form.valueField = sonDetail.foreignKey;
-          form.indexOf = formDetail.indexOf;
-          form.remark = formDetail.remark;
+          form.indexOf = sonDetail.indexOf;
+          form.remark = sonDetail.remark;
           form.readOnly = false;
           form.value = '';
           if (sonDetail.inputType === 'select') {

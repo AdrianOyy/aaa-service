@@ -14,22 +14,28 @@ module.exports = app => {
       const detailList = [];
       for (const form of formList) {
         const dynamicFormDetail = {
-          fieldName: form.fieldName ? form.fieldName.value.toLowerCase() : null,
-          fieldDisplayName: form.fieldDisplayName ? form.fieldDisplayName.value : null,
-          fieldType: form.fieldType ? form.fieldType.value : null,
-          inputType: form.inputType ? form.inputType.value : null,
-          showOnRequest: form.showOnRequest.value === '1',
-          foreignTable: form.foreignTable ? form.foreignTable.value : null,
-          foreignKey: form.foreignKey ? form.foreignKey.value : null,
-          indexOf: form.indexOf ? form.indexOf.value : null,
-          remark: form.remark ? form.remark.value : null,
-          foreignDisplayKey: form.foreignDisplayKey ? form.foreignDisplayKey.value : null,
-          required: form.required.value === '1',
-          readable: form.readable.value === '1',
-          writable: form.writable.value === '1',
+          fieldName: form.fieldName ? form.fieldName.toLowerCase() : null,
+          fieldDisplayName: form.fieldDisplayName,
+          fieldType: form.fieldType,
+          inputType: form.inputType,
+          showOnRequest: form.showOnRequest === '1',
+          foreignTable: form.foreignTable,
+          foreignKey: form.foreignKey,
+          indexOf: form.indexOf !== null ? form.indexOf : Number.MAX_SAFE_INTEGER,
+          remark: form.remark,
+          foreignDisplayKey: form.foreignDisplayKey,
+          required: form.required === '1',
+          readable: form.readable === '1',
+          writable: form.writable === '1',
         };
         detailList.push(dynamicFormDetail);
       }
+      detailList.sort((a, b) => {
+        return a.indexOf - b.indexOf;
+      });
+      detailList.forEach(el => {
+        if (el.indexOf === Number.MAX_SAFE_INTEGER) el.indexOf = null;
+      });
       return { dynamicFormModel, detailList };
     }
 
