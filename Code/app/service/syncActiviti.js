@@ -1,5 +1,7 @@
 'use strict';
 
+const rejectUnauthorized = !(!process.env.npm_config_rejectUnauthorized || process.env.npm_config_rejectUnauthorized === 'N');
+
 module.exports = app => {
   return class extends app.Service {
     async loadUser(user, options) {
@@ -88,10 +90,12 @@ module.exports = app => {
           contentType: options.contentType ? options.contentType : 'json',
           dataType: options.dataType ? options.dataType : 'json',
           timeout: options.timeout ? options.timeout : 60 * 1000,
+          rejectUnauthorized,
         },
         options.data ? { data: options.data } : undefined,
         options.headers ? { headers: options.headers } : undefined
       );
+      console.log(curl);
       const result = await ctx.curl(url,
         curl
       );

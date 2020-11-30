@@ -49,5 +49,9 @@ docker run -dit \
 -e imapUser=gitlab@apjcorp.com \
 -e imapPass=apj.com666 \
 -e transitionHost=10.231.131.123:3000 \
+-e rejectUnauthorized=N \
+-e cpsurl=https://cps-dev-api.cldpaast71.serverdev.hadev.org.hk/cps/alladhoc/ \
 aaa-service
 ````
+--rejectUnauthorized 是否忽略证书 默认为N， 不填或N为忽略证书，Y为不忽略证书
+--cpsurl cps请求地址，默认https://cps-dev-api.cldpaast71.serverdev.hadev.org.hk/cps/alladhoc/

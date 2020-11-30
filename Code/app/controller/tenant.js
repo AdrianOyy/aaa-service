@@ -1,5 +1,7 @@
 'use strict';
 
+const cpsurl = process.env.npm_config_cpsurl ? process.env.npm_config_cpsurl : 'https://cps-dev-api.cldpaast71.serverdev.hadev.org.hk/cps/alladhoc/';
+
 module.exports = app => {
   return class extends app.Controller {
     async list() {
@@ -207,7 +209,7 @@ module.exports = app => {
       const vms = [];
       const tenant = {};
       try {
-        const url = 'https://cps-dev-api.cldpaast71.serverdev.hadev.org.hk/cps/alladhoc/' + cpsId;
+        const url = cpsurl + cpsId;
         const result = await ctx.service.syncActiviti.curl(url, { method: 'GET' }, ctx);
         console.log('1', result);
         const data = result.data;
@@ -299,74 +301,78 @@ module.exports = app => {
 
       const vms = [];
       const tenant = {};
-      const url = 'https://cps-dev-api.cldpaast71.serverdev.hadev.org.hk/cps/alladhoc/5b1f7144625da9b4c2ef54c1';
-      const result = await ctx.service.syncActiviti.curl(url, { method: 'GET' }, ctx);
-      console.log('1 testCps result', result);
-      const data = result.data;
-      console.log('2 testCps data[0].adhoc[0]', data[0].adhoc[0]);
-      const code = data[0].adhoc[0].project_code;
-      tenant.justification = data[0].adhoc[0].justification;
-      // search tenant
-      if (code) {
-        const findTenant = await ctx.model.models.tenant.findOne({
-          attributes: [ 'id' ],
-          where: {
-            code,
-          },
+      const url = cpsurl + '5b1f7144625da9b4c2ef54c1';
+      try {
+        const result = await ctx.service.syncActiviti.curl(url, { method: 'GET' }, ctx);
+        console.log('1 testCps result', result);
+        const data = result.data;
+        console.log('2 testCps data[0].adhoc[0]', data[0].adhoc[0]);
+        const code = data[0].adhoc[0].project_code;
+        tenant.justification = data[0].adhoc[0].justification;
+        // search tenant
+        if (code) {
+          const findTenant = await ctx.model.models.tenant.findOne({
+            attributes: [ 'id' ],
+            where: {
+              code,
+            },
+          });
+          findTenant ? tenant.tenant = findTenant.id : undefined;
+        }
+        const application_types = await ctx.model.models.vm_applicationType.findAll({
+          raw: true,
+          attributes: [ 'id', 'name' ],
         });
-        findTenant ? tenant.tenant = findTenant.id : undefined;
-      }
-      const application_types = await ctx.model.models.vm_applicationType.findAll({
-        raw: true,
-        attributes: [ 'id', 'name' ],
-      });
-      const locations = await ctx.model.models.vm_zone.findAll({
-        raw: true,
-        attributes: [ 'id', 'name' ],
-      });
-      const platforms = await ctx.model.models.vm_platform_type.findAll({
-        raw: true,
-        attributes: [ 'id', 'name' ],
-      });
-      const phases = await ctx.model.models.vm_type.findAll({
-        raw: true,
-        attributes: [ 'id', 'name' ],
-      });
-      const rows = data[0].adhoc[0].rows;
-      if (rows && rows.length > 0
-        && application_types && application_types.length > 0
-        && locations && locations.length > 0
-        && platforms && platforms.length > 0
-        && phases && phases.length > 0
-      ) {
-        rows.forEach(_ => {
-          const application_type = application_types.filter(_ => _.name === _.application_type);
-          const network_zone = locations.filter(_ => _.name === _.location);
-          const platform = platforms.filter(_ => _.name === _.platform);
-          const environment_type = phases.filter(_ => _.name === _.phases);
-          if (application_type && network_zone && platform && environment_type) {
-            const vm = {
-              application_type: application_type.id,
-              cpu_request_number: _.cpu_require[0],
-              data_storage_request_number: _.disk_require[0],
-              environment_type: environment_type.id,
-              network_zone: network_zone.id,
-              phase: _.phase,
-              platform: platform.id,
-              ram_request_number: _.mem_require[0],
-            };
-            vms.push(vm);
-          }
+        const locations = await ctx.model.models.vm_zone.findAll({
+          raw: true,
+          attributes: [ 'id', 'name' ],
         });
-      } else if (rows && rows.length > 0) {
-        rows.forEach(_ => {
-          vms.push(_);
+        const platforms = await ctx.model.models.vm_platform_type.findAll({
+          raw: true,
+          attributes: [ 'id', 'name' ],
         });
+        const phases = await ctx.model.models.vm_type.findAll({
+          raw: true,
+          attributes: [ 'id', 'name' ],
+        });
+        const rows = data[0].adhoc[0].rows;
+        if (rows && rows.length > 0
+          && application_types && application_types.length > 0
+          && locations && locations.length > 0
+          && platforms && platforms.length > 0
+          && phases && phases.length > 0
+        ) {
+          rows.forEach(_ => {
+            const application_type = application_types.filter(_ => _.name === _.application_type);
+            const network_zone = locations.filter(_ => _.name === _.location);
+            const platform = platforms.filter(_ => _.name === _.platform);
+            const environment_type = phases.filter(_ => _.name === _.phases);
+            if (application_type && network_zone && platform && environment_type) {
+              const vm = {
+                application_type: application_type.id,
+                cpu_request_number: _.cpu_require[0],
+                data_storage_request_number: _.disk_require[0],
+                environment_type: environment_type.id,
+                network_zone: network_zone.id,
+                phase: _.phase,
+                platform: platform.id,
+                ram_request_number: _.mem_require[0],
+              };
+              vms.push(vm);
+            }
+          });
+        } else if (rows && rows.length > 0) {
+          rows.forEach(_ => {
+            vms.push(_);
+          });
+        }
+        console.log('3 testCps', { tenant, vms });
+        ctx.success({ tenant, vms });
+      } catch (error) {
+        console.log(error);
+        ctx.success(error);
       }
 
-      console.log('3 testCps', { tenant, vms });
-
-      ctx.success({ tenant, vms });
     }
   };
 };
