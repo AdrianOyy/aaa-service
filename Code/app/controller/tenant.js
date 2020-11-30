@@ -250,10 +250,10 @@ module.exports = app => {
           && phases && phases.length > 0
         ) {
           rows.forEach(_ => {
-            const application_type = application_types.filter(_ => _.name === _.application_type);
-            const network_zone = locations.filter(_ => _.name === _.location);
-            const platform = platforms.filter(_ => _.name === _.platform);
-            const environment_type = phases.filter(_ => _.name === _.phases);
+            const application_type = application_types.filter(__ => __.name === _.application_type);
+            const network_zone = locations.filter(__ => __.name === _.location);
+            const platform = platforms.filter(__ => __.name === _.platform);
+            const environment_type = phases.filter(__ => __.name === _.phases);
             if (application_type && network_zone && platform && environment_type) {
               const vm = {
                 application_type: application_type.id,
@@ -343,10 +343,10 @@ module.exports = app => {
           && phases && phases.length > 0
         ) {
           rows.forEach(_ => {
-            const application_type = application_types.filter(_ => _.name === _.application_type);
-            const network_zone = locations.filter(_ => _.name === _.location);
-            const platform = platforms.filter(_ => _.name === _.platform);
-            const environment_type = phases.filter(_ => _.name === _.phases);
+            const application_type = application_types.filter(__ => __.name === _.application_type);
+            const network_zone = locations.filter(__ => __.name === _.location);
+            const platform = platforms.filter(__ => __.name === _.platform);
+            const environment_type = phases.filter(__ => __.name === _.phases);
             if (application_type && network_zone && platform && environment_type) {
               const vm = {
                 application_type: application_type.id,
