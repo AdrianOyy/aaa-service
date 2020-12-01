@@ -209,11 +209,10 @@ module.exports = app => {
       const vms = [];
       const tenant = {};
       try {
+        const { application_types, locations, platforms, phases } = await this.getSelect(ctx);
         const url = cpsurl + cpsId;
         const result = await ctx.service.syncActiviti.curl(url, { method: 'GET' }, ctx);
-        console.log('1', result);
         const data = result.data;
-        console.log('2 data[0].adhoc[0]', data[0].adhoc[0]);
         const code = data[0].adhoc[0].project_code;
         tenant.justification = data[0].adhoc[0].justification;
         // search tenant
@@ -226,22 +225,6 @@ module.exports = app => {
           });
           findTenant ? tenant.tenant = findTenant.id : undefined;
         }
-        const application_types = await ctx.model.models.vm_applicationType.findAll({
-          raw: true,
-          attributes: [ 'id', 'name' ],
-        });
-        const locations = await ctx.model.models.vm_zone.findAll({
-          raw: true,
-          attributes: [ 'id', 'name' ],
-        });
-        const platforms = await ctx.model.models.vm_platform_type.findAll({
-          raw: true,
-          attributes: [ 'id', 'name' ],
-        });
-        const phases = await ctx.model.models.vm_type.findAll({
-          raw: true,
-          attributes: [ 'id', 'name' ],
-        });
         const rows = data[0].adhoc[0].rows;
         if (rows && rows.length > 0
           && application_types && application_types.length > 0
@@ -249,29 +232,23 @@ module.exports = app => {
           && platforms && platforms.length > 0
           && phases && phases.length > 0
         ) {
-          rows.forEach(_ => {
-            const application_type = application_types.filter(__ => __.name === _.application_type);
-            const network_zone = locations.filter(__ => __.name === _.location);
-            const platform = platforms.filter(__ => __.name === _.platform);
-            const environment_type = phases.filter(__ => __.name === _.phases);
-            if (application_type && network_zone && platform && environment_type) {
-              const vm = {
-                application_type: application_type.id,
-                cpu_request_number: _.cpu_require[0],
-                data_storage_request_number: _.disk_require[0],
-                environment_type: environment_type.id,
-                network_zone: network_zone.id,
-                phase: _.phase,
-                platform: platform.id,
-                ram_request_number: _.mem_require[0],
-              };
-              vms.push(vm);
-            }
-          });
-        } else if (rows && rows.length > 0) {
-          rows.forEach(_ => {
-            vms.push(_);
-          });
+          for (const row of rows) {
+            const application_type = application_types.filter(_ => _.name === row.application_type);
+            const network_zone = locations.filter(_ => row.location && row.location.indexOf(_.name) !== -1);
+            const platform = platforms.filter(_ => _.name === row.platform);
+            const environment_type = phases.filter(_ => _.name === row.phase);
+            const vm = {
+              application_type: application_type.length > 0 ? application_type[0].id : undefined,
+              cpu_request_number: row.cpu_require[0],
+              data_storage_request_number: row.disk_require[0],
+              environment_type: environment_type.length > 0 ? environment_type[0].id : undefined,
+              network_zone: network_zone.length > 0 ? network_zone[0].id : undefined,
+              phase: row.phase,
+              platform: platform.length > 0 ? platform[0].id : undefined,
+              ram_request_number: row.mem_require[0],
+            };
+            vms.push(vm);
+          }
         }
       } catch (error) {
         console.log(error);
@@ -303,10 +280,15 @@ module.exports = app => {
       const tenant = {};
       const url = cpsurl + '5b1f7144625da9b4c2ef54c1';
       try {
+        const { application_types, locations, platforms, phases } = await this.getSelect(ctx);
+        console.log('1 select list:-------------');
+        console.log('application_types', application_types);
+        console.log('locations', locations);
+        console.log('platforms', platforms);
+        console.log('phases', phases);
         const result = await ctx.service.syncActiviti.curl(url, { method: 'GET' }, ctx);
-        console.log('1 testCps result', result);
         const data = result.data;
-        console.log('2 testCps data[0].adhoc[0]', data[0].adhoc[0]);
+        console.log('data', data);
         const code = data[0].adhoc[0].project_code;
         tenant.justification = data[0].adhoc[0].justification;
         // search tenant
@@ -319,22 +301,6 @@ module.exports = app => {
           });
           findTenant ? tenant.tenant = findTenant.id : undefined;
         }
-        const application_types = await ctx.model.models.vm_applicationType.findAll({
-          raw: true,
-          attributes: [ 'id', 'name' ],
-        });
-        const locations = await ctx.model.models.vm_zone.findAll({
-          raw: true,
-          attributes: [ 'id', 'name' ],
-        });
-        const platforms = await ctx.model.models.vm_platform_type.findAll({
-          raw: true,
-          attributes: [ 'id', 'name' ],
-        });
-        const phases = await ctx.model.models.vm_type.findAll({
-          raw: true,
-          attributes: [ 'id', 'name' ],
-        });
         const rows = data[0].adhoc[0].rows;
         if (rows && rows.length > 0
           && application_types && application_types.length > 0
@@ -342,29 +308,29 @@ module.exports = app => {
           && platforms && platforms.length > 0
           && phases && phases.length > 0
         ) {
-          rows.forEach(_ => {
-            const application_type = application_types.filter(__ => __.name === _.application_type);
-            const network_zone = locations.filter(__ => __.name === _.location);
-            const platform = platforms.filter(__ => __.name === _.platform);
-            const environment_type = phases.filter(__ => __.name === _.phases);
-            if (application_type && network_zone && platform && environment_type) {
-              const vm = {
-                application_type: application_type.id,
-                cpu_request_number: _.cpu_require[0],
-                data_storage_request_number: _.disk_require[0],
-                environment_type: environment_type.id,
-                network_zone: network_zone.id,
-                phase: _.phase,
-                platform: platform.id,
-                ram_request_number: _.mem_require[0],
-              };
-              vms.push(vm);
-            }
-          });
-        } else if (rows && rows.length > 0) {
-          rows.forEach(_ => {
-            vms.push(_);
-          });
+          for (const row of rows) {
+            console.log('row', row);
+            console.log('row.application_type', row.application_type);
+            console.log('row.location', row.location);
+            console.log('row.platform', row.platform);
+            console.log('row.phase', row.phase);
+            const application_type = application_types.filter(_ => _.name === row.application_type);
+            const network_zone = locations.filter(_ => row.location && row.location.indexOf(_.name) !== -1);
+            const platform = platforms.filter(_ => _.name === row.platform);
+            const environment_type = phases.filter(_ => _.name === row.phase);
+            console.log('application_type', application_type, 'network_zone', network_zone, 'platform', platform, 'environment_type', environment_type);
+            const vm = {
+              application_type: application_type.length > 0 ? application_type[0].id : undefined,
+              cpu_request_number: row.cpu_require[0],
+              data_storage_request_number: row.disk_require[0],
+              environment_type: environment_type.length > 0 ? environment_type[0].id : undefined,
+              network_zone: network_zone.length > 0 ? network_zone[0].id : undefined,
+              phase: row.phase,
+              platform: platform.length > 0 ? platform[0].id : undefined,
+              ram_request_number: row.mem_require[0],
+            };
+            vms.push(vm);
+          }
         }
         console.log('3 testCps', { tenant, vms });
         ctx.success({ tenant, vms });
@@ -373,6 +339,27 @@ module.exports = app => {
         ctx.success(error);
       }
 
+    }
+
+    async getSelect(ctx) {
+      console.log('getSelect');
+      const application_types = await ctx.model.models.vm_applicationType.findAll({
+        raw: true,
+        attributes: [ 'id', 'name' ],
+      });
+      const locations = await ctx.model.models.vm_cdc.findAll({
+        raw: true,
+        attributes: [ 'id', 'name' ],
+      });
+      const platforms = await ctx.model.models.vm_platform.findAll({
+        raw: true,
+        attributes: [ 'id', 'name' ],
+      });
+      const phases = await ctx.model.models.vm_type.findAll({
+        raw: true,
+        attributes: [ 'id', 'name' ],
+      });
+      return { application_types, locations, platforms, phases };
     }
   };
 };
