@@ -208,6 +208,7 @@ module.exports = app => {
       if (!cpsId) ctx.error();
       const vms = [];
       const tenant = {};
+      let errorMessage = '';
       try {
         const { application_types, locations, platforms, phases } = await this.getSelect(ctx);
         const url = cpsurl + cpsId;
@@ -234,21 +235,40 @@ module.exports = app => {
         ) {
           for (const row of rows) {
             const application_type = application_types.filter(_ => _.name === row.application_type);
-            const network_zone = locations.filter(_ => row.location && row.location.indexOf(_.name) !== -1);
+            const network_zone = locations.filter(_ => _.name === row.location);
             const platform = platforms.filter(_ => _.name === row.platform);
             const environment_type = phases.filter(_ => _.name === row.phase);
-            const vm = {
-              application_type: application_type.length > 0 ? application_type[0].id : undefined,
-              cpu_request_number: row.cpu_require[0],
-              data_storage_request_number: row.disk_require[0],
-              environment_type: environment_type.length > 0 ? environment_type[0].id : undefined,
-              network_zone: network_zone.length > 0 ? network_zone[0].id : undefined,
-              phase: row.phase,
-              platform: platform.length > 0 ? platform[0].id : undefined,
-              ram_request_number: row.mem_require[0],
-            };
-            vms.push(vm);
+            application_type.length === 0
+              && errorMessage.indexOf(row.application_type + ' does not exist;') === -1
+              ? errorMessage += row.application_type + ' does not exist;' : undefined;
+            network_zone.length === 0
+              && errorMessage.indexOf(row.location + ' does not exist;') === -1
+              ? errorMessage += row.location + ' does not exist;' : undefined;
+            platform.length === 0
+              && errorMessage.indexOf(row.platform + ' does not exist;') === -1
+              ? errorMessage += row.platform + ' does not exist;' : undefined;
+            environment_type.length === 0
+              && errorMessage.indexOf(row.phase + ' does not exist;') === -1
+              ? errorMessage += row.phase + ' does not exist;' : undefined;
+            if (application_type.length > 0 && network_zone.length > 0 && platform.length > 0 && environment_type.length > 0) {
+              const vm = {
+                application_type: application_type.length > 0 ? application_type[0].id : undefined,
+                cpu_request_number: row.cpu_require[0],
+                data_storage_request_number: row.disk_require[0],
+                environment_type: environment_type.length > 0 ? environment_type[0].id : undefined,
+                network_zone: network_zone.length > 0 ? network_zone[0].id : undefined,
+                phase: row.phase,
+                platform: platform.length > 0 ? platform[0].id : undefined,
+                ram_request_number: row.mem_require[0],
+              };
+              vms.push(vm);
+            }
           }
+        } else {
+          !application_types || application_types.length === 0 ? errorMessage += 'vm_applicationType does not exist;' : undefined;
+          !locations || locations.length === 0 ? errorMessage += 'vm_cdc does not exist;' : undefined;
+          !platforms || platforms.length === 0 ? errorMessage += 'vm_platform does not exist;' : undefined;
+          !phases || phases.length === 0 ? errorMessage += 'vm_type does not exist;' : undefined;
         }
       } catch (error) {
         console.log(error);
@@ -267,9 +287,13 @@ module.exports = app => {
         };
         vms.push(vm);
       }
-      console.log({ tenant, vms });
+      console.log({ tenant, vms }, errorMessage);
+      if (vms.length > 0 && errorMessage === '') {
+        ctx.success({ tenant, vms });
+      } else {
+        ctx.error(errorMessage);
+      }
 
-      ctx.success({ tenant, vms });
     }
 
     async testCps() {
