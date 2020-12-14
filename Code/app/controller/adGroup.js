@@ -70,6 +70,7 @@ module.exports = app => {
       };
       try {
         await oldModel.update(newModel);
+        ctx.service.syncActiviti.saveOrUpdateGroup({ id: oldModel.dataValues.id, cn: name }, { headers: ctx.headers });
         ctx.success();
       } catch (error) {
         console.log('error==========================error');
