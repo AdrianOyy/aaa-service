@@ -25,7 +25,7 @@ module.exports = app => {
       });
       let userModel = await ctx.model.models.user.findOne({
         where: {
-          email: user.userPrincipalName,
+          email: user.mail ? user.mail : user.userPrincipalName,
         },
       });
       if (userModel !== null) {
@@ -43,7 +43,7 @@ module.exports = app => {
           surname: user.sn,
           givenname: user.givenName,
           displayname: user.displayName,
-          email: user.userPrincipalName,
+          email: user.mail ? user.mail : user.userPrincipalName,
           createdAt: new Date(),
         });
       }
