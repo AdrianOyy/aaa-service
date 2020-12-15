@@ -44,13 +44,13 @@ module.exports = app => {
             } else if (data.userPrincipalName === 'shenchengan@apj.com') {
               returnResult.push('rexshen@apjcorp.com');
             } else {
-              returnResult.push(data.userPrincipalName);
+              returnResult.push(data.mail ? data.mail : data.userPrincipalName);
             }
           }
         } else if (returnType.toLowerCase() === 'userordistribution') {
           const users = await ctx.service.adService.findUsers(email);
           for (const data of users) {
-            returnResult.push(data.userPrincipalName);
+            returnResult.push(data.mail ? data.mail : data.userPrincipalName);
           }
           const groups = await ctx.service.adService.findGroups('cn=*' + email + '*');
           for (const data of groups) {
