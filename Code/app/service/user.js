@@ -25,15 +25,15 @@ module.exports = app => {
       });
       let userModel = await ctx.model.models.user.findOne({
         where: {
-          email: user.mail ? user.mail : user.userPrincipalName,
+          sAMAccountName: user.sAMAccountName,
         },
       });
       if (userModel !== null) {
         await userModel.update({
-          sAMAccountName: user.sAMAccountName,
           surname: user.sn,
           givenname: user.givenName,
           displayname: user.displayName,
+          email: user.mail ? user.mail : user.userPrincipalName,
           UACDesc: new Date() + 'update',
           updatedAt: new Date(),
         });
@@ -74,6 +74,7 @@ module.exports = app => {
       }
       user.groups = groups;
       user.username = user.sAMAccountName;
+      user.userPrincipalName = user.mail ? user.mail : user.userPrincipalName;
       await ctx.service.syncActiviti.loadUser(user, { headers: { Authorization: 'Bearer ' + auth.token } });
       return user;
     }
