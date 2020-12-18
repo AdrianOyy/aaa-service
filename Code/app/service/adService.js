@@ -11,7 +11,7 @@ module.exports = app => {
       const response = await ctx.service.syncActiviti.curl(url, { data: { username, password } }, ctx);
       const data = response.data.data;
       let result = {};
-      if (data.auth) {
+      if (data && data.auth) {
         const user = data.user;
         const groups = data.groups;
         result.user = user;

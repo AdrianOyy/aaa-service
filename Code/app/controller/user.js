@@ -52,6 +52,7 @@ module.exports = app => {
       const { ctx } = this;
       try {
         const { username, password } = ctx.request.body;
+        if (!username || !password) ctx.error();
         const auth = await ctx.service.adService.authenticate(username, password);
         if (auth) {
           if (auth.user && auth.user.userPrincipalName === 'shenchengan@apj.com') {
