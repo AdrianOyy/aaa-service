@@ -64,7 +64,7 @@ module.exports = app => {
           },
         });
         if (ad_group !== null) {
-          groups[index].id = ad_group.id;
+          groups[index].id = ad_group.name;
           await ctx.model.models.user_group_mapping.create({
             groupId: ad_group.id,
             userId,

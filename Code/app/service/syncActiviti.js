@@ -95,7 +95,7 @@ module.exports = app => {
         options.data ? { data: options.data } : undefined,
         options.headers ? { headers: options.headers } : undefined
       );
-      console.log(curl);
+      console.log(new Date(), 'curl: url', url);
       const result = await ctx.curl(url,
         curl
       );

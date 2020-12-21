@@ -61,7 +61,15 @@ module.exports = app => {
       // todo 暂时使用1
       let manager_group_id = 1;
       if (tenant) {
-        manager_group_id = tenant.manager_group_id;
+        const ad_group = await ctx.model.models.ad_group.findOne({
+          raw: true,
+          where: {
+            id: tenant.manager_group_id,
+          },
+        });
+        if (ad_group) {
+          manager_group_id = ad_group.name;
+        }
       }
 
       const activitiData = {
