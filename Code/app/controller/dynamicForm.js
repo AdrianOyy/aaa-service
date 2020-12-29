@@ -187,6 +187,16 @@ module.exports = app => {
       const { formKey, formId, version } = ctx.query;
       if (!formKey || !formId) ctx.error();
       const res = await ctx.service.dynamicForm.getDetailByKey(formKey, version, formId);
+      if (res && res.tenant && res.tenant.manager_group_id) {
+        const manager_group = await ctx.model.models.ad_group.findOne({
+          raw: true,
+          attributes: [ 'name' ],
+          where: {
+            id: res.tenant.manager_group_id,
+          },
+        });
+        manager_group ? res.tenant.manager_group_name = manager_group.name : undefined;
+      }
       if (!res) ctx.error();
       else ctx.success(res);
     }
