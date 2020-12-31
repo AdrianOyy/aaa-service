@@ -21,13 +21,25 @@ module.exports = [
   {
     model: 'apply_for',
     data: {
-      Type: 'LAN account (LoginID)  and/or',
+      Type: 'CORP ID (Login ID)',
     },
   },
   {
     model: 'apply_for',
     data: {
       Type: 'Intranet email account',
+    },
+  },
+  {
+    model: 'apply_for_internet',
+    data: {
+      Type: 'Internet web access',
+    },
+  },
+  {
+    model: 'apply_for_internet',
+    data: {
+      Type: 'Internet Email address',
     },
   },
   {
