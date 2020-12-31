@@ -5,7 +5,7 @@ module.exports = app => {
 
   const account_type = app.model.define('account_type', {
     id: { type: INTEGER, autoIncrement: true, primaryKey: true, cnName: 'ID' },
-    name: { type: STRING(256), allowNull: false, cnName: '名称', comment: '名称' },
+    type: { type: STRING(256), allowNull: false, cnName: '类型', comment: '类型' },
   }, {
     paranoid: true,
     tableName: 'account_type',

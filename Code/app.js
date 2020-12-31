@@ -44,5 +44,8 @@ module.exports = app => {
     if (!await model.vm_cdc.findOne()) {
       await sequelizeFixtures.loadFile(fixturesPath + 'vm_cdc.js', model);
     }
+    if (!await model.account_type.findOne()) {
+      await sequelizeFixtures.loadFile(fixturesPath + 'account_type.js', model);
+    }
   });
 };

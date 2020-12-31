@@ -141,27 +141,6 @@ module.exports = app => {
       return vmlist;
     }
 
-    // eslint-disable-next-line no-dupe-class-members
-    async test() {
-      const { ctx } = this;
-      await ctx.service.mailer.testMail();
-      // console.log(data);
-      const formId = 14;
-      const formKey = 'VMAllocation';
-      // const { formKey, formId } = ctx.request.body;
-      const dynamicForm = await ctx.service.dynamicForm.getDetailByKey(formKey, formId);
-      const { childTable } = dynamicForm;
-      for (const index in childTable) {
-        if (index % 2 === 0) {
-          childTable[index].type = 'HCI';
-        } else {
-          childTable[index].type = 'VMWare';
-        }
-      }
-      await ctx.service.cluster.getClusterList(childTable);
-      ctx.success('success');
-    }
-
     async preDefine() {
       const { ctx } = this;
       let pass = true;

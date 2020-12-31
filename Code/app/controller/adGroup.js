@@ -7,7 +7,14 @@ module.exports = app => {
       const { Op } = app.Sequelize;
       const limit = parseInt(ctx.query.limit) || 10;
       const offset = (parseInt(ctx.query.page || 1) - 1) * limit;
-      const { name, createdAt, updatedAt, prop, order } = ctx.query;
+      const { name, prop, order } = ctx.query;
+      let { createdAt, updatedAt } = ctx.query;
+      createdAt = ctx.service.common.getDateRangeCondition(createdAt);
+      updatedAt = ctx.service.common.getDateRangeCondition(updatedAt);
+      if (createdAt === false || updatedAt === false) {
+        ctx.error();
+        return;
+      }
       let Order = [[ 'createdAt', 'DESC' ]];
       if (order && prop) {
         Order = [[ prop, order ]];
@@ -16,8 +23,8 @@ module.exports = app => {
         where: Object.assign(
           {},
           name ? { name: { [Op.like]: `%${name}%` } } : undefined,
-          createdAt ? { createdAt: { [Op.and]: [{ [Op.gte]: new Date(createdAt) }, { [Op.lt]: new Date(new Date(createdAt) - (-8.64e7)) }] } } : undefined,
-          updatedAt ? { updatedAt: { [Op.and]: [{ [Op.gte]: new Date(updatedAt) }, { [Op.lt]: new Date(new Date(updatedAt) - (-8.64e7)) }] } } : undefined
+          createdAt ? { createdAt } : undefined,
+          updatedAt ? { updatedAt } : undefined
         ),
         order: Order,
         offset,

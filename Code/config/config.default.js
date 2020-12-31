@@ -58,6 +58,7 @@ module.exports = appInfo => {
     allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH',
   };
 
+
   // ===================================
   //             安全 设置
   // ===================================
@@ -74,8 +75,8 @@ module.exports = appInfo => {
   };
 
   config.activiti = {
-    url: 'http://localhost:8888',
-    // url: 'http://10.231.131.123:3004',
+    // url: 'http://localhost:8888',
+    url: 'http://10.231.131.123:3004',
   };
 
   // ===================================

@@ -11,51 +11,11 @@ module.exports = app => {
         justification, budget_type, project_owner,
         contact_person, project_estimation, methodology_text, prop, order } = ctx.query;
       let { createdAt, updatedAt } = ctx.query;
-      createdAt = createdAt && JSON.parse(createdAt);
-      updatedAt = updatedAt && JSON.parse(updatedAt);
-      let c1,
-        c2;
-      if (createdAt && createdAt.startDate) {
-        c1 = new Date(createdAt.startDate) - 0;
-        c1 = c1 - c1 % 8.64e7;
-      }
-      if (createdAt && createdAt.endDate) {
-        c2 = new Date(createdAt.endDate) - 0;
-        c2 = c2 - c2 % 8.64e7;
-      }
-      if (c1 && c2 && (c1 - c2 > 0)) {
-        const c = c1;
-        c1 = c2;
-        c2 = c;
-      }
-      const c = [];
-      if (c1) {
-        c.push({ [Op.gte]: c1 });
-      }
-      if (c2) {
-        c.push({ [Op.lt]: new Date(c2 - (-8.64e7)) })
-      }
-      let u1,
-        u2;
-      if (updatedAt && updatedAt.startDate) {
-        u1 = new Date(updatedAt.startDate) - 0;
-        u1 = u1 - u1 % 8.64e7;
-      }
-      if (updatedAt && updatedAt.endDate) {
-        u2 = new Date(updatedAt.endDate) - 0;
-        u2 = u2 - u2 % 8.64e7;
-      }
-      if (u1 && u2 && (u1 - u2 > 0)) {
-        const u = u1;
-        u1 = u2;
-        u2 = u;
-      }
-      const u = [];
-      if (u1) {
-        u.push({ [Op.gte]: u1 });
-      }
-      if (u2) {
-        u.push({ [Op.lt]: new Date(u2 - (-8.64e7)) })
+      createdAt = ctx.service.common.getDateRangeCondition(createdAt);
+      updatedAt = ctx.service.common.getDateRangeCondition(updatedAt);
+      if (createdAt === false || updatedAt === false) {
+        ctx.error();
+        return;
       }
       const limit = parseInt(ctx.query.limit) || 10;
       const offset = (parseInt(ctx.query.page || 1) - 1) * limit;
@@ -78,8 +38,8 @@ module.exports = app => {
             contact_person ? { contact_person } : contact_person,
             project_estimation ? { project_estimation } : project_estimation,
             methodology_text ? { methodology_text } : methodology_text,
-            c1 || c2 ? { createdAt: { [Op.and]: c } } : undefined,
-            u1 || u2 ? { updatedAt: { [Op.and]: u } } : undefined
+            createdAt ? { createdAt } : undefined,
+            updatedAt ? { updatedAt } : undefined
           ),
           include: [
             {
