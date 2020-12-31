@@ -40,26 +40,45 @@ module.exports = app => {
           for (const data of result) {
             // todo
             if (data.userPrincipalName === 'Qiwei@apj.com') {
-              returnResult.push('tomqi@apjcorp.com');
+              returnResult.push({
+                mail: 'tomqi@apjcorp.com',
+                display: 'Tom qi',
+              });
             } else if (data.userPrincipalName === 'shenchengan@apj.com') {
               returnResult.push('rexshen@apjcorp.com');
+              returnResult.push({
+                mail: 'rexshen@apjcorp.com',
+                display: 'Rex shen',
+              });
             } else {
-              returnResult.push(data.mail ? data.mail : data.userPrincipalName);
+              returnResult.push({
+                mail: data.mail ? data.mail : data.userPrincipalName,
+                display: data.displayName,
+              });
             }
           }
         } else if (returnType.toLowerCase() === 'userordistribution') {
           const users = await ctx.service.adService.findUsers(email);
           for (const data of users) {
-            returnResult.push(data.mail ? data.mail : data.userPrincipalName);
+            returnResult.push({
+              mail: data.mail ? data.mail : data.userPrincipalName,
+              display: data.displayName,
+            });
           }
           const groups = await ctx.service.adService.findGroups('cn=*' + email + '*');
           for (const data of groups) {
-            returnResult.push(data.cn);
+            returnResult.push({
+              mail: data.cn,
+              display: data.cn,
+            });
           }
         } else if (returnType.toLowerCase() === 'distribution') {
           const result = await ctx.service.adService.findGroups('cn=*' + email + '*');
           for (const data of result) {
-            returnResult.push(data.cn);
+            returnResult.push({
+              mail: data.cn,
+              display: data.cn,
+            });
           }
         }
         ctx.success(returnResult);
