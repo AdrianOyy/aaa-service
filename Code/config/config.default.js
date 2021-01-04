@@ -98,6 +98,7 @@ module.exports = appInfo => {
 
   config.schedule = {
     interval: '60s',
+    userinterval: '1day',
   };
 
   return config;

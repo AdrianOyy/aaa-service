@@ -59,5 +59,14 @@ module.exports = app => {
       const data = response.data.data;
       return data;
     }
+
+    async getUsersForGroup(groupNames) {
+      const { ctx } = this;
+      const config = app.config.adService;
+      const url = `${config.url}/getUsersForGroup`;
+      const response = await ctx.service.syncActiviti.curl(url, { data: { groupNames } }, ctx);
+      const data = response.data.data;
+      return data;
+    }
   };
 };

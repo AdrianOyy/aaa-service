@@ -108,7 +108,7 @@ module.exports = app => {
                       const msg = message.split('***************************************************************');
                       if (messsage.action === 'Reject') {
                         const rejectString = msg[0];
-                        const rejectReason = rejectString.slice(rejectString.indexOf('in the colon:') + 'in the colon:'.length, rejectString.indexOf('(reason end)'));
+                        const rejectReason = rejectString.slice(rejectString.indexOf('in the colon:') + 'in the colon:'.length);
                         messsage.rejectReason = rejectReason;
                       }
                       const taskIdString = msg[msg.length - 1];
