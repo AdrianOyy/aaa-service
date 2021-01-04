@@ -8,7 +8,7 @@ module.exports = app => {
       const { Op } = app.Sequelize;
       const limit = parseInt(ctx.query.limit) || 10;
       const offset = (parseInt(ctx.query.page || 1) - 1) * limit;
-      const { surname, prop, order } = ctx.query;
+      const { surname, givenName, displayName, email, prop, order } = ctx.query;
       let { createdAt, updatedAt } = ctx.query;
       createdAt = ctx.service.common.getDateRangeCondition(createdAt);
       updatedAt = ctx.service.common.getDateRangeCondition(updatedAt);
@@ -19,6 +19,9 @@ module.exports = app => {
       const where = Object.assign(
         {},
         surname ? { surname: { [Op.like]: `%${surname}%` } } : undefined,
+        givenName ? { givenname: { [Op.like]: `%${givenName}%` } } : undefined,
+        displayName ? { displayname: { [Op.like]: `%${displayName}%` } } : undefined,
+        email ? { email: { [Op.like]: `%${email}%` } } : undefined,
         createdAt ? { createdAt } : undefined,
         updatedAt ? { updatedAt } : undefined
       );
@@ -70,6 +73,9 @@ module.exports = app => {
           }
           if (auth.user && auth.user.userPrincipalName === 'yangzhihong@apj.com') {
             auth.user.userPrincipalName = 'morseyang@apjcorp.com';
+          }
+          if (auth.user && auth.user.userPrincipalName === 'lijunjie@apj.com') {
+            auth.user.userPrincipalName = 'amaneru@163.com';
           }
           const user = await ctx.service.user.loadUser(auth);
           if (user) {

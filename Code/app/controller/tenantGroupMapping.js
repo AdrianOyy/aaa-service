@@ -50,6 +50,7 @@ module.exports = app => {
         ctx.error();
       }
     }
+
     async handledList() {
       const { ctx } = this;
       const rawList = await ctx.model.models.tenant_group_mapping.findAll({
@@ -70,6 +71,7 @@ module.exports = app => {
       });
       ctx.success(list);
     }
+
     async detail() {
       const { ctx } = this;
       const { id } = ctx.query;
@@ -90,6 +92,7 @@ module.exports = app => {
       });
       ctx.success(result);
     }
+
     async update() {
       const { ctx } = this;
       const { id } = ctx.query;
@@ -112,6 +115,7 @@ module.exports = app => {
         ctx.error('service busy');
       }
     }
+
     async create() {
       const { ctx } = this;
       const { tenantId, groupId } = ctx.request.body;
@@ -134,6 +138,7 @@ module.exports = app => {
         throw { status: 500, message: 'service busy' };
       }
     }
+
     async delete() {
       const { ctx } = this;
       const { id } = ctx.query;
@@ -150,6 +155,7 @@ module.exports = app => {
         ctx.error('service busy');
       }
     }
+
     async deleteMany() {
       const { ctx } = this;
       const { Op } = app.Sequelize;
@@ -169,15 +175,15 @@ module.exports = app => {
         ctx.error('service busy');
       }
     }
+
     async checkExist() {
       const { ctx } = this;
       const { Op } = app.Sequelize;
-      const { id, tenantId, groupId } = ctx.query;
+      const { id, tenantId } = ctx.query;
       const count = await ctx.model.models.tenant_group_mapping.count({
         where: {
           id: { [Op.ne]: id },
           tenantId,
-          ad_groupId: groupId,
         },
       });
       ctx.success(count);

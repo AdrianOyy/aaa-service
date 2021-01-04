@@ -5,13 +5,13 @@ module.exports = app => {
 
   const inventory = app.model.define('inventory', {
     id: { type: INTEGER, autoIncrement: true, primaryKey: true },
-    _ID: { type: INTEGER },
+    _ID: { type: STRING },
     UnitCode: { type: STRING },
     EquipID: { type: INTEGER },
-    AssetID: { type: INTEGER },
+    AssetID: { type: STRING },
     ModelCode: { type: STRING },
     ModelDesc: { type: STRING },
-    ClosetID: { type: INTEGER },
+    ClosetID: { type: STRING },
     Rack: { type: STRING },
     RLU: { type: STRING },
     ItemOwner: { type: STRING },
