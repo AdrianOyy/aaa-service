@@ -29,6 +29,7 @@ module.exports = app => {
         throw { status: 500, message: 'service busy' };
       }
     }
+
     async findUsers() {
       const { ctx } = this;
       const { email, returnType } = ctx.request.body;
@@ -86,6 +87,7 @@ module.exports = app => {
         throw { status: 500, message: 'service busy' };
       }
     }
+
     async checkUsers() {
       const { ctx } = this;
       const { emails } = ctx.request.body;

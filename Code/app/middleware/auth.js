@@ -25,7 +25,12 @@ module.exports = (options, app) => {
         id: user.id,
         name: user.displayname,
       };
+      await next();
+      const option = { content: { username: user.sAMAccountName }, expiresIn: app.config.jwt.expiresIn };
+      const newToken = ctx.service.jwtUtils.getToken(option);
+      if (ctx.response.body) {
+        Object.assign(ctx.response.body, { newToken });
+      }
     }
-    await next();
   };
 };

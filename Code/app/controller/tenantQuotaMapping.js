@@ -101,7 +101,7 @@ module.exports = app => {
         tenantId,
         type,
         quota,
-        year: new Date(year).getFullYear(),
+        year: parseInt(year),
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -150,29 +150,16 @@ module.exports = app => {
       }
     }
 
-    async checkTypeExist() {
+    async checkExist() {
       const { ctx } = this;
       const { Op } = app.Sequelize;
-      const { id, tenantId, type } = ctx.query;
+      const { id, tenantId, year, type } = ctx.query;
       const count = await ctx.model.models.tenant_quota_mapping.count({
         where: {
           id: { [Op.ne]: id },
           tenantId,
           type,
-        },
-      });
-      ctx.success(count);
-    }
-
-    async checkYearExist() {
-      const { ctx } = this;
-      const { Op } = app.Sequelize;
-      const { id, tenantId, year } = ctx.query;
-      const count = await ctx.model.models.tenant_quota_mapping.count({
-        where: {
-          id: { [Op.ne]: id },
-          tenantId,
-          year: new Date(year).getFullYear(),
+          year: parseInt(year),
         },
       });
       ctx.success(count);
