@@ -9,6 +9,7 @@ module.exports = app => {
     PowerID: { type: INTEGER },
     InputType: { type: STRING },
     InventoryID: { type: STRING },
+    ServerID: { type: STRING },
   }, {
     paranoid: true,
     tableName: 'powerInput',
@@ -19,6 +20,7 @@ module.exports = app => {
     const ms = app.model.models;
     ms.powerInput.belongsTo(ms.power, { as: 'power', foreignKey: 'PowerID', targetKey: '_ID', constraint: false });
     ms.powerInput.belongsTo(ms.inventory, { as: 'inventory', foreignKey: 'InventoryID', targetKey: '_ID', constraint: false });
+    ms.powerInput.belongsTo(ms.server, { as: 'server', foreignKey: 'ServerID', targetKey: '_ID', constraint: false });
   };
   return powerInput;
 };

@@ -7,6 +7,7 @@ module.exports = app => {
     id: { type: INTEGER, autoIncrement: true, primaryKey: true },
     _ID: { type: INTEGER, unique: true },
     InventoryID: { type: STRING },
+    ServerID: { type: STRING },
     SlotID: { type: STRING },
     PortID: { type: STRING },
     PortType: { type: STRING },

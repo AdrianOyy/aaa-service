@@ -161,6 +161,13 @@ module.exports = app => {
   router.delete(`${prefix}/inventory/deleteMany`, controller.inventory.deleteMany);
   router.get(`${prefix}/inventory/checkIDExist`, controller.inventory.checkIDExist);
 
+  router.get(`${prefix}/server/list`, controller.server.list);
+  router.get(`${prefix}/server/detail`, controller.server.detail);
+  router.post(`${prefix}/server/create`, controller.server.create);
+  router.put(`${prefix}/server/update`, controller.server.update);
+  router.delete(`${prefix}/server/deleteMany`, controller.server.deleteMany);
+  router.get(`${prefix}/server/checkIDExist`, controller.server.checkIDExist);
+
   router.get(`${prefix}/inventoryLifeCycle/list`, controller.inventoryLifeCycle.list);
   router.get(`${prefix}/inventoryLifeCycle/detail`, controller.inventoryLifeCycle.detail);
   router.post(`${prefix}/inventoryLifeCycle/create`, controller.inventoryLifeCycle.create);

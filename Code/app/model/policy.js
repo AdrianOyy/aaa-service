@@ -7,6 +7,7 @@ module.exports = app => {
     id: { type: INTEGER, autoIncrement: true, primaryKey: true },
     _ID: { type: INTEGER, unique: true },
     InventoryID: { type: STRING },
+    ServerID: { type: STRING },
     IPAddress: { type: STRING },
     DefGateway: { type: STRING },
     SubnetMask: { type: STRING },
@@ -26,6 +27,7 @@ module.exports = app => {
   policy.associate = function() {
     const ms = app.model.models;
     ms.policy.belongsTo(ms.inventory, { as: 'inventory', foreignKey: 'InventoryID', targetKey: '_ID', constraint: false });
+    ms.policy.belongsTo(ms.server, { as: 'server', foreignKey: 'ServerID', targetKey: '_ID', constraint: false });
   };
   return policy;
 };
