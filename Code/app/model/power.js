@@ -5,7 +5,7 @@ module.exports = app => {
 
   const power = app.model.define('power', {
     id: { type: INTEGER, autoIncrement: true, primaryKey: true },
-    _ID: { type: INTEGER },
+    _ID: { type: INTEGER, unique: true },
     PowerType: { type: STRING },
   }, {
     paranoid: true,

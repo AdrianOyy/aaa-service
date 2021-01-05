@@ -5,10 +5,11 @@ module.exports = app => {
 
   const powerOutput = app.model.define('powerOutput', {
     id: { type: INTEGER, autoIncrement: true, primaryKey: true },
-    _ID: { type: INTEGER },
+    _ID: { type: INTEGER, unique: true },
     PowerID: { type: INTEGER },
     OutletType: { type: STRING },
-    InventoryID: { type: INTEGER },
+    InventoryID: { type: STRING },
+    ServerID: { type: STRING },
   }, {
     paranoid: true,
     tableName: 'powerOutput',
@@ -19,6 +20,7 @@ module.exports = app => {
     const ms = app.model.models;
     ms.powerOutput.belongsTo(ms.power, { as: 'power', foreignKey: 'PowerID', targetKey: '_ID', constraint: false });
     ms.powerOutput.belongsTo(ms.inventory, { as: 'inventory', foreignKey: 'InventoryID', targetKey: '_ID', constraint: false });
+    ms.powerOutput.belongsTo(ms.server, { as: 'server', foreignKey: 'ServerID', targetKey: '_ID', constraint: false });
   };
   return powerOutput;
 };

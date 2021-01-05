@@ -4,7 +4,6 @@ module.exports = app => {
   return class extends app.Controller {
     async list() {
       const { ctx } = this;
-      const { Op } = app.Sequelize;
       const limit = parseInt(ctx.query.limit) || 10;
       const offset = (parseInt(ctx.query.page || 1) - 1) * limit;
       const { prop, order } = ctx.query;
@@ -156,15 +155,18 @@ module.exports = app => {
 
     async checkIDExist() {
       const { ctx } = this;
-      const { Op } = app.Sequelize;
+      // const { Op } = app.Sequelize;
       const { _ID, id } = ctx.query;
       if (!_ID) ctx.error;
-      const count = await ctx.model.models.inventoryLifeCycle.count({
-        where: Object.assign(
-          { _ID },
-          id ? { id: { [ Op.ne ]: id } } : undefined
-        ),
-      });
+      const sql = 'SELECT count(id) as count FROM inventoryLifeCycle WHERE _ID = ' + _ID + (id ? ' and id != ' + id : '');
+      const query = await app.model.query(sql);
+      const count = query && query[0] && query[0][0] ? query[0][0].count : 0;
+      // const count = await ctx.model.models.inventoryLifeCycle.count({
+      //   where: Object.assign(
+      //     { _ID },
+      //     id ? { id: { [ Op.ne ]: id } } : undefined
+      //   ),
+      // });
       ctx.success(count);
     }
   };

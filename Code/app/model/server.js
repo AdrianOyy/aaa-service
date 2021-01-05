@@ -3,7 +3,7 @@
 module.exports = app => {
   const { INTEGER, STRING, FLOAT, DATE } = app.Sequelize;
 
-  const inventory = app.model.define('inventory', {
+  const server = app.model.define('server', {
     id: { type: INTEGER, autoIncrement: true, primaryKey: true },
     _ID: { type: STRING, unique: true },
     UnitCode: { type: STRING },
@@ -34,18 +34,18 @@ module.exports = app => {
     MaintID: { type: STRING },
   }, {
     paranoid: true,
-    tableName: 'inventory',
-    tableCnName: '状态',
+    tableName: 'server',
+    tableCnName: '服务',
   });
 
-  inventory.associate = function() {
+  server.associate = function() {
     const ms = app.model.models;
-    ms.inventory.belongsTo(ms.inventoryStatus, { as: 'status', foreignKey: 'Status', constraint: false });
-    ms.inventory.belongsTo(ms.equipType, { as: 'equipType', foreignKey: 'EquipType', constraint: false });
-    ms.inventory.hasMany(ms.policy, { as: 'policy', foreignKey: 'InventoryID', sourceKey: '_ID', constraint: false });
-    ms.inventory.hasMany(ms.equipmentPort, { as: 'equipPort', foreignKey: 'InventoryID', sourceKey: '_ID', constraint: false });
-    ms.inventory.hasMany(ms.powerInput, { as: 'powerInput', foreignKey: 'InventoryID', sourceKey: '_ID', constraint: false });
-    ms.inventory.hasMany(ms.powerOutput, { as: 'powerOutput', foreignKey: 'InventoryID', sourceKey: '_ID', constraint: false });
+    ms.server.belongsTo(ms.inventoryStatus, { as: 'status', foreignKey: 'Status', constraint: false });
+    ms.server.belongsTo(ms.equipType, { as: 'equipType', foreignKey: 'EquipType', constraint: false });
+    ms.server.hasMany(ms.policy, { as: 'policy', foreignKey: 'ServerID', sourceKey: '_ID', constraint: false });
+    ms.server.hasMany(ms.equipmentPort, { as: 'equipPort', foreignKey: 'ServerID', sourceKey: '_ID', constraint: false });
+    ms.server.hasMany(ms.powerInput, { as: 'powerInput', foreignKey: 'ServerID', sourceKey: '_ID', constraint: false });
+    ms.server.hasMany(ms.powerOutput, { as: 'powerOutput', foreignKey: 'ServerID', sourceKey: '_ID', constraint: false });
   };
-  return inventory;
+  return server;
 };

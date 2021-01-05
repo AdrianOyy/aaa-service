@@ -5,8 +5,8 @@ module.exports = app => {
 
   const inventoryLifeCycle = app.model.define('inventoryLifeCycle', {
     id: { type: INTEGER, autoIncrement: true, primaryKey: true },
-    _ID: { type: STRING },
-    InventoryID: { type: INTEGER },
+    _ID: { type: STRING, unique: true },
+    InventoryID: { type: STRING },
     AssetID: { type: STRING },
     RecordCreatedOn: { type: DATE },
     ActionType: { type: STRING },

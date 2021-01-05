@@ -32,21 +32,7 @@ module.exports = app => {
         model: ctx.model.models.equipType,
         as: 'equipType',
       }];
-      const result = await ctx.model.models.inventory.findAndCountAll(findAdParams);
-      ctx.success(result);
-    }
-
-    async listStatus() {
-      const { ctx } = this;
-
-      const result = await ctx.model.models.inventoryStatus.findAll({});
-      ctx.success(result);
-    }
-
-    async listEquipType() {
-      const { ctx } = this;
-
-      const result = await ctx.model.models.equipType.findAll({});
+      const result = await ctx.model.models.server.findAndCountAll(findAdParams);
       ctx.success(result);
     }
 
@@ -57,7 +43,7 @@ module.exports = app => {
         ctx.success();
         return;
       }
-      const inventory = await ctx.model.models.inventory.findOne({
+      const server = await ctx.model.models.server.findOne({
         where: {
           id,
         },
@@ -92,7 +78,7 @@ module.exports = app => {
           },
         ],
       });
-      ctx.success(inventory);
+      ctx.success(server);
     }
 
     async create() {
@@ -103,7 +89,7 @@ module.exports = app => {
         DOB, DeliveryDate, DeliveryNoteReceivedDate, MaintID, EquipType,
       } = ctx.request.body;
       if (!_ID || !EquipType) ctx.error();
-      const inventory = {
+      const server = {
         _ID,
         EquipType,
         AssetID: AssetID ? AssetID : null,
@@ -127,7 +113,7 @@ module.exports = app => {
         updatedAt: new Date(),
       };
       try {
-        await ctx.model.models.inventory.create(inventory);
+        await ctx.model.models.server.create(server);
         ctx.success();
       } catch (error) {
         console.log(error.message);
@@ -144,7 +130,7 @@ module.exports = app => {
         DOB, DeliveryDate, DeliveryNoteReceivedDate, MaintID, EquipType,
       } = ctx.request.body;
       if (!_ID) ctx.error();
-      const oldModel = await ctx.model.models.inventory.findByPk(id);
+      const oldModel = await ctx.model.models.server.findByPk(id);
       if (!oldModel) ctx.error();
       const newModel = {
         _ID,
@@ -186,7 +172,7 @@ module.exports = app => {
       const { idList } = ctx.request.body;
       if (!idList || !idList.length) ctx.error();
       try {
-        await ctx.model.models.inventory.destroy({
+        await ctx.model.models.server.destroy({
           where: {
             id: { [Op.in]: idList },
           },
@@ -205,10 +191,10 @@ module.exports = app => {
       // const { Op } = app.Sequelize;
       const { _ID, id } = ctx.query;
       if (!_ID) ctx.error;
-      const sql = 'SELECT count(id) as count FROM inventory WHERE _ID = ' + _ID + (id ? ' and id != ' + id : '');
+      const sql = 'SELECT count(id) as count FROM server WHERE _ID = ' + _ID + (id ? ' and id != ' + id : '');
       const query = await app.model.query(sql);
       const count = query && query[0] && query[0][0] ? query[0][0].count : 0;
-      // const count = await ctx.model.models.inventory.count({
+      // const count = await ctx.model.models.server.count({
       //   where: Object.assign(
       //     { _ID },
       //     id ? { id: { [ Op.ne ]: id } } : undefined

@@ -13,7 +13,7 @@ module.exports = app => {
       'vm_platform_applicationType', 'vm_type_zone_cdc',
       'resource_request_history', 'dynamicForm', 'dynamicFormDetail', 'vm_cluster_dc_mapping',
       'tenant_hostname_reference', 'ip_assignment', 'inventoryStatus', 'equipType',
-      'inventory', 'policy', 'equipmentPort', 'portAssignment', 'power', 'powerInput',
+      'inventory', 'server', 'policy', 'equipmentPort', 'portAssignment', 'power', 'powerInput',
       'powerOutput', 'inventoryLifeCycle', 'clinical_group',
       'account_type', 'apply_for', 'apply_for_internet', 'authentication_method', 'clinical_applications',
       'is_same', 'owa_webmail', 'yes_no', 'staff_type', 'non_clinical_applications',
