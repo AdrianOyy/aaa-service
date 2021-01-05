@@ -96,9 +96,9 @@ module.exports = appInfo => {
   config.schedule = {
     interval: '60s',
   };
-
+  const cron = process.env.npm_config_loadCron ? process.env.npm_config_loadCron : '0 0 23 * * *';
   config.loadUser = {
-    cron: '0 0 23 * * *',
+    cron,
   };
 
   return config;

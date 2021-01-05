@@ -1,7 +1,7 @@
 'use strict';
 
 const dayjs = require('dayjs');
-const loadUser = process.env.npm_config_loadUser ? process.env.npm_config_loadUser : 'N';
+const loadFlag = process.env.npm_config_loadFlag ? process.env.npm_config_loadFlag : 'Y';
 
 module.exports = app => {
   return {
@@ -10,12 +10,13 @@ module.exports = app => {
       immediate: true,
       type: 'all',
     },
-    // loadUser 默认为N不开启，RY 设置时，启动时会执行一次，Y 21点前设置不立即执行
+    // loadFlag 默认为N不开启，RY 设置时，启动时会执行一次，Y 21点前设置不立即执行
     async task(ctx) {
-      if (loadUser === 'N') {
+      console.log(app.config.loadUser.cron);
+      if (loadFlag === 'N') {
         return;
       }
-      if (loadUser !== 'RY' && dayjs(new Date()).hour() < 21) {
+      if (loadFlag !== 'RY' && dayjs(new Date()).hour() < 21) {
         console.log(new Date(), 'load user task: 未立即执行');
         return;
       }

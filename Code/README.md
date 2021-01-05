@@ -51,8 +51,11 @@ docker run -dit \
 -e transitionHost=10.231.131.123:3000 \
 -e rejectUnauthorized=N \
 -e cpsurl=https://cps-dev-api.cldpaast71.serverdev.hadev.org.hk/cps/alladhoc/ \
--e loadUser=Y \
 aaa-service
 ````
 --rejectUnauthorized 是否忽略证书 默认为N， 不填或N为忽略证书，Y为不忽略证书
 --cpsurl cps请求地址，默认https://cps-dev-api.cldpaast71.serverdev.hadev.org.hk/cps/alladhoc/
+-e loadUser=Y \
+-e loadCron=0 0 23 * * * \
+--loadUser 是否执行同步用户，为N不执行，RY马上执行一次，之后按照Cron执行。默认为Y 21点后马上执行一次，之后按照Cron执行；21点前不马上执行，按照Cron执行。
+--loadCron 同步用户，Cron配置，默认为0 0 23 * * *，。每天23点。
