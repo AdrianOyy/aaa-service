@@ -152,7 +152,7 @@ module.exports = app => {
         updatedAt: new Date(),
       };
       try {
-        if (!dayjs(expiryDate).isSame(oldModel.expiryDate)) {
+        if (dayjs(expiryDate).format('YYYY-MM-DD') !== dayjs(oldModel.expiryDate).format('YYYY-MM-DD')) {
           await oldModel.update(newModel);
         }
         ctx.success();

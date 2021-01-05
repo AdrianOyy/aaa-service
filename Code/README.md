@@ -51,6 +51,7 @@ docker run -dit \
 -e transitionHost=10.231.131.123:3000 \
 -e rejectUnauthorized=N \
 -e cpsurl=https://cps-dev-api.cldpaast71.serverdev.hadev.org.hk/cps/alladhoc/ \
+-e loadUser=Y \
 aaa-service
 ````
 --rejectUnauthorized 是否忽略证书 默认为N， 不填或N为忽略证书，Y为不忽略证书
