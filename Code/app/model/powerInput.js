@@ -5,10 +5,10 @@ module.exports = app => {
 
   const powerInput = app.model.define('powerInput', {
     id: { type: INTEGER, autoIncrement: true, primaryKey: true },
-    _ID: { type: INTEGER },
+    _ID: { type: INTEGER, unique: true },
     PowerID: { type: INTEGER },
     InputType: { type: STRING },
-    InventoryID: { type: INTEGER },
+    InventoryID: { type: STRING },
   }, {
     paranoid: true,
     tableName: 'powerInput',

@@ -5,8 +5,8 @@ module.exports = app => {
 
   const equipmentPort = app.model.define('equipmentPort', {
     id: { type: INTEGER, autoIncrement: true, primaryKey: true },
-    _ID: { type: INTEGER },
-    InventoryID: { type: INTEGER },
+    _ID: { type: INTEGER, unique: true },
+    InventoryID: { type: STRING },
     SlotID: { type: STRING },
     PortID: { type: STRING },
     PortType: { type: STRING },

@@ -5,7 +5,7 @@ module.exports = app => {
 
   const inventory = app.model.define('inventory', {
     id: { type: INTEGER, autoIncrement: true, primaryKey: true },
-    _ID: { type: STRING },
+    _ID: { type: STRING, unique: true },
     UnitCode: { type: STRING },
     EquipID: { type: INTEGER },
     AssetID: { type: STRING },
