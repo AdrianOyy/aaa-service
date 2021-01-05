@@ -98,7 +98,10 @@ module.exports = appInfo => {
 
   config.schedule = {
     interval: '60s',
-    userinterval: '1day',
+  };
+
+  config.loadUser = {
+    cron: '0 0 23 * * *',
   };
 
   return config;

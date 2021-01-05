@@ -1,5 +1,7 @@
 'use strict';
 
+const dayjs = require('dayjs');
+
 module.exports = app => {
   return class extends app.Controller {
     async list() {
@@ -150,7 +152,9 @@ module.exports = app => {
         updatedAt: new Date(),
       };
       try {
-        await oldModel.update(newModel);
+        if (!dayjs(expiryDate).isSame(oldModel.expiryDate)) {
+          await oldModel.update(newModel);
+        }
         ctx.success();
       } catch (error) {
         console.log('error==========================error');
