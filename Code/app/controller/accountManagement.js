@@ -46,7 +46,6 @@ module.exports = app => {
                 display: 'Tom qi',
               });
             } else if (data.userPrincipalName === 'shenchengan@apj.com') {
-              returnResult.push('rexshen@apjcorp.com');
               returnResult.push({
                 mail: 'rexshen@apjcorp.com',
                 display: 'Rex shen',
