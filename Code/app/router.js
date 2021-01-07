@@ -184,4 +184,6 @@ module.exports = app => {
   router.post(`${prefix}/accountManagement/getUsersByEmails`, controller.accountManagement.getUsersByEmails);
   router.post(`${prefix}/accountManagement/findUsers`, controller.accountManagement.findUsers);
   router.post(`${prefix}/accountManagement/checkUsers`, controller.accountManagement.checkUsers);
+  router.get(`${prefix}/accountManagement/getPublicKey`, controller.accountManagement.getPublicKey);
+  router.post(`${prefix}/accountManagement/getDisplayName`, controller.accountManagement.getDisplayName);
 };

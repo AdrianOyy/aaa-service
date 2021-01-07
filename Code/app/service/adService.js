@@ -24,6 +24,7 @@ module.exports = app => {
       }
       return result;
     }
+
     async userExistsMany(usernames) {
       const { ctx } = this;
       const config = app.config.adService;

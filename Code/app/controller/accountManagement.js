@@ -105,5 +105,28 @@ module.exports = app => {
         throw { status: 500, message: 'service busy' };
       }
     }
+
+    async getDisplayName() {
+      const { ctx } = this;
+      const { valueList, returnType } = ctx.request.body;
+      if (!valueList) ctx.success([]);
+      const config = app.config.adService;
+      const url = `${config.url}/findDisplayNames`;
+      const data = await ctx.service.syncActiviti.curl(url, {
+        method: 'POST',
+        data: {
+          emails: valueList,
+          type: returnType,
+        },
+      }, ctx);
+      const res = data && data.data ? data.data.data : [];
+      ctx.success(res);
+    }
+
+    async getPublicKey() {
+      const { ctx } = this;
+      const publicKey = 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC8HMr2CBpoZPm3t9tCVlrKtTmI4jNJc7/HhxjIEiDjC8czP4PV+44LjXvLYcSV0fwi6nE4LH2c5PBPEnPfqp0g8TZeX+bYGvd70cXee9d8wHgBqi4k0J0X33c0ZnW7JruftPyvJo9OelYSofBXQTcwI+3uIl/YvrgQRv6A5mW01QIDAQAB';
+      ctx.success(publicKey);
+    }
   };
 };
