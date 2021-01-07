@@ -76,7 +76,7 @@ module.exports = app => {
       const newModel = {
         type,
         quota,
-        year: new Date(year).getFullYear(),
+        year: parseInt(year),
         updatedAt: new Date(),
       };
       try {
