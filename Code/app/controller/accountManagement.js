@@ -44,16 +44,19 @@ module.exports = app => {
               returnResult.push({
                 mail: 'tomqi@apjcorp.com',
                 display: 'Tom qi',
+                corp: data.cn,
               });
             } else if (data.userPrincipalName === 'shenchengan@apj.com') {
               returnResult.push({
                 mail: 'rexshen@apjcorp.com',
                 display: 'Rex shen',
+                corp: data.cn,
               });
             } else {
               returnResult.push({
                 mail: data.mail ? data.mail : data.userPrincipalName,
                 display: data.displayName,
+                corp: data.cn,
               });
             }
           }
@@ -63,6 +66,7 @@ module.exports = app => {
             returnResult.push({
               mail: data.mail ? data.mail : data.userPrincipalName,
               display: data.displayName,
+              corp: data.cn,
             });
           }
           const groups = await ctx.service.adService.findGroups('cn=*' + email + '*');
@@ -70,6 +74,7 @@ module.exports = app => {
             returnResult.push({
               mail: data.cn,
               display: data.cn,
+              corp: data.cn,
             });
           }
         } else if (returnType.toLowerCase() === 'distribution') {
@@ -78,6 +83,7 @@ module.exports = app => {
             returnResult.push({
               mail: data.cn,
               display: data.cn,
+              corp: data.cn,
             });
           }
         }
@@ -107,14 +113,15 @@ module.exports = app => {
 
     async getDisplayName() {
       const { ctx } = this;
-      const { valueList, returnType } = ctx.request.body;
+      const { valueList, returnType, isCorp } = ctx.request.body;
       if (!valueList) ctx.success([]);
       const config = app.config.adService;
       const url = `${config.url}/findDisplayNames`;
       const data = await ctx.service.syncActiviti.curl(url, {
         method: 'POST',
         data: {
-          emails: valueList,
+          emails: isCorp ? undefined : valueList,
+          corps: isCorp ? valueList : undefined,
           type: returnType,
         },
       }, ctx);

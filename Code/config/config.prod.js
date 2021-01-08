@@ -10,17 +10,36 @@ module.exports = appInfo => {
   //             ORM 设置
   // ===================================
   config.sequelize = {
-    dialect: process.env.npm_config_dbType, // support: mysql, mariadb, postgres, mssql
-    database: process.env.npm_config_dbName,
-    host: process.env.npm_config_dbHost,
-    port: process.env.npm_config_dbPort,
-    username: process.env.npm_config_dbUser,
-    password: process.env.npm_config_dbPassword,
-    logging: false,
-    define: {
-      freezeTableName: false,
-      underscored: false,
-    },
+    datasources: [
+      {
+        delegate: 'model',
+        dialect: process.env.npm_config_dbType, // support: mysql, mariadb, postgres, mssql
+        database: process.env.npm_config_dbName,
+        host: process.env.npm_config_dbHost,
+        port: process.env.npm_config_dbPort,
+        username: process.env.npm_config_dbUser,
+        password: process.env.npm_config_dbPassword,
+        logging: false,
+        define: {
+          freezeTableName: false,
+          underscored: false,
+        },
+      },
+      {
+        delegate: 'procedureModel',
+        dialect: process.env.npm_config_dbType, // support: mysql, mariadb, postgres, mssql
+        database: process.env.npm_config_dbName,
+        host: process.env.npm_config_dbHost,
+        port: process.env.npm_config_dbPort,
+        username: process.env.npm_config_dbUser,
+        password: process.env.npm_config_dbPassword,
+        logging: false,
+        define: {
+          freezeTableName: false,
+          underscored: false,
+        },
+      },
+    ],
   };
 
   config.mailer = {
@@ -71,6 +90,11 @@ module.exports = appInfo => {
   config.adService = {
     url: outboundUrl + '/adService',
   };
+
+  config.procedure = {
+    fnName: process.env.npm_config_procedureFn,
+  };
+
 
   config.activiti = {
     url: process.env.npm_config_activitiUrl,

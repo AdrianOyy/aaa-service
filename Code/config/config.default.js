@@ -10,17 +10,36 @@ module.exports = appInfo => {
   //             ORM 设置
   // ===================================
   config.sequelize = {
-    dialect: 'mysql', // support: mysql, mariadb, postgres, mssql
-    database: 'aaa_service',
-    host: '10.231.131.123',
-    port: '3306',
-    username: 'admin',
-    password: 'APJ@com123',
-    logging: false,
-    define: {
-      freezeTableName: false,
-      underscored: false,
-    },
+    datasources: [
+      {
+        delegate: 'model',
+        dialect: 'mysql', // support: mysql, mariadb, postgres, mssql
+        database: 'aaa_service',
+        host: '10.231.131.123',
+        port: '3306',
+        username: 'admin',
+        password: 'APJ@com123',
+        logging: false,
+        define: {
+          freezeTableName: false,
+          underscored: false,
+        },
+      },
+      {
+        delegate: 'procedureModel',
+        dialect: 'mysql', // support: mysql, mariadb, postgres, mssql
+        database: 'nsr_gis_app',
+        host: '10.231.131.123',
+        port: '3306',
+        username: 'admin',
+        password: 'APJ@com123',
+        logging: false,
+        define: {
+          freezeTableName: false,
+          underscored: false,
+        },
+      },
+    ],
   };
 
   config.mailer = {
@@ -74,6 +93,10 @@ module.exports = appInfo => {
     url: outboundUrl + '',
   };
 
+  config.procedure = {
+    fnName: 'sp_getLocationList',
+  };
+
   config.activiti = {
     // url: 'http://localhost:8888',
     url: 'http://10.231.131.123:3004',
@@ -82,9 +105,10 @@ module.exports = appInfo => {
   // ===================================
   //           全局 中间件 设置
   // ===================================
-  config.middleware = [ 'log', 'auth' ];
+  // config.middleware = [ 'log', 'auth' ];
+  config.middleware = [ 'auth' ];
   config.auth = {
-    ignore: [ '/user/login', '/tenant/getCps', '/tenant/testCps' ],
+    ignore: [ '/user/login', '/tenant/getCps', '/tenant/testCps', '/procedure/call' ],
   };
   config.log = {
     tsHost: '127.0.0.1:3001',
