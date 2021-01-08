@@ -1,7 +1,7 @@
 'use strict';
 
 const dayjs = require('dayjs');
-const loadFlag = process.env.npm_config_loadFlag ? process.env.npm_config_loadFlag : 'Y';
+const loadFlag = process.env.npm_config_loadFlag ? process.env.npm_config_loadFlag : 'N';
 
 module.exports = app => {
   return {

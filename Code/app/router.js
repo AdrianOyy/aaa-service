@@ -76,6 +76,7 @@ module.exports = app => {
   router.get(`${prefix}/user/detail`, controller.user.detail);
   router.post(`${prefix}/user/login`, controller.user.login);
   router.post(`${prefix}/user/findUser`, controller.user.findUser);
+  router.post(`${prefix}/user/getUsersForGroup`, controller.user.getUsersForGroup);
 
   router.get(`${prefix}/user_group_mapping/list`, controller.userGourpMapping.list);
   router.get(`${prefix}/user_group_mapping/detail`, controller.userGourpMapping.detail);
