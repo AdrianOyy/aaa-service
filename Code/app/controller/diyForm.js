@@ -95,9 +95,34 @@ module.exports = app => {
         }
         const emails = parentData.supervisoremailaccount.value.split(',');
         const result = await ctx.service.syncActiviti.getUsersByEmails({ emails }, { headers: ctx.headers });
-        let userIds = [];
-        result && result.data && result.data.length > 0 ? userIds = result.data.map(_ => { return _.id; }) : undefined;
-        userIds && userIds.length > 0 ? activitiData.variables.manager_user_id = userIds : undefined;
+        const userIds = [];
+        if (result && result.data && result.data.length > 0) {
+          result.data.forEach(_ => {
+            if (_) {
+              userIds.push(_.id);
+            }
+          });
+        }
+        if (userIds && userIds.length > 0) {
+          activitiData.variables.manager_user_id = userIds;
+        } else {
+          const res = await ctx.service.adService.findUsersByEmails(emails.map(_ => {
+            if (_ === 'tomqi@apjcorp.com') {
+              return 'qiwei@apj.com';
+            }
+            return _;
+          }));
+          const token = await ctx.service.jwtUtils.getToken({ content: { username: 'shenchengan' }, expiresIn: app.config.jwt.expiresIn });
+          for (let i = 0; i < res.length; i++) {
+            const auth = {};
+            auth.token = token;
+            auth.user = res[i].user;
+            auth.groups = res[i].groups;
+            const user = await ctx.service.user.loadUser(auth);
+            user ? userIds.push(user.id.toString()) : undefined;
+          }
+          activitiData.variables.manager_user_id = userIds;
+        }
       }
       // 启动流程
       const { pid, message, error } = await ctx.service.syncActiviti.startProcess(activitiData, { headers: ctx.headers });

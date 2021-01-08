@@ -109,5 +109,34 @@ module.exports = app => {
       const user = await ctx.service.adService.findUser(username);
       ctx.success(user);
     }
+
+    async getUsersForGroup() {
+      const { ctx } = this;
+      const { groupNames } = ctx.request.body;
+      const oldUsers = await ctx.model.models.user.findAll({
+        raw: true,
+        attributes: [ 'sAMAccountName' ],
+      });
+      const filterUsers = [];
+      if (oldUsers && oldUsers.length > 0) {
+        oldUsers.forEach(_ => {
+          if (_.sAMAccountName) {
+            filterUsers.push(_.sAMAccountName);
+          }
+        });
+      }
+      const groupUsers = await ctx.service.adService.getUsersForGroup(groupNames);
+      const result = [];
+      if (groupUsers && groupUsers.length > 0) {
+        groupUsers.forEach(_ => {
+          if (filterUsers.includes(_.user.sAMAccountName)) {
+            result.push({ mail: (_.user.mail ? _.user.mail : _.user.userPrincipalName), isLogin: true });
+          } else {
+            result.push({ mail: (_.user.mail ? _.user.mail : _.user.userPrincipalName), isLogin: false });
+          }
+        });
+      }
+      ctx.success(result);
+    }
   };
 };

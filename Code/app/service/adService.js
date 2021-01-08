@@ -69,5 +69,14 @@ module.exports = app => {
       const data = response.data.data;
       return data;
     }
+
+    async findUsersByEmails(emails) {
+      const { ctx } = this;
+      const config = app.config.adService;
+      const url = `${config.url}/findUsersByEmails`;
+      const response = await ctx.service.syncActiviti.curl(url, { data: { emails } }, ctx);
+      const data = response.data.data;
+      return data;
+    }
   };
 };
