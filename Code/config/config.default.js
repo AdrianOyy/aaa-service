@@ -108,7 +108,7 @@ module.exports = appInfo => {
   // config.middleware = [ 'log', 'auth' ];
   config.middleware = [ 'auth' ];
   config.auth = {
-    ignore: [ '/user/login', '/tenant/getCps', '/tenant/testCps', '/procedure/call' ],
+    ignore: [ '/user/login', '/tenant/getCps', '/tenant/testCps' ],
   };
   config.log = {
     tsHost: '127.0.0.1:3001',
