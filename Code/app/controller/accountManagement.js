@@ -32,12 +32,12 @@ module.exports = app => {
 
     async findUsers() {
       const { ctx } = this;
-      const { email, returnType } = ctx.request.body;
+      const { email, returnType, isCorp } = ctx.request.body;
       if (!email) ctx.error();
       try {
         const returnResult = [];
         if (!returnType || returnType.toLowerCase() === 'user') {
-          const result = await ctx.service.adService.findUsers(email);
+          const result = await ctx.service.adService.findUsers(email, isCorp);
           for (const data of result) {
             // todo
             if (data.userPrincipalName === 'Qiwei@apj.com') {
@@ -61,7 +61,7 @@ module.exports = app => {
             }
           }
         } else if (returnType.toLowerCase() === 'userordistribution') {
-          const users = await ctx.service.adService.findUsers(email);
+          const users = await ctx.service.adService.findUsers(email, isCorp);
           for (const data of users) {
             returnResult.push({
               mail: data.mail ? data.mail : data.userPrincipalName,
