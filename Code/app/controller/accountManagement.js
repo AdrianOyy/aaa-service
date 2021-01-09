@@ -72,8 +72,8 @@ module.exports = app => {
           const groups = await ctx.service.adService.findGroups('&(objectClass=group)|(displayName=*' + email + '*)(cn=*' + email + '*)(sAMAccountName=*' + email + '*)');
           for (const data of groups) {
             returnResult.push({
-              mail: data.cn,
-              display: data.cn,
+              mail: data.displayName ? data.displayName : data.cn,
+              display: data.displayName ? data.displayName : data.cn,
               corp: data.cn,
             });
           }
@@ -81,8 +81,8 @@ module.exports = app => {
           const result = await ctx.service.adService.findGroups('&(objectClass=group)|(displayName=*' + email + '*)(cn=*' + email + '*)(sAMAccountName=*' + email + '*)');
           for (const data of result) {
             returnResult.push({
-              mail: data.cn,
-              display: data.cn,
+              mail: data.displayName ? data.displayName : data.cn,
+              display: data.displayName ? data.displayName : data.cn,
               corp: data.cn,
             });
           }
