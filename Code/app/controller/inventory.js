@@ -204,8 +204,8 @@ module.exports = app => {
       const { ctx } = this;
       // const { Op } = app.Sequelize;
       const { _ID, id } = ctx.query;
-      if (!_ID) ctx.error;
-      const sql = 'SELECT count(id) as count FROM inventory WHERE _ID = ' + _ID + (id ? ' and id != ' + id : '');
+      if (!_ID || !id) ctx.error;
+      const sql = `SELECT count(id) as count FROM inventory WHERE _ID = \'${_ID}\' and id != \'${id}\'`;
       const query = await app.model.query(sql);
       const count = query && query[0] && query[0][0] ? query[0][0].count : 0;
       // const count = await ctx.model.models.inventory.count({

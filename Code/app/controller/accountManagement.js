@@ -69,7 +69,7 @@ module.exports = app => {
               corp: data.cn,
             });
           }
-          const groups = await ctx.service.adService.findGroups('cn=*' + email + '*');
+          const groups = await ctx.service.adService.findGroups('&(objectClass=group)|(displayName=*' + email + '*)(cn=*' + email + '*)(sAMAccountName=*' + email + '*)');
           for (const data of groups) {
             returnResult.push({
               mail: data.cn,
@@ -78,7 +78,7 @@ module.exports = app => {
             });
           }
         } else if (returnType.toLowerCase() === 'distribution') {
-          const result = await ctx.service.adService.findGroups('cn=*' + email + '*');
+          const result = await ctx.service.adService.findGroups('&(objectClass=group)|(displayName=*' + email + '*)(cn=*' + email + '*)(sAMAccountName=*' + email + '*)');
           for (const data of result) {
             returnResult.push({
               mail: data.cn,
