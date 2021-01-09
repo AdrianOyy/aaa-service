@@ -53,21 +53,25 @@ module.exports = app => {
                 corp: data.cn,
               });
             } else {
+              if ((data.mail || data.userPrincipalName) && data.displayName) {
+                returnResult.push({
+                  mail: data.mail ? data.mail : data.userPrincipalName,
+                  display: data.displayName,
+                  corp: data.cn,
+                });
+              }
+            }
+          }
+        } else if (returnType.toLowerCase() === 'userordistribution') {
+          const users = await ctx.service.adService.findUsers(email, isCorp);
+          for (const data of users) {
+            if ((data.mail || data.userPrincipalName) && data.displayName) {
               returnResult.push({
                 mail: data.mail ? data.mail : data.userPrincipalName,
                 display: data.displayName,
                 corp: data.cn,
               });
             }
-          }
-        } else if (returnType.toLowerCase() === 'userordistribution') {
-          const users = await ctx.service.adService.findUsers(email, isCorp);
-          for (const data of users) {
-            returnResult.push({
-              mail: data.mail ? data.mail : data.userPrincipalName,
-              display: data.displayName,
-              corp: data.cn,
-            });
           }
           const groups = await ctx.service.adService.findGroups('&(objectClass=group)|(displayName=*' + email + '*)(cn=*' + email + '*)(sAMAccountName=*' + email + '*)');
           for (const data of groups) {
