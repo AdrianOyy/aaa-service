@@ -45,20 +45,20 @@ module.exports = app => {
               returnResult.push({
                 mail: 'tomqi@apjcorp.com',
                 display: 'Tom qi',
-                corp: data.cn,
+                corp: data.sAMAccountName,
               });
             } else if (data.userPrincipalName === 'shenchengan@apj.com') {
               returnResult.push({
                 mail: 'rexshen@apjcorp.com',
                 display: 'Rex shen',
-                corp: data.cn,
+                corp: data.sAMAccountName,
               });
             } else {
               if ((data.mail || data.userPrincipalName) && data.displayName) {
                 returnResult.push({
                   mail: data.mail ? data.mail : data.userPrincipalName,
                   display: data.displayName,
-                  corp: data.cn,
+                  corp: data.sAMAccountName,
                 });
               }
             }
@@ -72,20 +72,20 @@ module.exports = app => {
               returnResult.push({
                 mail: 'tomqi@apjcorp.com',
                 display: 'Tom qi',
-                corp: data.cn,
+                corp: data.sAMAccountName,
               });
             } else if (data.userPrincipalName === 'shenchengan@apj.com') {
               returnResult.push({
                 mail: 'rexshen@apjcorp.com',
                 display: 'Rex shen',
-                corp: data.cn,
+                corp: data.sAMAccountName,
               });
             } else {
               if ((data.mail || data.userPrincipalName) && data.displayName) {
                 returnResult.push({
                   mail: data.mail ? data.mail : data.userPrincipalName,
                   display: data.displayName,
-                  corp: data.cn,
+                  corp: data.sAMAccountName,
                 });
               }
             }
@@ -95,7 +95,7 @@ module.exports = app => {
             returnResult.push({
               mail: data.mail,
               display: data.displayName,
-              corp: data.cn,
+              corp: data.sAMAccountName,
             });
           }
         }
@@ -106,7 +106,7 @@ module.exports = app => {
               returnResult.push({
                 mail: data.mail,
                 display: data.displayName,
-                corp: data.cn,
+                corp: data.sAMAccountName,
               });
             }
           }
