@@ -137,21 +137,14 @@ module.exports = app => {
 
     async getDisplayName() {
       const { ctx } = this;
-      const { valueList, returnType, isCorp } = ctx.request.body;
-      if (!valueList) ctx.success([]);
+      const { keywordList } = ctx.request.body;
+      if (!keywordList) ctx.success([]);
       const config = app.config.adService;
       const url = `${config.url}/findDisplayNames`;
-      const a = {
-        emails: isCorp ? undefined : valueList,
-        corps: isCorp ? valueList : undefined,
-        type: returnType,
-      };
       const data = await ctx.service.syncActiviti.curl(url, {
         method: 'POST',
         data: {
-          emails: isCorp ? undefined : valueList,
-          corps: isCorp ? valueList : undefined,
-          type: returnType,
+          keywordList,
         },
       }, ctx);
       const res = data && data.data ? data.data.data : [];
