@@ -16,14 +16,6 @@ module.exports = app => {
         include: {
           model: ctx.model.models.ad_group,
           as: 'ad_group',
-          include: {
-            model: ctx.model.models.tenant_group_mapping,
-            as: 'tenantGroupMapping',
-            include: {
-              model: ctx.model.models.tenant,
-              as: 'tenant',
-            },
-          },
         },
       });
       const tenantList = [];

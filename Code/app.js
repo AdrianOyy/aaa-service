@@ -36,23 +36,37 @@ module.exports = app => {
     // 初始化数据
     const model = app.model.models;
     const fixturesPath = 'app/model/fixtures/';
+    console.log('Start initializing database');
+    console.log('=============================================');
     if (!await model.group.findOne()) {
+      console.log('Now: group');
       await sequelizeFixtures.loadFile(fixturesPath + 'group.js', model);
     }
     if (!await model.vm_platform_type.findOne()) {
+      console.log('Now: vm_platform_type');
       await sequelizeFixtures.loadFile(fixturesPath + 'vm_platform_type.js', model);
     }
     if (!await model.inventoryStatus.findOne()) {
+      console.log('Now: inventoryStatus');
       await sequelizeFixtures.loadFile(fixturesPath + 'inventoryStatus.js', model);
     }
     if (!await model.equipType.findOne()) {
+      console.log('Now: equipType');
       await sequelizeFixtures.loadFile(fixturesPath + 'equipType.js', model);
     }
     if (!await model.vm_cdc.findOne()) {
+      console.log('Now: vm_cdc');
       await sequelizeFixtures.loadFile(fixturesPath + 'vm_cdc.js', model);
     }
     if (!await model.account_type.findOne()) {
+      console.log('Now: account_type');
       await sequelizeFixtures.loadFile(fixturesPath + 'account_type.js', model);
     }
+    if (!await model.role.findOne()) {
+      console.log('Now: role');
+      await sequelizeFixtures.loadFile(fixturesPath + 'role.js', model);
+    }
+    console.log('=============================================');
+    console.log('End initializing database');
   });
 };

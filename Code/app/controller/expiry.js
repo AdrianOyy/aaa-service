@@ -32,47 +32,6 @@ module.exports = app => {
           ),
           include: [
             {
-              model: ctx.model.models.assign,
-              as: 'assign',
-              include: [
-                {
-                  model: ctx.model.models.tenant_group_mapping,
-                  as: 'tenant_group_mapping',
-                  include: [
-                    {
-                      model: ctx.model.models.tenant,
-                      as: 'tenant',
-                      where: Object.assign(
-                        {},
-                        tenantId ? { id: tenantId } : undefined
-                      ),
-                      required: true,
-                    },
-                    {
-                      model: ctx.model.models.ad_group,
-                      as: 'ad_group',
-                      where: Object.assign(
-                        {},
-                        groupId ? { id: groupId } : undefined
-                      ),
-                      required: true,
-                    },
-                  ],
-                  required: true,
-                },
-                {
-                  model: ctx.model.models.role,
-                  as: 'role',
-                  where: Object.assign(
-                    {},
-                    roleId ? { id: roleId } : undefined
-                  ),
-                  required: true,
-                },
-              ],
-              required: true,
-            },
-            {
               model: ctx.model.models.user,
               as: 'user',
               where: Object.assign(
@@ -102,35 +61,6 @@ module.exports = app => {
           id,
         },
         include: [
-          {
-            model: ctx.model.models.assign,
-            as: 'assign',
-            include: [
-              {
-                model: ctx.model.models.tenant_group_mapping,
-                as: 'tenant_group_mapping',
-                include: [
-                  {
-                    model: ctx.model.models.tenant,
-                    as: 'tenant',
-                    required: true,
-                  },
-                  {
-                    model: ctx.model.models.ad_group,
-                    as: 'ad_group',
-                    required: true,
-                  },
-                ],
-                required: true,
-              },
-              {
-                model: ctx.model.models.role,
-                as: 'role',
-                required: true,
-              },
-            ],
-            required: true,
-          },
           {
             model: ctx.model.models.user,
             as: 'user',

@@ -116,11 +116,6 @@ module.exports = app => {
               id: { [Op.in]: idList },
             },
           }, { transaction: t });
-          await ctx.model.models.tenant_group_mapping.destroy({
-            where: {
-              ad_groupId: { [Op.in]: idList },
-            },
-          }, { transaction: t });
           await ctx.model.models.user_group_mapping.destroy({
             where: {
               groupId: { [Op.in]: idList },
