@@ -18,7 +18,7 @@ module.exports = app => {
 
   expiry.associate = function() {
     const ms = app.model.models;
-    ms.expiry.belongsTo(ms.assign, { as: 'assign', foreignKey: 'assignId', constraint: false });
+    // ms.expiry.belongsTo(ms.assign, { as: 'assign', foreignKey: 'assignId', constraint: false });
     ms.expiry.belongsTo(ms.user, { as: 'user', foreignKey: 'userId', constraint: false });
   };
 

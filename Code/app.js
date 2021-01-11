@@ -12,7 +12,7 @@ module.exports = app => {
     console.log('\n');
     const syncModels = [
       'ad_group', 'groupType', 'role', 'group', 'tenant', 'user', 'user_group_mapping',
-      'tenant_group_mapping', 'assign', 'expiry', 'tenant_quota_mapping', 'vm_location',
+      'expiry', 'tenant_quota_mapping', 'vm_location',
       'vm_cluster', 'vm_master', 'vm_guest',
       'vm_applicationType', 'vm_cdc', 'vm_zone',
       'vm_platform_type', 'vm_platform', 'vm_type', 'vm_cluster_applicationType',

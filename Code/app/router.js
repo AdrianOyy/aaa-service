@@ -19,14 +19,14 @@ module.exports = app => {
   router.get(`${prefix}/vm_location/detail`, controller.vmLocation.detail);
   router.post(`${prefix}/vm_location/create`, controller.vmLocation.create);
 
-  router.get(`${prefix}/assign/list`, controller.assign.list);
-  router.get(`${prefix}/assign/detail`, controller.assign.detail);
-  router.post(`${prefix}/assign/create`, controller.assign.create);
-  router.put(`${prefix}/assign/update`, controller.assign.update);
-  router.delete(`${prefix}/assign/delete`, controller.assign.delete);
-  router.delete(`${prefix}/assign/deleteMany`, controller.assign.deleteMany);
-  router.get(`${prefix}/assign/checkExist`, controller.assign.checkExist);
-  router.get(`${prefix}/assign/handledList`, controller.assign.handledList);
+  // router.get(`${prefix}/assign/list`, controller.assign.list);
+  // router.get(`${prefix}/assign/detail`, controller.assign.detail);
+  // router.post(`${prefix}/assign/create`, controller.assign.create);
+  // router.put(`${prefix}/assign/update`, controller.assign.update);
+  // router.delete(`${prefix}/assign/delete`, controller.assign.delete);
+  // router.delete(`${prefix}/assign/deleteMany`, controller.assign.deleteMany);
+  // router.get(`${prefix}/assign/checkExist`, controller.assign.checkExist);
+  // router.get(`${prefix}/assign/handledList`, controller.assign.handledList);
 
   router.get(`${prefix}/expiry/list`, controller.expiry.list);
   router.get(`${prefix}/expiry/detail`, controller.expiry.detail);
