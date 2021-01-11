@@ -93,8 +93,8 @@ module.exports = app => {
           const adGroups = await ctx.service.adService.findGroups(groupQuery);
           for (const data of adGroups) {
             returnResult.push({
-              mail: data.displayName ? data.displayName : data.cn,
-              display: data.displayName ? data.displayName : data.cn,
+              mail: data.mail,
+              display: data.displayName,
               corp: data.cn,
             });
           }
@@ -104,8 +104,8 @@ module.exports = app => {
           for (const data of distributions) {
             if (data.mail) {
               returnResult.push({
-                mail: data.displayName ? data.displayName : data.cn,
-                display: data.displayName ? data.displayName : data.cn,
+                mail: data.mail,
+                display: data.displayName,
                 corp: data.cn,
               });
             }
