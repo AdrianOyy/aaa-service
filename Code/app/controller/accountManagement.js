@@ -92,6 +92,16 @@ module.exports = app => {
           }
           const adGroups = await ctx.service.adService.findGroups(groupQuery);
           for (const data of adGroups) {
+            returnResult.push({
+              mail: data.displayName ? data.displayName : data.cn,
+              display: data.displayName ? data.displayName : data.cn,
+              corp: data.cn,
+            });
+          }
+        }
+        if (returnType && returnType.dl) {
+          const distributions = await ctx.service.adService.findGroups(groupQuery);
+          for (const data of distributions) {
             if (data.mail) {
               returnResult.push({
                 mail: data.displayName ? data.displayName : data.cn,
@@ -99,16 +109,6 @@ module.exports = app => {
                 corp: data.cn,
               });
             }
-          }
-        }
-        if (returnType && returnType.dl) {
-          const distributions = await ctx.service.adService.findGroups(groupQuery);
-          for (const data of distributions) {
-            returnResult.push({
-              mail: data.displayName ? data.displayName : data.cn,
-              display: data.displayName ? data.displayName : data.cn,
-              corp: data.cn,
-            });
           }
         }
         ctx.success(returnResult);
