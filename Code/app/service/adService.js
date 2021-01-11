@@ -43,10 +43,11 @@ module.exports = app => {
       return data;
     }
 
-    async findUsers(email, isCorp) {
+    async findUsers(email) {
       const { ctx } = this;
       const config = app.config.adService;
-      const url = `${config.url}/findUsers?email=${email}` + (isCorp ? `&isCorp=${isCorp}` : '');
+
+      const url = `${config.url}/findUsers?email=${email}`;
       const response = await ctx.service.syncActiviti.curl(url, { method: 'GET' }, ctx);
       const data = response.data.data;
       return data;

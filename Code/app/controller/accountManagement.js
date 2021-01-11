@@ -32,13 +32,14 @@ module.exports = app => {
 
     async findUsers() {
       const { ctx } = this;
-      const { email, returnType, isCorp } = ctx.request.body;
+      const { email, returnType } = ctx.request.body;
       if (!email) ctx.error();
       try {
         const returnResult = [];
-        if (!returnType || returnType.toLowerCase() === 'user') {
-          const result = await ctx.service.adService.findUsers(email, isCorp);
-          for (const data of result) {
+        const groupQuery = '&(objectClass=group)|(displayName=*' + email + '*)(cn=*' + email + '*)(sAMAccountName=*' + email + '*)';
+        if (returnType && returnType.users) {
+          const users = await ctx.service.adService.findUsers(email);
+          for (const data of users) {
             // todo
             if (data.userPrincipalName === 'Qiwei@apj.com') {
               returnResult.push({
@@ -62,28 +63,45 @@ module.exports = app => {
               }
             }
           }
-        } else if (returnType.toLowerCase() === 'userordistribution') {
-          const users = await ctx.service.adService.findUsers(email, isCorp);
+        } else if (returnType && returnType.members) {
+          const users = await ctx.service.adService.findUsers(email);
           for (const data of users) {
-            if ((data.mail || data.userPrincipalName) && data.displayName) {
+            // todo
+            if (data.userPrincipalName === 'Qiwei@apj.com') {
               returnResult.push({
-                mail: data.mail ? data.mail : data.userPrincipalName,
-                display: data.displayName,
+                mail: 'tomqi@apjcorp.com',
+                display: 'Tom qi',
+                corp: data.cn,
+              });
+            } else if (data.userPrincipalName === 'shenchengan@apj.com') {
+              returnResult.push({
+                mail: 'rexshen@apjcorp.com',
+                display: 'Rex shen',
+                corp: data.cn,
+              });
+            } else {
+              if ((data.mail || data.userPrincipalName) && data.displayName) {
+                returnResult.push({
+                  mail: data.mail ? data.mail : data.userPrincipalName,
+                  display: data.displayName,
+                  corp: data.cn,
+                });
+              }
+            }
+          }
+          const adGroups = await ctx.service.adService.findGroups(groupQuery);
+          for (const data of adGroups) {
+            if (data.mail) {
+              returnResult.push({
+                mail: data.displayName ? data.displayName : data.cn,
+                display: data.displayName ? data.displayName : data.cn,
                 corp: data.cn,
               });
             }
           }
-          const groups = await ctx.service.adService.findGroups('&(objectClass=group)|(displayName=*' + email + '*)(cn=*' + email + '*)(sAMAccountName=*' + email + '*)');
-          for (const data of groups) {
-            returnResult.push({
-              mail: data.displayName ? data.displayName : data.cn,
-              display: data.displayName ? data.displayName : data.cn,
-              corp: data.cn,
-            });
-          }
-        } else if (returnType.toLowerCase() === 'distribution') {
-          const result = await ctx.service.adService.findGroups('&(objectClass=group)|(displayName=*' + email + '*)(cn=*' + email + '*)(sAMAccountName=*' + email + '*)');
-          for (const data of result) {
+        } else if (returnType && returnType.dl) {
+          const distributions = await ctx.service.adService.findGroups(groupQuery);
+          for (const data of distributions) {
             returnResult.push({
               mail: data.displayName ? data.displayName : data.cn,
               display: data.displayName ? data.displayName : data.cn,
