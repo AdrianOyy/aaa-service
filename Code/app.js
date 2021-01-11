@@ -4,6 +4,12 @@ const sequelizeFixtures = require('sequelize-fixtures');
 module.exports = app => {
   app.beforeStart(async function() {
     // 同步模型
+    console.log('DB host:\t\t\t\t', app.config.sequelize.datasources[0].host);
+    console.log('DB port:\t\t\t\t', app.config.sequelize.datasources[0].port);
+    console.log('using DB:\t\t\t\t', app.config.sequelize.datasources[0].database);
+    console.log('using procedure DB:\t\t\t', app.config.sequelize.datasources[1].database);
+    console.log('using procedure function:\t\t', app.config.procedure.fnName);
+    console.log('\n');
     const syncModels = [
       'ad_group', 'groupType', 'role', 'group', 'tenant', 'user', 'user_group_mapping',
       'tenant_group_mapping', 'assign', 'expiry', 'tenant_quota_mapping', 'vm_location',
@@ -18,14 +24,15 @@ module.exports = app => {
       'account_type', 'apply_for', 'apply_for_internet', 'authentication_method', 'clinical_applications',
       'is_same', 'owa_webmail', 'yes_no', 'staff_type', 'non_clinical_applications',
     ];
-    console.log('=============================================');
     console.log('Start syncing model');
+    console.log('=============================================');
     for (const syncModel of syncModels) {
       console.log('Now: ', syncModel);
       await app.model.models[syncModel].sync();
     }
-    console.log('End syncing model');
     console.log('=============================================');
+    console.log('End syncing model');
+    console.log('\n');
     // 初始化数据
     const model = app.model.models;
     const fixturesPath = 'app/model/fixtures/';

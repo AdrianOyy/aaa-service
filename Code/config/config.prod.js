@@ -28,7 +28,7 @@ module.exports = appInfo => {
       {
         delegate: 'procedureModel',
         dialect: process.env.npm_config_dbType, // support: mysql, mariadb, postgres, mssql
-        database: process.env.npm_config_dbName,
+        database: process.env.npm_config_procedureDBName,
         host: process.env.npm_config_dbHost,
         port: process.env.npm_config_dbPort,
         username: process.env.npm_config_dbUser,
