@@ -63,7 +63,8 @@ module.exports = app => {
               }
             }
           }
-        } else if (returnType && returnType.members) {
+        }
+        if (returnType && returnType.members) {
           const users = await ctx.service.adService.findUsers(email);
           for (const data of users) {
             // todo
@@ -99,7 +100,8 @@ module.exports = app => {
               });
             }
           }
-        } else if (returnType && returnType.dl) {
+        }
+        if (returnType && returnType.dl) {
           const distributions = await ctx.service.adService.findGroups(groupQuery);
           for (const data of distributions) {
             returnResult.push({
