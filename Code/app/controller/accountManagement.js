@@ -52,27 +52,12 @@ module.exports = app => {
         if (returnType && returnType.members) {
           const users = await ctx.service.adService.findUsers(email);
           for (const data of users) {
-            // todo
-            if (data.userPrincipalName === 'Qiwei@apj.com') {
+            if ((data.mail || data.userPrincipalName) && data.displayName) {
               returnResult.push({
-                mail: 'tomqi@apjcorp.com',
-                display: 'Tom qi',
+                mail: data.mail ? data.mail : data.userPrincipalName,
+                display: data.displayName,
                 corp: data.cn,
               });
-            } else if (data.userPrincipalName === 'shenchengan@apj.com') {
-              returnResult.push({
-                mail: 'rexshen@apjcorp.com',
-                display: 'Rex shen',
-                corp: data.cn,
-              });
-            } else {
-              if ((data.mail || data.userPrincipalName) && data.displayName) {
-                returnResult.push({
-                  mail: data.mail ? data.mail : data.userPrincipalName,
-                  display: data.displayName,
-                  corp: data.cn,
-                });
-              }
             }
           }
           const adGroups = await ctx.service.adService.findGroups(groupQuery);
