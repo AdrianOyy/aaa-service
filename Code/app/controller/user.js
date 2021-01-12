@@ -65,18 +65,6 @@ module.exports = app => {
         if (!username || !password) ctx.error();
         const auth = await ctx.service.adService.authenticate(username, password);
         if (auth) {
-          if (auth.user && auth.user.userPrincipalName === 'shenchengan@apj.com') {
-            auth.user.userPrincipalName = 'rexshen@apjcorp.com';
-          }
-          if (auth.user && auth.user.userPrincipalName === 'Qiwei@apj.com') {
-            auth.user.userPrincipalName = 'tomqi@apjcorp.com';
-          }
-          if (auth.user && auth.user.userPrincipalName === 'yangzhihong@apj.com') {
-            auth.user.userPrincipalName = 'morseyang@apjcorp.com';
-          }
-          if (auth.user && auth.user.userPrincipalName === 'lijunjie@apj.com') {
-            auth.user.userPrincipalName = 'amaneru@163.com';
-          }
           const user = await ctx.service.user.loadUser(auth);
           if (user) {
             const groupList = [];
