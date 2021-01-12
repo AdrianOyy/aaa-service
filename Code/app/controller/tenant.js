@@ -89,6 +89,16 @@ module.exports = app => {
             as: 'group',
             required: true,
           },
+          {
+            model: ctx.model.models.role,
+            as: 'role',
+            required: true,
+          },
+          {
+            model: ctx.model.models.ad_group,
+            as: 'mapping_group',
+            required: true,
+          },
         ],
       });
       ctx.success(result);
@@ -100,11 +110,13 @@ module.exports = app => {
         name, code, manager_group_id, supporter_group_id, group_id,
         justification, budget_type, project_owner,
         contact_person, project_estimation,
-        methodology_text } = ctx.request.body;
+        methodology_text, roleId, mappingGroupId,
+      } = ctx.request.body;
       if (!name || !code || !manager_group_id || !supporter_group_id || !group_id ||
         !justification || !budget_type || !project_owner ||
         !contact_person || !project_estimation ||
-        !methodology_text) ctx.error();
+        !methodology_text || !roleId || !mappingGroupId
+      ) ctx.error();
       const existNum = await ctx.model.models.tenant.count({
         where: {
           code,
@@ -115,6 +127,8 @@ module.exports = app => {
         name,
         code,
         manager_group_id,
+        mapping_group_id: mappingGroupId,
+        role_id: roleId,
         supporter_group_id,
         group_id,
         justification,
@@ -142,7 +156,7 @@ module.exports = app => {
       const { id } = ctx.query;
       const {
         name, manager_group_id, supporter_group_id, group_id,
-        justification, budget_type,
+        justification, budget_type, mappingGroupId, roleId,
         project_owner, contact_person, project_estimation,
         methodology_text } = ctx.request.body;
       if (!id || !name || !manager_group_id || !supporter_group_id || !group_id ||
@@ -162,6 +176,8 @@ module.exports = app => {
         contact_person,
         project_estimation,
         methodology_text,
+        mapping_group_id: mappingGroupId,
+        role_id: roleId,
         updatedAt: new Date(),
       };
       try {
