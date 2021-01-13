@@ -19,15 +19,6 @@ module.exports = app => {
   router.get(`${prefix}/vm_location/detail`, controller.vmLocation.detail);
   router.post(`${prefix}/vm_location/create`, controller.vmLocation.create);
 
-  // router.get(`${prefix}/assign/list`, controller.assign.list);
-  // router.get(`${prefix}/assign/detail`, controller.assign.detail);
-  // router.post(`${prefix}/assign/create`, controller.assign.create);
-  // router.put(`${prefix}/assign/update`, controller.assign.update);
-  // router.delete(`${prefix}/assign/delete`, controller.assign.delete);
-  // router.delete(`${prefix}/assign/deleteMany`, controller.assign.deleteMany);
-  // router.get(`${prefix}/assign/checkExist`, controller.assign.checkExist);
-  // router.get(`${prefix}/assign/handledList`, controller.assign.handledList);
-
   router.get(`${prefix}/expiry/list`, controller.expiry.list);
   router.get(`${prefix}/expiry/detail`, controller.expiry.detail);
   router.post(`${prefix}/expiry/create`, controller.expiry.create);
@@ -35,6 +26,7 @@ module.exports = app => {
   router.delete(`${prefix}/expiry/delete`, controller.expiry.delete);
   router.delete(`${prefix}/expiry/deleteMany`, controller.expiry.deleteMany);
   router.get(`${prefix}/expiry/checkExist`, controller.expiry.checkExist);
+  // router.get(`${prefix}/expiry/checkUser`, controller.expiry.checkUser);
 
   router.get(`${prefix}/tenant_quota_mapping/list`, controller.tenantQuotaMapping.list);
   router.get(`${prefix}/tenant_quota_mapping/detail`, controller.tenantQuotaMapping.detail);
@@ -60,6 +52,7 @@ module.exports = app => {
   router.post(`${prefix}/user/login`, controller.user.login);
   router.post(`${prefix}/user/findUser`, controller.user.findUser);
   router.post(`${prefix}/user/getUsersForGroup`, controller.user.getUsersForGroup);
+  router.get(`${prefix}/user/findUserByTenant`, controller.user.findUserByTenant);
 
   router.get(`${prefix}/user_group_mapping/list`, controller.userGourpMapping.list);
   router.get(`${prefix}/user_group_mapping/detail`, controller.userGourpMapping.detail);

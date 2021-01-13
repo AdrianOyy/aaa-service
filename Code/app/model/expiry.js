@@ -8,7 +8,7 @@ module.exports = app => {
     tenantId: { type: INTEGER, allowNull: false, cnName: 'tenant ID', comment: 'tenant ID' },
     userId: { type: INTEGER, allowNull: true, cnName: '用户Id', comment: '用户Id' },
     type: { type: STRING, allowNull: false, cnName: '撤权类型', comment: '撤权类型', defaultValue: 'tenant' },
-    expiryDate: { type: DATE, allowNull: true, cnName: '过期日期', comment: '过期日期' },
+    expiryDate: { type: DATE, allowNull: false, cnName: '过期日期', comment: '过期日期' },
     createdAt: { type: DATE, allowNull: true, cnName: '创建时间', comment: '创建时间' },
     updatedAt: { type: DATE, allowNull: true, cnName: '更新时间', comment: '更新时间' },
   }, {

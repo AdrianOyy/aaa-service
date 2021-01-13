@@ -126,5 +126,23 @@ module.exports = app => {
       }
       ctx.success(result);
     }
+
+    async findUserByTenant() {
+      const { ctx } = this;
+      const { tenantId } = ctx.query;
+      if (!tenantId) {
+        ctx.success([]);
+        return;
+      }
+      try {
+        const userList = await ctx.service.user.getUserByTenantId(tenantId);
+        ctx.success(userList);
+      } catch (error) {
+        console.log('error=========================error');
+        console.log(error.message);
+        console.log('error=========================error');
+        ctx.error();
+      }
+    }
   };
 };
