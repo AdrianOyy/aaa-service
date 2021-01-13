@@ -94,19 +94,22 @@ module.exports = app => {
           activitiData.variables.updateTree = await ctx.service.workflow.setUpdateType(parentData, startValues, deploymentId);
         }
         const emails = parentData.supervisoremailaccount.value.split(',');
-        const result = await ctx.service.syncActiviti.getUsersByEmails({ emails }, { headers: ctx.headers });
+        const users = await ctx.model.models.user.findAll({
+          raw: true,
+          attributes: [ 'corpId', 'id' ],
+        });
         const userIds = [];
-        if (result && result.data && result.data.length > 0) {
-          result.data.forEach(_ => {
-            if (_) {
-              userIds.push(_.id);
+        if (users && users.length > 0 && emails.length > 0) {
+          users.forEach(_ => {
+            if (emails.includes(_.corpId)) {
+              userIds.push(_.id.toString());
             }
           });
         }
         if (userIds && userIds.length > 0) {
           activitiData.variables.manager_user_id = userIds;
         } else {
-          const res = await ctx.service.adService.findUsersByEmails(emails);
+          const res = await ctx.service.adService.findUsersByCn(emails);
           const token = await ctx.service.jwtUtils.getToken({ content: { username: 'shenchengan' }, expiresIn: app.config.jwt.expiresIn });
           for (let i = 0; i < res.length; i++) {
             const auth = {};

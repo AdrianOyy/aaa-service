@@ -71,10 +71,10 @@ module.exports = app => {
       return data;
     }
 
-    async findUsersByEmails(emails) {
+    async findUsersByCn(emails) {
       const { ctx } = this;
       const config = app.config.adService;
-      const url = `${config.url}/findUsersByEmails`;
+      const url = `${config.url}/findUsersByCn`;
       const response = await ctx.service.syncActiviti.curl(url, { data: { emails } }, ctx);
       const data = response.data.data;
       return data;
