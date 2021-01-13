@@ -36,13 +36,13 @@ module.exports = app => {
       if (!email) ctx.error();
       try {
         const returnResult = [];
-        const groupQuery = '&(objectClass=group)|(displayName=*' + email + '*)(cn=*' + email + '*)(sAMAccountName=*' + email + '*)';
+        const groupQuery = '&(objectClass=group)|(displayName=' + email + '*)(cn=' + email + '*)';
         if (returnType && returnType.users) {
           const users = await ctx.service.adService.findUsers(email);
           for (const data of users) {
-            if ((data.mail || data.userPrincipalName) && data.displayName) {
+            if (data.cn && data.displayName) {
               returnResult.push({
-                mail: data.mail ? data.mail : data.userPrincipalName,
+                mail: data.mail,
                 display: data.displayName,
                 corp: data.cn,
               });
@@ -52,21 +52,25 @@ module.exports = app => {
         if (returnType && returnType.members) {
           const users = await ctx.service.adService.findUsers(email);
           for (const data of users) {
-            if ((data.mail || data.userPrincipalName) && data.displayName) {
-              returnResult.push({
-                mail: data.mail ? data.mail : data.userPrincipalName,
-                display: data.displayName,
-                corp: data.cn,
-              });
+            if (data.cn && data.displayName) {
+              if (data.cn && data.displayName) {
+                returnResult.push({
+                  mail: data.mail,
+                  display: data.displayName,
+                  corp: data.cn,
+                });
+              }
             }
           }
           const adGroups = await ctx.service.adService.findGroups(groupQuery);
           for (const data of adGroups) {
-            returnResult.push({
-              mail: data.mail,
-              display: data.displayName,
-              corp: data.cn,
-            });
+            if (data.cn && data.displayName) {
+              returnResult.push({
+                mail: data.mail,
+                display: data.displayName,
+                corp: data.cn,
+              });
+            }
           }
         }
         if (returnType && returnType.dl) {
