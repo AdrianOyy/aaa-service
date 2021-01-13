@@ -16,19 +16,26 @@ module.exports = app => {
         include: {
           model: ctx.model.models.ad_group,
           as: 'ad_group',
+          include: {
+            model: ctx.model.models.tenant,
+            as: 'tenant',
+          },
         },
       });
       const tenantList = [];
-      userGroupMappingList.forEach(el => {
-        const tenantSet = new Set();
-        el.ad_group.tenantGroupMapping.forEach(mapping => {
-          const { tenant } = mapping;
-          if (!tenantSet.has(tenant.id)) {
-            tenantSet.add(tenant.id);
-            tenantList.push(tenant.dataValues);
+      if (userGroupMappingList && userGroupMappingList.length > 0) {
+        userGroupMappingList.forEach(el => {
+          const tenantSet = new Set();
+          if (el.ad_group && el.ad_group.tenant) {
+            el.ad_group.tenant.forEach(tenant => {
+              if (!tenantSet.has(tenant.id)) {
+                tenantSet.add(tenant.id);
+                tenantList.push(tenant.dataValues);
+              }
+            });
           }
         });
-      });
+      }
       return tenantList;
     }
   };

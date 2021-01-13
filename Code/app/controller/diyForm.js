@@ -106,12 +106,7 @@ module.exports = app => {
         if (userIds && userIds.length > 0) {
           activitiData.variables.manager_user_id = userIds;
         } else {
-          const res = await ctx.service.adService.findUsersByEmails(emails.map(_ => {
-            if (_ === 'tomqi@apjcorp.com') {
-              return 'qiwei@apj.com';
-            }
-            return _;
-          }));
+          const res = await ctx.service.adService.findUsersByEmails(emails);
           const token = await ctx.service.jwtUtils.getToken({ content: { username: 'shenchengan' }, expiresIn: app.config.jwt.expiresIn });
           for (let i = 0; i < res.length; i++) {
             const auth = {};

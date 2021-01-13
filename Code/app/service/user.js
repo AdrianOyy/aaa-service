@@ -39,6 +39,7 @@ module.exports = app => {
         });
       } else {
         userModel = await ctx.model.models.user.create({
+          corpId: user.cn,
           sAMAccountName: user.sAMAccountName,
           surname: user.sn,
           givenname: user.givenName,
