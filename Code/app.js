@@ -62,6 +62,42 @@ module.exports = app => {
       console.log('Now: account_type');
       await sequelizeFixtures.loadFile(fixturesPath + 'account_type.js', model);
     }
+    if (!await model.apply_for.findOne()) {
+      console.log('Now: apply_for');
+      await sequelizeFixtures.loadFile(fixturesPath + 'apply_for.js', model);
+    }
+    if (!await model.apply_for_internet.findOne()) {
+      console.log('Now: apply_for_internet');
+      await sequelizeFixtures.loadFile(fixturesPath + 'apply_for_internet.js', model);
+    }
+    if (!await model.authentication_method.findOne()) {
+      console.log('Now: authentication_method');
+      await sequelizeFixtures.loadFile(fixturesPath + 'authentication_method.js', model);
+    }
+    if (!await model.clinical_applications.findOne()) {
+      console.log('Now: clinical_applications');
+      await sequelizeFixtures.loadFile(fixturesPath + 'clinical_applications.js', model);
+    }
+    if (!await model.is_same.findOne()) {
+      console.log('Now: is_same');
+      await sequelizeFixtures.loadFile(fixturesPath + 'is_same.js', model);
+    }
+    if (!await model.non_clinical_applications.findOne()) {
+      console.log('Now: non_clinical_applications');
+      await sequelizeFixtures.loadFile(fixturesPath + 'non_clinical_applications.js', model);
+    }
+    if (!await model.owa_webmail.findOne()) {
+      console.log('Now: owa_webmail');
+      await sequelizeFixtures.loadFile(fixturesPath + 'owa_webmail.js', model);
+    }
+    if (!await model.staff_type.findOne()) {
+      console.log('Now: staff_type');
+      await sequelizeFixtures.loadFile(fixturesPath + 'staff_type.js', model);
+    }
+    if (!await model.yes_no.findOne()) {
+      console.log('Now: yes_no');
+      await sequelizeFixtures.loadFile(fixturesPath + 'yes_no.js', model);
+    }
     if (!await model.role.findOne()) {
       console.log('Now: role');
       await sequelizeFixtures.loadFile(fixturesPath + 'role.js', model);

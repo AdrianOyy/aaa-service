@@ -5,7 +5,7 @@ module.exports = app => {
 
   const non_clinical_applications = app.model.define('non_clinical_applications', {
     id: { type: INTEGER, autoIncrement: true, primaryKey: true, cnName: 'ID' },
-    name: { type: STRING(256), allowNull: false, cnName: '名称', comment: '名称' },
+    type: { type: STRING(256), allowNull: false, cnName: '名称', comment: '名称' },
   }, {
     paranoid: true,
     tableName: 'non_clinical_applications',
