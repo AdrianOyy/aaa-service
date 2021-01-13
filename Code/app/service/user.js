@@ -142,5 +142,40 @@ module.exports = app => {
 
       return groupTypeList;
     }
+
+    /**
+     * Get user by tenant id
+     * @param {number | string} tenantId tenant's ID
+     * @return {Array<Object<user>>>} userList user list
+     */
+    async getUserByTenantId(tenantId) {
+      const { ctx } = this;
+      return await ctx.model.models.user.findAll({
+        include: [
+          {
+            model: ctx.model.models.user_group_mapping,
+            required: true,
+            as: 'userGroupMapping',
+            include: [
+              {
+                model: ctx.model.models.ad_group,
+                required: true,
+                as: 'ad_group',
+                include: [
+                  {
+                    model: ctx.model.models.tenant,
+                    as: 'tenant',
+                    where: {
+                      id: tenantId,
+                    },
+                    required: true,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+    }
   };
 };

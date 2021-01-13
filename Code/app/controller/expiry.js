@@ -6,13 +6,12 @@ module.exports = app => {
   return class extends app.Controller {
     async list() {
       const { ctx } = this;
-      const { Op } = app.Sequelize;
-      const { tenantId, groupId, roleId, userId,
-        expiryDate, prop, order } = ctx.query;
-      let { createdAt, updatedAt } = ctx.query;
+      const { tenantId, prop, order } = ctx.query;
+      let { createdAt, updatedAt, expiryDate } = ctx.query;
+      expiryDate = ctx.service.common.getDateRangeCondition(expiryDate);
       createdAt = ctx.service.common.getDateRangeCondition(createdAt);
       updatedAt = ctx.service.common.getDateRangeCondition(updatedAt);
-      if (createdAt === false || updatedAt === false) {
+      if (createdAt === false || updatedAt === false || expiryDate === false) {
         ctx.error();
         return;
       }
@@ -26,19 +25,15 @@ module.exports = app => {
         const res = await ctx.model.models.expiry.findAndCountAll({
           where: Object.assign(
             {},
-            expiryDate ? { expiryDate: { [Op.and]: [{ [Op.gte]: new Date(expiryDate) }, { [Op.lt]: new Date(new Date(expiryDate) - (-8.64e7)) }] } } : undefined,
+            tenantId ? { tenantId } : undefined,
+            expiryDate ? { expiryDate } : undefined,
             createdAt ? { createdAt } : undefined,
             updatedAt ? { updatedAt } : undefined
           ),
           include: [
             {
-              model: ctx.model.models.user,
-              as: 'user',
-              where: Object.assign(
-                {},
-                userId ? { id: userId } : undefined
-              ),
-              required: true,
+              model: ctx.model.models.tenant,
+              as: 'tenant',
             },
           ],
           order: Order,
@@ -53,6 +48,7 @@ module.exports = app => {
         ctx.error();
       }
     }
+
     async detail() {
       const { ctx } = this;
       const { id } = ctx.query;
@@ -62,21 +58,28 @@ module.exports = app => {
         },
         include: [
           {
-            model: ctx.model.models.user,
-            as: 'user',
+            model: ctx.model.models.tenant,
+            as: 'tenant',
             required: true,
           },
         ],
       });
       ctx.success(result);
     }
+
     async update() {
       const { ctx } = this;
       const { id } = ctx.query;
       const { expiryDate } = ctx.request.body;
-      if (!id || !expiryDate) ctx.error();
+      if (!id || !expiryDate) {
+        ctx.error();
+        return;
+      }
       const oldModel = await ctx.model.models.expiry.findByPk(id);
-      if (!oldModel) ctx.error();
+      if (!oldModel) {
+        ctx.error();
+        return;
+      }
       const newModel = {
         expiryDate,
         updatedAt: new Date(),
@@ -93,15 +96,15 @@ module.exports = app => {
         ctx.error('service busy');
       }
     }
+
     async create() {
       const { ctx } = this;
-      const { assignId, userId, expiryDate } = ctx.request.body;
-      if (!assignId || !userId || !expiryDate) {
+      const { tenantId, expiryDate } = ctx.request.body;
+      if (!tenantId || !expiryDate) {
         ctx.error();
       }
       const model = {
-        assignId,
-        userId,
+        tenantId,
         expiryDate,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -113,6 +116,7 @@ module.exports = app => {
         throw { status: 500, message: 'service busy' };
       }
     }
+
     async delete() {
       const { ctx } = this;
       const { id } = ctx.query;
@@ -129,6 +133,7 @@ module.exports = app => {
         ctx.error('service busy');
       }
     }
+
     async deleteMany() {
       const { ctx } = this;
       const { Op } = app.Sequelize;
@@ -148,18 +153,45 @@ module.exports = app => {
         ctx.error('service busy');
       }
     }
+
     async checkExist() {
       const { ctx } = this;
       const { Op } = app.Sequelize;
-      const { id, assignId, userId } = ctx.query;
-      const count = await ctx.model.models.expiry.count({
-        where: {
-          id: { [Op.ne]: id },
-          assignId,
-          userId,
-        },
-      });
-      ctx.success(count);
+      const { id, tenantId } = ctx.query;
+      try {
+        const count = await ctx.model.models.expiry.count({
+          where: {
+            id: { [Op.ne]: id },
+            tenantId,
+          },
+        });
+        ctx.success(count);
+      } catch (error) {
+        console.log('error=========================error');
+        console.log(error.message);
+        console.log('error=========================error');
+        ctx.error();
+      }
     }
+
+    // async checkUser() {
+    //   const { ctx } = this;
+    //   const { Op } = app.Sequelize;
+    //   const { id, tenantId, userId } = ctx.query;
+    //   try {
+    //     const count = await ctx.model.models.expiry.count({
+    //       where: {
+    //         id: { [Op.ne]: id },
+    //         tenantId,
+    //         userId,
+    //       },
+    //     });
+    //     ctx.success(count);
+    //   } catch (error) {
+    //     console.log('error=========================error');
+    //     console.log(error.message);
+    //     console.log('error=========================error');
+    //   }
+    // }
   };
 };
