@@ -13,7 +13,7 @@ module.exports = app => {
         attributes: [ 'name' ],
       });
       const user = auth.user;
-      const groups = auth.groups.filter(_ => {
+      const groups = auth.groups ? auth.groups.filter(_ => {
         let flag = false;
         for (const ad_group of ad_groups) {
           if (ad_group.name === _.cn) {
@@ -22,7 +22,7 @@ module.exports = app => {
           }
         }
         return flag;
-      });
+      }) : [];
       let userModel = await ctx.model.models.user.findOne({
         where: {
           sAMAccountName: user.sAMAccountName,
@@ -30,6 +30,7 @@ module.exports = app => {
       });
       if (userModel !== null) {
         await userModel.update({
+          corpId: user.cn,
           surname: user.sn,
           givenname: user.givenName,
           displayname: user.displayName,
