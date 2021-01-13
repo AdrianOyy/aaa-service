@@ -37,7 +37,7 @@ module.exports = app => {
       try {
         const returnResult = [];
         const groupQuery = '&(objectClass=group)|(displayName=' + email + '*)(cn=' + email + '*)';
-        if (returnType && returnType.user) {
+        if (returnType && (returnType.user || returnType.users)) {
           const users = await ctx.service.adService.findUsers(email);
           for (const data of users) {
             if (data.cn && data.displayName) {
