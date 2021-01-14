@@ -47,8 +47,8 @@ module.exports = app => {
       const { ctx } = this;
       const config = app.config.adService;
 
-      const url = `${config.url}/findUsers?email=${email}`;
-      const response = await ctx.service.syncActiviti.curl(url, { method: 'GET' }, ctx);
+      const url = `${config.url}/findUsers`;
+      const response = await ctx.service.syncActiviti.curl(url, { data: { email } }, ctx);
       const data = response.data.data;
       return data;
     }
@@ -56,8 +56,8 @@ module.exports = app => {
     async findGroups(groupName) {
       const { ctx } = this;
       const config = app.config.adService;
-      const url = `${config.url}/findGroups?groupName=${groupName}`;
-      const response = await ctx.service.syncActiviti.curl(url, { method: 'GET' }, ctx);
+      const url = `${config.url}/findGroups`;
+      const response = await ctx.service.syncActiviti.curl(url, { data: { groupName } }, ctx);
       const data = response.data.data;
       return data;
     }
