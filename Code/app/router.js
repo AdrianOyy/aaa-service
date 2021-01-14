@@ -162,6 +162,7 @@ module.exports = app => {
   router.post(`${prefix}/accountManagement/checkUsers`, controller.accountManagement.checkUsers);
   router.get(`${prefix}/accountManagement/getPublicKey`, controller.accountManagement.getPublicKey);
   router.post(`${prefix}/accountManagement/getDisplayName`, controller.accountManagement.getDisplayName);
+  router.post(`${prefix}/accountManagement/testfindUsers`, controller.accountManagement.testfindUsers);
 
   router.get(`${prefix}/role/list`, controller.role.list);
 

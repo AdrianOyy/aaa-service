@@ -45,15 +45,15 @@ module.exports = app => {
 
     async findUsers(email) {
       const { ctx } = this;
-      const url = adURL + adService.api.findUsers + '?email=' + email;
-      const response = await ctx.service.syncActiviti.curl(url, { method: 'GET' }, ctx);
+      const url = adURL + adService.api.findUsers;
+      const response = await ctx.service.syncActiviti.curl(url, { data: { email } }, ctx);
       return response.data.data;
     }
 
     async findGroups(groupName) {
       const { ctx } = this;
-      const url = adURL + adService.api.findGroups + '?groupName=' + groupName;
-      const response = await ctx.service.syncActiviti.curl(url, { method: 'GET' }, ctx);
+      const url = adURL + adService.api.findGroups;
+      const response = await ctx.service.syncActiviti.curl(url, { data: { groupName } }, ctx);
       return response.data.data;
     }
 
