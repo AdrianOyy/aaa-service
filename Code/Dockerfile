@@ -26,7 +26,7 @@ RUN npm --production --registry https://registry.npm.taobao.org install
 EXPOSE 7001
 
 # 启动node应用
-CMD [
+CMD [ \
 "sh", "-c", "npm start \
 --dbType=${dbType} \
 --dbName=${dbName} \
@@ -75,5 +75,5 @@ CMD [
 --mailHost=${mailHost} \
 --mailPort=${mailPort} \
 --mailUser=${mailUser} \
---mailPass=${mailPass}"
+--mailPass=${mailPass}" \
 ]
