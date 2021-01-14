@@ -36,9 +36,9 @@ module.exports = app => {
       if (!email) ctx.error();
       try {
         const returnResult = [];
-        const groupQuery = '&(objectClass=group)|(displayName=' + email + '*)(cn=' + email + '*)';
         if (returnType && (returnType.user || returnType.users)) {
           const users = await ctx.service.adService.findUsers(email);
+          console.log(new Date(), 'findUsers users', users.length);
           for (const data of users) {
             if (data.cn && data.displayName) {
               returnResult.push({
@@ -51,6 +51,7 @@ module.exports = app => {
         }
         if (returnType && returnType.members) {
           const users = await ctx.service.adService.findUsers(email);
+          console.log(new Date(), 'findUsers members : users', users.length);
           for (const data of users) {
             if (data.cn && data.displayName) {
               if (data.cn && data.displayName) {
@@ -62,27 +63,56 @@ module.exports = app => {
               }
             }
           }
-          const adGroups = await ctx.service.adService.findGroups(groupQuery);
+          const adGroups = await ctx.service.adService.findGroups(email);
+          console.log(new Date(), 'findUsers members : adGroups', adGroups.length);
           for (const data of adGroups) {
-            if (data.cn && data.displayName) {
+            if (data.cn) {
               returnResult.push({
                 mail: data.mail,
-                display: data.displayName,
+                display: data.cn,
                 corp: data.cn,
               });
             }
           }
         }
         if (returnType && returnType.dl) {
-          const distributions = await ctx.service.adService.findGroups(groupQuery);
+          const distributions = await ctx.service.adService.findGroups(email);
+          console.log(new Date(), 'findUsers dl adGroups', distributions.length);
+          console.log(new Date(), 'findUsers dl distributions', distributions.length ? distributions.filter(_ => _.mail).length : distributions.length);
           for (const data of distributions) {
             if (data.mail) {
               returnResult.push({
                 mail: data.mail,
-                display: data.displayName,
-                corp: data.sAMAccountName,
+                display: data.cn,
+                corp: data.cn,
               });
             }
+          }
+        }
+        ctx.success(returnResult);
+      } catch (error) {
+        throw { status: 500, message: 'service busy' };
+      }
+    }
+    async testfindUsers() {
+      const { ctx } = this;
+      const { search } = ctx.request.body;
+      if (!search || !(search instanceof Array)) ctx.error();
+      try {
+        const returnResult = [];
+        for (let index = 0; index < search.length; index++) {
+          const email = search[index].email;
+          const method = search[index].method;
+          if (method === 'user') {
+            console.log(new Date(), 'testfindUsers-findUsers start query: ', email);
+            const users = await ctx.service.adService.findUsers(email);
+            console.log(new Date(), 'testfindUsers-findUsers end. users length: ', users.length);
+            returnResult.push({ number: index, type: 'findUsers', email, resultLength: users.length, result: users });
+          } else if (method === 'group') {
+            console.log(new Date(), 'testfindUsers-findGroups start query: ', email);
+            const adGroups = await ctx.service.adService.findGroups(email);
+            console.log(new Date(), 'testfindUsers-findGroups end. adGroups length: ', adGroups.length);
+            returnResult.push({ number: index, type: 'findGroups', email, resultLength: adGroups.length, result: adGroups });
           }
         }
         ctx.success(returnResult);
