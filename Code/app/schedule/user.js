@@ -1,9 +1,8 @@
 'use strict';
 
 const dayjs = require('dayjs');
-const loadFlag = process.env.npm_config_loadFlag ? process.env.npm_config_loadFlag : 'N';
-
 module.exports = app => {
+  const { loadFlag } = app.config.loadUser;
   return {
     schedule: {
       cron: app.config.loadUser.cron,

@@ -37,5 +37,29 @@ module.exports = app => {
         return false;
       }
     }
+
+    /**
+     *
+     * @param {String} url request path
+     * @param {Object} [option] option
+     * @param {String} [option.method='GET'] request method default GET
+     * @param {Object} [option.headers] request headers
+     * @param {Object} [option.data] request body
+     * @param {Object} [option.params] request query string
+     * @return {Promise<any>} result request result
+     */
+    async request(url, option) {
+      const { ctx } = this;
+      console.log('Request to ', url);
+      const res = await ctx.curl(url,
+        Object.assign(
+          { method: option.method || 'GET' },
+          option.headers ? { headers: option.headers } : undefined,
+          option.data ? { data: option.data } : undefined,
+          option.params ? { params: option.params } : undefined
+        )
+      );
+      return JSON.parse(res.data);
+    }
   };
 };

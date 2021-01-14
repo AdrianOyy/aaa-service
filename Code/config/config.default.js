@@ -42,15 +42,6 @@ module.exports = appInfo => {
     ],
   };
 
-  config.mailer = {
-    host: 'smtp.mxhichina.com',
-    port: 25,
-    secure: false, // true for 465, false for other ports
-    auth: {
-      user: 'gitlab@apjcorp.com', // generated ethereal user
-      pass: 'apj.com666', // generated ethereal password
-    },
-  };
 
   // ===================================
   //             上传文件 设置
@@ -87,46 +78,112 @@ module.exports = appInfo => {
     },
   };
 
-  const outboundUrl = 'http://10.231.131.123:3010';
+
+  // ===================================
+  //             内部服务 设置
+  // ===================================
+  config.activiti = {
+    url: 'http://10.231.131.123:3004',
+    rejectUnauthorized: 'N',
+  };
+
+  config.log = {
+    tsHost: '127.0.0.1:3001',
+  };
+
+
+  // ===================================
+  //             外部服务 设置
+  // ===================================
+  config.outbound = {
+    url: 'http://10.231.131.123:8000',
+  };
 
   config.adService = {
-    url: outboundUrl + '',
+    prefix: '/adService',
+    api: {
+      auth: '/authenticate',
+      findDisplayNames: '/findDisplayNames',
+      userExistsMany: '/userExistsMany',
+      findUser: '/findUser',
+      findUsers: '/findUsers',
+      findGroups: '/findGroups',
+      getUsersForGroup: '/getUsersForGroup',
+      findUsersByCn: '/findUsersByCn',
+    },
+  };
+
+  config.cps = {
+    prefix: '/CPS',
+    api: {
+      alladhoc: '/cps/alladhoc',
+    },
+  };
+
+  config.cuid = {
+    prefix: '/CUID',
+    apiKey: '244575dc-0731-4340-a3a2-29f1d9f7104d',
+    api: {
+      getPublicKey: '/senseCuid/v1/getPublicKey',
+    },
   };
 
   config.procedure = {
     fnName: 'sp_getLocationList',
   };
 
-  config.activiti = {
-    // url: 'http://localhost:8888',
-    url: 'http://10.231.131.123:3004',
-  };
-
   // ===================================
   //           全局 中间件 设置
   // ===================================
-  // config.middleware = [ 'log', 'auth' ];
   config.middleware = [ 'auth' ];
   config.auth = {
-    ignore: [ '/user/login', '/tenant/getCps', '/tenant/testCps' ],
-  };
-  config.log = {
-    tsHost: '127.0.0.1:3001',
+    ignore: [
+      '/user/login',
+      '/tenant/getCps',
+      '/tenant/testCps',
+      '/expiry/checkTenant',
+      '/expiry/checkUser',
+      '/accountManagement/getPublicKey',
+    ],
   };
 
+
+  // ===================================
+  //           JSON WEB TOKEN 设置
+  // ===================================
   config.jwt = {
     expiresIn: '10m',
     secret: '1234567abc',
     iss: 'SENSEPLATFORM',
   };
 
-  config.schedule = {
-    interval: '60s',
+  // ===================================
+  //           其他 设置
+  // ===================================
+  config.loadUser = {
+    loadFlag: 'N',
+    cron: '0 0 23 * * *',
   };
 
-  const cron = process.env.npm_config_loadCron ? process.env.npm_config_loadCron : '0 0 23 * * *';
-  config.loadUser = {
-    cron,
+  config.imap = {
+    flag: 'N',
+    fetchIndex: '1:*',
+    namespace: null,
+    interval: '60s',
+    user: null,
+    password: null,
+    host: null,
+    port: null,
+  };
+
+  config.mailer = {
+    host: 'smtp.mxhichina.com',
+    port: 25,
+    secure: false, // true for 465, false for other ports
+    auth: {
+      user: 'gitlab@apjcorp.com', // generated ethereal user
+      pass: 'apj.com666', // generated ethereal password
+    },
   };
 
   return config;

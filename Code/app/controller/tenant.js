@@ -1,8 +1,8 @@
 'use strict';
 
-const cpsurl = process.env.npm_config_cpsurl ? process.env.npm_config_cpsurl : 'https://cps-dev-api.cldpaast71.serverdev.hadev.org.hk/cps/alladhoc/';
-
 module.exports = app => {
+  const { cps, outbound } = app.config;
+  const cpsurl = outbound.url + cps.prefix + cps.api.alladhoc;
   return class extends app.Controller {
     async list() {
       const { ctx } = this;

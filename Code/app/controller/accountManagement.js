@@ -127,8 +127,22 @@ module.exports = app => {
 
     async getPublicKey() {
       const { ctx } = this;
-      const publicKey = 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC8HMr2CBpoZPm3t9tCVlrKtTmI4jNJc7/HhxjIEiDjC8czP4PV+44LjXvLYcSV0fwi6nE4LH2c5PBPEnPfqp0g8TZeX+bYGvd70cXee9d8wHgBqi4k0J0X33c0ZnW7JruftPyvJo9OelYSofBXQTcwI+3uIl/YvrgQRv6A5mW01QIDAQAB';
-      ctx.success(publicKey);
+      const { cuid, outbound } = app.config;
+      const url = outbound.url + cuid.prefix + cuid.api.getPublicKey;
+      try {
+        const { data } = await ctx.service.common.request(url, {
+          headers: {
+            'x-apikey': cuid.apiKey,
+          },
+        });
+        ctx.success(data);
+      } catch (e) {
+        ctx.error();
+        console.log('Error when request ', url);
+        console.log('=========================');
+        console.log(e.message);
+        console.log('=========================');
+      }
     }
   };
 };

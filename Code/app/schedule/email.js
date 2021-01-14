@@ -1,13 +1,10 @@
 'use strict';
 
-const imapFlag = process.env.npm_config_imapFlag ? process.env.npm_config_imapFlag : 'N';
-const fetchIndex = process.env.npm_config_fetchIndex ? process.env.npm_config_fetchIndex : '1:*';
-const namespace = process.env.npm_config_namespace ? process.env.npm_config_namespace : null;
-
 module.exports = app => {
+  const { imapFlag, fetchIndex, namespace, interval } = app.config.imap;
   return {
     schedule: {
-      interval: app.config.schedule.interval,
+      interval,
       immediate: true,
       type: 'all',
     },

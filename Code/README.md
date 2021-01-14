@@ -1,27 +1,12 @@
-docker镜像打包
-1 进入code所在目录
-2 将app、config、lib、.eslintrc.js、app.js、Dockerfile、package.json、package-lock.json添加到压缩文件docker-aaa-server.zip
-3 打开FinalShell
-4 进入code所在目录cd /home/aaa-server/
-5 上传docker-aaa-server.zip
-6 删除zip文件以外的文件
-7 解压 zip文件 unzip docker-aaa-server.zip 覆盖现有文件
-8 运行docker build -t aaa-service . (aaa-service 为docker iamges名称，.指当前目录)
-9 docker images 查看所有images
-10 docker run --restart=always --name aaa-service -d -p 3003:7001 aaa-service(3003为对外访问接口，7001为服务接口，-d代表后台运行，去掉可查看显示日志信息)
-11 docker ps -a 查看当前运行镜像
+### Build
 
-docker镜像删除（非第一次安装时，请先执行此操作）
-1 docker ps -a 查看当前运行镜像
-2 复制对应IMAGE为aaa-service的CONTAINER ID
-3 docker rm CONTAINER ID -f
-4 重复执行2、3，直到所有IMAGE为aaa-service的都被删除
-4 docker images 查看所有images
-5 docker rmi aaa-service
+````shell
+docker build -t aaa-service[:tag] .
+````
 
 
 
-运行
+### Run
 
 ````cmd
 docker run -dit \
@@ -34,30 +19,95 @@ docker run -dit \
 -e dbPort=3306 \
 -e dbUser=admin \
 -e dbPassword=APJ@com123 \
--e outboundUrl=http://10.231.131.123:7000 \
--e activitiUrl=http://10.231.131.123:3004 \
+-e procedureDBName=nsr_gis_app \
+-e activitiUrl=10.231.131.123:8888 \
+-e transitionHost=10.231.131.123:3000 \
+-e outboundUrl=10.231.131.123:8000 \
+-e adPrefix=/adService \
+-e cpsPrefix=/CPS \
+-e CUIDPrefix=/CUID \
+-e CUIDAPIKey=244575dc-0731-4340-a3a2-29f1d9f7104d \
+-e procedureFn=sp_getLocationList \
 -e jwtExpiresIn=10m \
 -e jwtSecret=1234567abc \
 -e jwtIss=SENSEPLATFORM \
+-e imapUser=gitlab@apjcorp.com \
+-e imapPass=apj.com666 \
+-e imapHost=imap.mxhichina.com \
+-e imapPort=993 \
 -e mailHost=smtp.mxhichina.com \
 -e mailPort=25 \
 -e mailUser=gitlab@apjcorp.com \
 -e mailPass=apj.com666 \
--e imapFlag=Y \
--e imapHost=imap.mxhichina.com \
--e imapPort=993 \
--e imapUser=gitlab@apjcorp.com \
--e imapPass=apj.com666 \
--e transitionHost=10.231.131.123:3000 \
--e rejectUnauthorized=N \
--e cpsurl=https://cps-dev-api.cldpaast71.serverdev.hadev.org.hk/cps/alladhoc/ \
--e procedureFn=sp_getLocationList \
--e procedureDBName=nsr_gis_app \
 aaa-service
 ````
---rejectUnauthorized 是否忽略证书 默认为N， 不填或N为忽略证书，Y为不忽略证书
---cpsurl cps请求地址，默认https://cps-dev-api.cldpaast71.serverdev.hadev.org.hk/cps/alladhoc/
--e loadFlag=Y \
--e loadCron=0 0 23 * * * \
---loadFlag 是否执行同步用户，为N不执行，RY马上执行一次，之后按照Cron执行。默认为Y 21点后马上执行一次，之后按照Cron执行；21点前不马上执行，按照Cron执行。
---loadCron 同步用户，Cron配置，默认为0 0 23 * * *，。每天23点。
+
+
+```shell
+# cps service host
+https://cps-dev-api.cldpaast71.serverdev.hadev.org.hk
+```
+
+
+
+### 参数说明
+
+| 参数名          | 描述                                                      |
+| --------------- | --------------------------------------------------------- |
+| dbType          | 数据库类型                                                |
+| dbName          | 数据库库名                                                |
+| dbHost          | 数据库地址                                                |
+| dbPort          | 数据库端口                                                |
+| dbUser          | 数据库用户                                                |
+| dbPassword      | 数据库密码                                                |
+| procedureDBName | 存储过程数据库库名                                        |
+| activitiUrl     | workflow service 地址                                     |
+| transitionHost  | transition service 地址                                   |
+| outboundUrl     | outbound 地址                                             |
+| adPrefix        | ad service API 前缀                                       |
+| cpsPrefix       | cps service API 前缀                                      |
+| CUIDPrefix      | CUID service API 前缀                                     |
+| CUIDAPIKey      | CUID service API key                                      |
+| procedureFn     | 存储过程函数名                                            |
+| jwtExpiresIn    | token 过期时间 e.g. : 10m   # 10分钟                      |
+| jwtSecret       | JSON web token 加密参数（需要与 workflow service 的一致） |
+| jwtIss          | token 签发机构签名                                        |
+| imapUser        |                                                           |
+| imapPass        |                                                           |
+| imapHost        |                                                           |
+| imapPort        |                                                           |
+| mailHost        |                                                           |
+| mailPort        |                                                           |
+| imapUser        |                                                           |
+| mailPass        |                                                           |
+
+
+
+
+
+### 可选参数
+
+| 参数名              | 默认值            | 描述                   |
+| ------------------- | ----------------- | ---------------------- |
+| procedureDBType | 同 dbType | 存储过程数据库类型 |
+| procedureDBHost | 同 dbHost | 存储过程数据库地址 |
+| procedureDBPort | 同 dbPort | 存储过程数据库端口 |
+| procedureDBUser | 同 dbUser | 存储过程数据库用户 |
+| procedureDBPassword | 同 dbPassword | 存储过程数据库密码 |
+| rejectUnauthorized | N | 是否忽略证书 默认为N， 不填或N为忽略证书，Y为不忽略证书 |
+| authAPI             | /authenticate     |  |
+| findDisplayNameAPI  | /findDisplayNames |  |
+| userExistsManyAPI   | /userExistsMany   |  |
+| findUserAPI         | /findUser         |  |
+| findUsersAPI        | /findUsers        |  |
+| findGroups          | /findGroups       |  |
+| getGusrsForGourpAPI | /getUsersForGroup |  |
+| findUsersByCnAPI    | /findUsersByCn    |  |
+| alladhocAPI         | /cps/alladhoc     |  |
+|  getPublicKeyAPI		    |  /sense/Cuid/v1/getPublicKey| cuid 获取公钥 |
+| loadFlag	| N |  |
+| loadCron	| 0 0 23 * * * |  |
+| imapFlag	| N |  |
+| imapFetchIndex	| 1:* |  |
+| imapNamespace	| null |  |
+| imapInterval	| 60s |  |

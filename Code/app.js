@@ -3,13 +3,30 @@ const sequelizeFixtures = require('sequelize-fixtures');
 
 module.exports = app => {
   app.beforeStart(async function() {
-    // 同步模型
+    // 输入配置信息
+    console.log('\n');
+    console.log('Configure:');
+    console.log('=============================================================================================================');
     console.log('DB host:\t\t\t\t', app.config.sequelize.datasources[0].host);
     console.log('DB port:\t\t\t\t', app.config.sequelize.datasources[0].port);
-    console.log('using DB:\t\t\t\t', app.config.sequelize.datasources[0].database);
-    console.log('using procedure DB:\t\t\t', app.config.sequelize.datasources[1].database);
-    console.log('using procedure function:\t\t', app.config.procedure.fnName);
+    console.log('Using DB:\t\t\t\t', app.config.sequelize.datasources[0].database);
+    console.log('Using procedure DB:\t\t\t', app.config.sequelize.datasources[1].database);
+    console.log('Using procedure function:\t\t', app.config.procedure.fnName);
+    console.log('Workflow service config:\n', app.config.activiti);
+    console.log('Transition service config:\n', app.config.log);
+    console.log('Outbound config:\n', app.config.outbound);
+    console.log('AD service config:\n', app.config.adService);
+    console.log('CPS service config:\n', app.config.cps);
+    console.log('CUID service config:\n', app.config.cuid);
+    console.log('Token config:\n', app.config.jwt);
+    console.log('Load flag:\t\t\t\t', app.config.loadUser.loadFlag);
+    console.log('Load cron:\t\t\t\t', app.config.loadUser.cron);
+    console.log('Imap config:\n', app.config.imap);
+    console.log('Mail host:\t\t\t\t', app.config.mailer.host);
+    console.log('Mail port:\t\t\t\t', app.config.mailer.port);
+    console.log('=============================================================================================================');
     console.log('\n');
+    // 同步模型
     const syncModels = [
       'ad_group', 'groupType', 'role', 'group', 'tenant', 'user', 'user_group_mapping',
       'expiry', 'tenant_quota_mapping', 'vm_location',
@@ -104,5 +121,6 @@ module.exports = app => {
     }
     console.log('=============================================');
     console.log('End initializing database');
+    console.log('\n');
   });
 };

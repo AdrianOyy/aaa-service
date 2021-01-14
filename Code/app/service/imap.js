@@ -3,25 +3,19 @@
 const jwt = require('jsonwebtoken');
 const Imap = require('imap');
 
-// const inspect = require('util').inspect;
-const user = process.env.npm_config_imapUser;
-const password = process.env.npm_config_imapPass;
-const host = process.env.npm_config_imapHost;
-const port = process.env.npm_config_imapPort;
-const imapConfig = {
-  user,
-  password,
-  host,
-  port,
-  tls: true,
-  tlsOptions: { rejectUnauthorized: false },
-};
-const imapFlag = process.env.npm_config_imapFlag;
-if (imapFlag && imapFlag === 'Y') {
-  console.log(new Date(), 'imapConfig', imapConfig);
-}
-
 module.exports = app => {
+  const { user, password, host, port, flag } = app.config.imap;
+  const imapConfig = {
+    user,
+    password,
+    host,
+    port,
+    tls: true,
+    tlsOptions: { rejectUnauthorized: false },
+  };
+  if (flag && flag === 'Y') {
+    console.log(new Date(), 'imapConfig', imapConfig);
+  }
   return class extends app.Service {
     async createBox(namespace) {
       const imap = new Imap(imapConfig);

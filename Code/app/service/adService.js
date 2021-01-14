@@ -1,24 +1,28 @@
 'use strict';
 
 module.exports = app => {
+  const { outbound, adService, jwt } = app.config;
+  const adURL = outbound.url + adService.prefix;
 
   return class extends app.Service {
     async authenticate(username, password) {
       const { ctx } = this;
-      const config = app.config.adService;
-      const expiresIn = app.config.jwt.expiresIn;
-      const url = `${config.url}/authenticate`;
+      const url = adURL + adService.api.auth;
       const response = await ctx.service.syncActiviti.curl(url, { data: { username, password } }, ctx);
-      const data = response.data.data;
+      const { data } = response.data;
       let result = {};
       if (data && data.auth) {
         const user = data.user;
         const groups = data.groups;
         result.user = user;
         result.groups = groups;
-        const options = { content: { username: user.sAMAccountName }, expiresIn };
-        const token = ctx.service.jwtUtils.getToken(options);
-        result.token = token;
+        const options = {
+          content: {
+            username: user.sAMAccountName,
+          },
+          expiresIn: jwt.expiresIn,
+        };
+        result.token = ctx.service.jwtUtils.getToken(options);
       } else {
         result = false;
       }
@@ -27,57 +31,44 @@ module.exports = app => {
 
     async userExistsMany(usernames) {
       const { ctx } = this;
-      const config = app.config.adService;
-      const url = `${config.url}/userExistsMany`;
+      const url = adURL + adService.api.userExistsMany;
       const response = await ctx.service.syncActiviti.curl(url, { data: { usernames } }, ctx);
-      const data = response.data.data;
-      return data;
+      return response.data.data;
     }
 
     async findUser(username) {
       const { ctx } = this;
-      const config = app.config.adService;
-      const url = `${config.url}/findUser?username=${username}`;
+      const url = adURL + adService.api.findUser + '?username=' + username;
       const response = await ctx.service.syncActiviti.curl(url, { method: 'GET' }, ctx);
-      const data = response.data.data;
-      return data;
+      return response.data.data;
     }
 
     async findUsers(email) {
       const { ctx } = this;
-      const config = app.config.adService;
-
-      const url = `${config.url}/findUsers?email=${email}`;
+      const url = adURL + adService.api.findUsers + '?email=' + email;
       const response = await ctx.service.syncActiviti.curl(url, { method: 'GET' }, ctx);
-      const data = response.data.data;
-      return data;
+      return response.data.data;
     }
 
     async findGroups(groupName) {
       const { ctx } = this;
-      const config = app.config.adService;
-      const url = `${config.url}/findGroups?groupName=${groupName}`;
+      const url = adURL + adService.api.findGroups + '?groupName=' + groupName;
       const response = await ctx.service.syncActiviti.curl(url, { method: 'GET' }, ctx);
-      const data = response.data.data;
-      return data;
+      return response.data.data;
     }
 
     async getUsersForGroup(groupNames) {
       const { ctx } = this;
-      const config = app.config.adService;
-      const url = `${config.url}/getUsersForGroup`;
+      const url = adURL + adService.api.getUsersForGroup;
       const response = await ctx.service.syncActiviti.curl(url, { data: { groupNames } }, ctx);
-      const data = response.data.data;
-      return data;
+      return response.data.data;
     }
 
     async findUsersByCn(emails) {
       const { ctx } = this;
-      const config = app.config.adService;
-      const url = `${config.url}/findUsersByCn`;
+      const url = adURL + adService.api.findUsersByCn;
       const response = await ctx.service.syncActiviti.curl(url, { data: { emails } }, ctx);
-      const data = response.data.data;
-      return data;
+      return response.data.data;
     }
   };
 };

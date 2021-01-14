@@ -26,4 +26,54 @@ RUN npm --production --registry https://registry.npm.taobao.org install
 EXPOSE 7001
 
 # 启动node应用
-CMD ["sh", "-c", "npm start --procedureFn=${procedureFn} --procedureDBName=${procedureDBName} --transitionHost=${transitionHost} --mailHost=${mailHost} --mailPort=${mailPort} --mailUser=${mailUser} --mailPass=${mailPass} --dbType=${dbType} --dbName=${dbName} --dbHost=${dbHost} --dbPort=${dbPort} --dbUser=${dbUser} --dbPassword=${dbPassword} --outboundUrl=${outboundUrl} --activitiUrl=${activitiUrl} --jwtExpiresIn=${jwtExpiresIn} --jwtSecret=${jwtSecret} --jwtIss=${jwtIss} --imapFlag=${imapFlag} --imapHost=${imapHost} --imapPort=${imapPort} --imapUser=${imapUser} --imapPass=${imapPass} --rejectUnauthorized=${rejectUnauthorized} --cpsurl=${cpsurl} --fetchIndex=${fetchIndex} --namespace=${namespace} --loadFlag=${loadFlag} --loadCron=${loadCron}"]
+CMD [
+"sh", "-c", "npm start \
+--dbType=${dbType} \
+--dbName=${dbName} \
+--dbHost=${dbHost} \
+--dbPort=${dbPort} \
+--dbUser=${dbUser} \
+--dbPassword=${dbPassword} \
+--procedureDBType=${procedureDBType} \
+--procedureDBName=${procedureDBName} \
+--procedureDBHost=${procedureDBHost} \
+--procedureDBPort=${procedureDBPort} \
+--procedureDBUser=${procedureDBUser} \
+--procedureDBPassword=${procedureDBPassword} \
+--activitiUrl=${activitiUrl} \
+--rejectUnauthorized=${rejectUnauthorized} \
+--transitionHost=${transitionHost} \
+--outboundUrl=${outboundUrl} \
+--adPrefix=${adPrefix} \
+--authAPI=${authAPI} \
+--findDisplayNameAPI=${findDisplayNameAPI} \
+--userExistsManyAPI=${userExistsManyAPI} \
+--findUserAPI=${findUserAPI} \
+--findUsersAPI=${findUsersAPI} \
+--findGroupsAPI=${findGroupsAPI} \
+--getGusrsForGourpAPI=${getGusrsForGourpAPI} \
+--findUsersByCnAPI=${findUsersByCnAPI} \
+--cpsPrefix=${cpsPrefix} \
+--alladhocAPI=${alladhocAPI} \
+--CUIDPrefix=${CUIDPrefix} \
+--CUIDAPIKey=${CUIDAPIKey} \
+--getPublicKeyAPI=${getPublicKeyAPI} \
+--procedureFn=${procedureFn} \
+--jwtExpiresIn=${jwtExpiresIn} \
+--jwtSecret=${jwtSecret} \
+--jwtIss=${jwtIss} \
+--loadFlag=${loadFlag} \
+--loadCron=${loadCron} \
+--imapFlag=${imapFlag} \
+--imapFetchIndex=${imapFetchIndex} \
+--imapNamespace=${imapNamespace} \
+--imapInterval=${imapInterval} \
+--imapUser=${imapUser} \
+--imapPass=${imapPass} \
+--imapHost=${imapHost} \
+--imapPort=${imapPort} \
+--mailHost=${mailHost} \
+--mailPort=${mailPort} \
+--mailUser=${mailUser} \
+--mailPass=${mailPass}"
+]

@@ -1,8 +1,9 @@
 'use strict';
 
-const rejectUnauthorized = !(!process.env.npm_config_rejectUnauthorized || process.env.npm_config_rejectUnauthorized === 'N');
 
 module.exports = app => {
+  const { rejectUnauthorized } = app.config.activiti;
+  const flag = !(!rejectUnauthorized || rejectUnauthorized === 'N');
   return class extends app.Service {
     async loadUser(user, options) {
       const { ctx } = this;
@@ -90,7 +91,7 @@ module.exports = app => {
           contentType: options.contentType ? options.contentType : 'json',
           dataType: options.dataType ? options.dataType : 'json',
           timeout: options.timeout ? options.timeout : 60 * 1000,
-          rejectUnauthorized,
+          rejectUnauthorized: flag,
         },
         options.data ? { data: options.data } : undefined,
         options.headers ? { headers: options.headers } : undefined
