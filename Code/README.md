@@ -20,7 +20,7 @@ docker run -dit \
 -e dbUser=admin \
 -e dbPassword=APJ@com123 \
 -e procedureDBName=nsr_gis_app \
--e activitiUrl=10.231.131.123:8888 \
+-e activitiUrl=10.231.131.123:3004 \
 -e transitionHost=10.231.131.123:3000 \
 -e outboundUrl=10.231.131.123:8000 \
 -e adPrefix=/adService \

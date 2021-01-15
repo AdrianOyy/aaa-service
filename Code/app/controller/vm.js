@@ -231,7 +231,7 @@ module.exports = app => {
         message = 'Predefine fail';
         pass = false;
       }
-      
+
       // return a map includes result and message to workflow service
       ctx.success({ pass, message });
     }
