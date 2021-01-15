@@ -22,7 +22,9 @@ module.exports = app => {
       });
       if (!tenant) return false;
       const { reference } = tenant;
-      return reference;
+      const res = [];
+      reference.map(ref => res.push(ref.windows_vm_hostname_reference));
+      return res;
     }
 
     /**
@@ -52,8 +54,7 @@ module.exports = app => {
         alreadyUsedCharList.push(vmGuestList[i].hostname.charAt(vmGuestList[i].hostname.length - 1));
       }
       // 求差集
-      const res = [ ...new Set([ ...new Set(lastCharList) ].filter(x => !new Set(alreadyUsedCharList).has(x))) ];
-      return res;
+      return [ ...new Set([ ...new Set(lastCharList) ].filter(x => !new Set(alreadyUsedCharList).has(x))) ];
     }
 
     /**
@@ -71,7 +72,7 @@ module.exports = app => {
       for (let i = 0; i < referenceList.length; i++) {
         const lastCharList = await this.getLastCharList(applicationType, referenceList[i]);
         for (let j = 0; j < lastCharList.length; j++) {
-          const hostName = `${hostname_prefix}${applicationType}${referenceList[i].windows_vm_hostname_reference}${lastCharList[j]}`;
+          const hostName = `${hostname_prefix}${applicationType}${referenceList[i]}${lastCharList[j]}`;
           hostNameList.push(hostName);
           if (hostNameList.length === requestNum) {
             flag = true;
