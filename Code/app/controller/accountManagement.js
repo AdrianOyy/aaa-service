@@ -37,7 +37,7 @@ module.exports = app => {
       try {
         const returnResult = [];
         if (returnType && (returnType.user || returnType.users)) {
-          const users = await ctx.service.adService.findUsers(email);
+          const users = await ctx.service.adService.findUsers('*' + email + '*');
           console.log(new Date(), 'findUsers users', users.length);
           for (const data of users) {
             if (data.cn && data.displayName) {
@@ -50,7 +50,7 @@ module.exports = app => {
           }
         }
         if (returnType && returnType.members) {
-          const users = await ctx.service.adService.findUsers(email);
+          const users = await ctx.service.adService.findUsers('*' + email + '*');
           console.log(new Date(), 'findUsers members : users', users.length);
           for (const data of users) {
             if (data.cn && data.displayName) {
@@ -63,7 +63,7 @@ module.exports = app => {
               }
             }
           }
-          const adGroups = await ctx.service.adService.findGroups(email);
+          const adGroups = await ctx.service.adService.findGroups('*' + email + '*');
           console.log(new Date(), 'findUsers members : adGroups', adGroups.length);
           for (const data of adGroups) {
             if (data.cn) {
@@ -76,7 +76,7 @@ module.exports = app => {
           }
         }
         if (returnType && returnType.dl) {
-          const distributions = await ctx.service.adService.findGroups(email);
+          const distributions = await ctx.service.adService.findGroups('*' + email + '*');
           console.log(new Date(), 'findUsers dl adGroups', distributions.length);
           console.log(new Date(), 'findUsers dl distributions', distributions.length ? distributions.filter(_ => _.mail).length : distributions.length);
           for (const data of distributions) {
@@ -143,8 +143,9 @@ module.exports = app => {
       const { ctx } = this;
       const { valueList } = ctx.request.body;
       if (!valueList) ctx.success([]);
-      const config = app.config.adService;
-      const url = `${config.url}/findDisplayNames`;
+      const outbound = app.config.outbound;
+      const adService = app.config.adService;
+      const url = `${outbound.url}${adService.prefix}/findDisplayNames`;
       const data = await ctx.service.syncActiviti.curl(url, {
         method: 'POST',
         data: {
