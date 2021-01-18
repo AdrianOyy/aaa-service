@@ -104,7 +104,7 @@ https://cps-dev-api.cldpaast71.serverdev.hadev.org.hk
 | getGusrsForGourpAPI | /getUsersForGroup |  |
 | findUsersByCnAPI    | /findUsersByCn    |  |
 | alladhocAPI         | /cps/alladhoc     |  |
-|  getPublicKeyAPI		    |  /sense/Cuid/v1/getPublicKey| cuid 获取公钥 |
+|  getPublicKeyAPI		    |  /senseCuid/v1/getPublicKey| cuid 获取公钥 |
 | loadFlag	| N |  |
 | loadCron	| 0 0 23 * * * |  |
 | imapFlag	| N |  |

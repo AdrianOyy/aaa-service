@@ -96,7 +96,7 @@ module.exports = app => {
         let fieldType = '';
         switch (el.fieldType) {
           case 'string':
-            fieldType = 'varchar(255)';
+            fieldType = 'varchar(512)';
             break;
           case 'boolean':
             fieldType = 'tinyint';
@@ -108,7 +108,7 @@ module.exports = app => {
             fieldType = 'datetime';
             break;
           default:
-            fieldType = 'varchar(255)';
+            fieldType = 'varchar(512)';
             break;
         }
         fieldList += `\`${el.fieldName.toLowerCase().replace(/\s+/g, '_')}\` ${fieldType},`;
