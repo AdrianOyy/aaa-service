@@ -34,26 +34,13 @@ module.exports = app => {
       const { ctx } = this;
       const { email, returnType } = ctx.request.body;
       if (!email) ctx.error();
+      const returnResult = [];
       try {
-        const returnResult = [];
         if (returnType && (returnType.user || returnType.users)) {
           const users = await ctx.service.adService.findUsers(email + '*');
-          console.log(new Date(), 'findUsers users', users.length);
-          for (const data of users) {
-            if (data.cn && data.displayName) {
-              returnResult.push({
-                mail: data.mail,
-                display: data.displayName,
-                corp: data.cn,
-              });
-            }
-          }
-        }
-        if (returnType && returnType.members) {
-          const users = await ctx.service.adService.findUsers(email + '*');
-          console.log(new Date(), 'findUsers members : users', users.length);
-          for (const data of users) {
-            if (data.cn && data.displayName) {
+          if (users && users.length > 0) {
+            console.log(new Date(), 'findUsers users', users.length);
+            for (const data of users) {
               if (data.cn && data.displayName) {
                 returnResult.push({
                   mail: data.mail,
@@ -63,36 +50,57 @@ module.exports = app => {
               }
             }
           }
+        }
+        if (returnType && returnType.members) {
+          const users = await ctx.service.adService.findUsers(email + '*');
+          if (users && users.length > 0) {
+            console.log(new Date(), 'findUsers members : users', users.length);
+            for (const data of users) {
+              if (data.cn && data.displayName) {
+                if (data.cn && data.displayName) {
+                  returnResult.push({
+                    mail: data.mail,
+                    display: data.displayName,
+                    corp: data.cn,
+                  });
+                }
+              }
+            }
+          }
           const adGroups = await ctx.service.adService.findGroups('*' + email + '*');
-          console.log(new Date(), 'findUsers members : adGroups', adGroups.length);
-          for (const data of adGroups) {
-            if (data.cn) {
-              returnResult.push({
-                mail: data.mail,
-                display: data.cn,
-                corp: data.cn,
-              });
+          if (adGroups && adGroups.length > 0) {
+            console.log(new Date(), 'findUsers members : adGroups', adGroups.length);
+            for (const data of adGroups) {
+              if (data.cn) {
+                returnResult.push({
+                  mail: data.mail,
+                  display: data.cn,
+                  corp: data.cn,
+                });
+              }
             }
           }
         }
         if (returnType && returnType.dl) {
           const distributions = await ctx.service.adService.findGroups('*' + email + '*');
-          console.log(new Date(), 'findUsers dl adGroups', distributions.length);
-          console.log(new Date(), 'findUsers dl distributions', distributions.length ? distributions.filter(_ => _.mail).length : distributions.length);
-          for (const data of distributions) {
-            if (data.mail) {
-              returnResult.push({
-                mail: data.mail,
-                display: data.cn,
-                corp: data.cn,
-              });
+          if (distributions && distributions.length > 0) {
+            console.log(new Date(), 'findUsers dl adGroups', distributions.length);
+            console.log(new Date(), 'findUsers dl distributions', distributions.length ? distributions.filter(_ => _.mail).length : distributions.length);
+            for (const data of distributions) {
+              if (data.mail) {
+                returnResult.push({
+                  mail: data.mail,
+                  display: data.cn,
+                  corp: data.cn,
+                });
+              }
             }
           }
         }
-        ctx.success(returnResult);
       } catch (error) {
-        throw { status: 500, message: 'service busy' };
+        console.log(error);
       }
+      ctx.success(returnResult);
     }
     async testfindUsers() {
       const { ctx } = this;
