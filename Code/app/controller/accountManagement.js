@@ -37,7 +37,8 @@ module.exports = app => {
       const returnResult = [];
       try {
         if (returnType && (returnType.user || returnType.users)) {
-          const users = await ctx.service.adService.findUsers(email + '*');
+          let users = await ctx.service.adService.findUsers(email + '*');
+          !users || users.length <= 0 ? users = await ctx.service.adService.findUsers('*' + email + '*') : undefined;
           if (users && users.length > 0) {
             console.log(new Date(), 'findUsers users', users.length);
             for (const data of users) {
@@ -52,7 +53,8 @@ module.exports = app => {
           }
         }
         if (returnType && returnType.members) {
-          const users = await ctx.service.adService.findUsers(email + '*');
+          let users = await ctx.service.adService.findUsers(email + '*');
+          !users || users.length <= 0 ? users = await ctx.service.adService.findUsers('*' + email + '*') : undefined;
           if (users && users.length > 0) {
             console.log(new Date(), 'findUsers members : users', users.length);
             for (const data of users) {
