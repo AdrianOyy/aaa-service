@@ -228,7 +228,7 @@ module.exports = app => {
         }
       } catch (error) {
         console.log(error);
-        message = 'Predefine fail';
+        message = error;
         pass = false;
       }
 
