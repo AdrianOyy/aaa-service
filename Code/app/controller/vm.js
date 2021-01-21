@@ -154,7 +154,17 @@ module.exports = app => {
         // generate hostname
         for (let i = 0; i < childTable.length; i++) {
           const prefix = await ctx.service.hostname.getPrefix(childTable[i]);
-          childTable[i].hostnamePrefix = prefix;
+          if (prefix) {
+            childTable[i].hostnamePrefix = prefix;
+          } else {
+            if (childTable[i].environment_type
+              && childTable[i].environment_type.name
+              && childTable[i].network_zone
+              && childTable[i].network_zone.name) {
+              message += `Environment Type \`${childTable[i].environment_type.name}\` and Network Zone \`${childTable[i].network_zone.name}\` has not Hostname Prefix\n`;
+            }
+            pass = false;
+          }
         }
         const typeCountList = await ctx.service.hostname.countByType(childTable);
         const hostnameMap = new Map();

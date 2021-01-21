@@ -137,8 +137,12 @@ module.exports = app => {
           zoneId,
         },
       });
-      const { hostname_prefix } = vm_type_zone_cdc;
-      return hostname_prefix;
+      let result = null;
+      if (vm_type_zone_cdc && vm_type_zone_cdc.hostname_prefix) {
+        const { hostname_prefix } = vm_type_zone_cdc;
+        result = hostname_prefix;
+      }
+      return result;
     }
 
     /**
