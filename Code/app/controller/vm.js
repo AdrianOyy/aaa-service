@@ -227,7 +227,10 @@ module.exports = app => {
           }
         }
       } catch (error) {
+        ctx.logger.error(error);
+        console.log('error=========================error');
         console.log(error);
+        console.log('error=========================error');
         message = 'Predefine fail';
         pass = false;
       }

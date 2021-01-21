@@ -34,6 +34,7 @@ module.exports = app => {
         });
         ctx.success(res);
       } catch (error) {
+        ctx.logger.error(error);
         console.log('error==========================error');
         console.log(error.message);
         console.log('error==========================error');
@@ -105,6 +106,7 @@ module.exports = app => {
         await oldModel.update(newModel);
         ctx.success();
       } catch (error) {
+        ctx.logger.error(error);
         console.log('error==========================error');
         console.log(error.message);
         console.log('error==========================error');
@@ -124,6 +126,7 @@ module.exports = app => {
         });
         ctx.success();
       } catch (error) {
+        ctx.logger.error(error);
         console.log('error==========================error');
         console.log(error.message);
         console.log('error==========================error');

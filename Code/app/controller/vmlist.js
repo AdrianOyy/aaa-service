@@ -12,9 +12,10 @@ module.exports = app => {
         const [ updateResults ] = await app.model.query(updateSql);
         ctx.success({ result: true, affectedRows: updateResults.affectedRows });
       } catch (error) {
-        console.log('error==========================error');
-        console.log(error.message);
-        console.log('error==========================error');
+        ctx.logger.error(error);
+        console.log('error=========================error');
+        console.log(error);
+        console.log('error=========================error');
         ctx.error('service busy');
       }
     }
@@ -29,6 +30,7 @@ module.exports = app => {
         const result = selectResults[0].number === 0;
         ctx.success(result);
       } catch (error) {
+        ctx.logger.error(error);
         console.log('error==========================error');
         console.log(error.message);
         console.log('error==========================error');
@@ -44,6 +46,7 @@ module.exports = app => {
         const type = await ctx.service.defineVMType.defineVMType(zone_id, type_id, size);
         ctx.success({ type });
       } catch (error) {
+        ctx.logger.error(error);
         console.log('error==========================error');
         console.log(error.message);
         console.log('error==========================error');

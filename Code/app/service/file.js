@@ -20,6 +20,7 @@ module.exports = app => {
         }
         return fileBlob;
       } catch (error) {
+        ctx.logger.error(error);
         console.log('error ================= error');
         console.log(error.message);
         console.log('error ================= error');

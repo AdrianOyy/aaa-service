@@ -29,6 +29,7 @@ module.exports = app => {
         await transaction.commit();
       } catch (err) {
         // 事务回滚
+        ctx.logger.error(err);
         console.log(err);
         await transaction.rollback();
         ctx.error();

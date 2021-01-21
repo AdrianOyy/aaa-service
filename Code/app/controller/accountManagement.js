@@ -169,6 +169,7 @@ module.exports = app => {
         ctx.success(data);
       } catch (e) {
         ctx.error();
+        ctx.logger.error(e);
         console.log('Error when request ', url);
         console.log('=========================');
         console.log(e.message);

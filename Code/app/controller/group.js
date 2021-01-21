@@ -33,6 +33,7 @@ module.exports = app => {
         });
         ctx.success(res);
       } catch (error) {
+        ctx.logger.error(error);
         console.log('error==========================error');
         console.log(error.message);
         console.log('error==========================error');

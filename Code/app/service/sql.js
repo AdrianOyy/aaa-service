@@ -18,6 +18,7 @@ module.exports = app => {
         await app.model.query('COMMIT');
         return { success: true, idList };
       } catch (error) {
+        this.ctx.logger.error(error);
         console.log('error ================= error');
         console.log(error.message);
         console.log('error ================= error');

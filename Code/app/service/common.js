@@ -31,6 +31,7 @@ module.exports = app => {
         }
         return c.length ? { [Op.and]: c } : undefined;
       } catch (e) {
+        this.ctx.logger.error(e);
         console.log('e.message=========================e.message');
         console.log(e.message);
         console.log('e.message=========================e.message');

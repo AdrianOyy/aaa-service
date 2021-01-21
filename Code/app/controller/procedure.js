@@ -10,7 +10,10 @@ module.exports = app => {
         const res = await ctx.procedureModel.query(`call ${fnName}("${arg}")`);
         ctx.success(res);
       } catch (e) {
-        console.log(e.message);
+        ctx.logger.error(e);
+        console.log('e=========================e');
+        console.log(e);
+        console.log('e=========================e');
         ctx.error();
       }
     }

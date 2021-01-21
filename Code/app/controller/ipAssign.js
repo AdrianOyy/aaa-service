@@ -72,6 +72,7 @@ module.exports = app => {
         await oldModel.update(newModel);
         ctx.success();
       } catch (error) {
+        ctx.logger.error(error);
         console.log('error==========================error');
         console.log(error.message);
         console.log('error==========================error');
@@ -99,6 +100,7 @@ module.exports = app => {
         await ctx.model.models.ip_assignment.create(model);
         ctx.success();
       } catch (err) {
+        ctx.logger.error(err);
         console.log('err ================= err');
         console.log(err);
         console.log('err ================= err');

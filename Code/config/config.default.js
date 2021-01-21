@@ -6,6 +6,10 @@ module.exports = appInfo => {
   config.prefix = '';
   config.keys = appInfo.name + '_20200702134922';
 
+  config.logger = {
+    dir: path.join(__dirname, '../logs'),
+  };
+
   // ===================================
   //             ORM 设置
   // ===================================
@@ -143,7 +147,8 @@ module.exports = appInfo => {
       '/tenant/testCps',
       '/expiry/checkTenant',
       '/expiry/checkUser',
-      '/accountManagement/getPublicKey',
+      '/vm/preDefine',
+      '/test/error',
     ],
   };
 

@@ -80,6 +80,7 @@ module.exports = app => {
         ctx.service.syncActiviti.saveOrUpdateGroup({ id: oldModel.dataValues.id, cn: name }, { headers: ctx.headers });
         ctx.success();
       } catch (error) {
+        ctx.logger.error(error);
         console.log('error==========================error');
         console.log(error.message);
         console.log('error==========================error');
@@ -97,6 +98,7 @@ module.exports = app => {
         await entity.destroy(id);
         ctx.success();
       } catch (error) {
+        ctx.logger.error(error);
         console.log('error==========================error');
         console.log(error.message);
         console.log('error==========================error');
@@ -126,6 +128,7 @@ module.exports = app => {
         ctx.service.syncActiviti.deleteGroup(idList.join(','), ctx.headers);
         ctx.success();
       } catch (error) {
+        ctx.logger.error(error);
         console.log('error==========================error');
         console.log(error.message);
         console.log('error==========================error');

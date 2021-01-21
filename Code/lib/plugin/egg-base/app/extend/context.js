@@ -9,9 +9,6 @@ module.exports = {
   },
   error(msg) {
     const message = msg || 'bad request';
-    console.log('message==========================message');
-    console.log(message);
-    console.log('message==========================message');
     throw { status: 400, message };
   },
   async returnListWithCount(promise) {
