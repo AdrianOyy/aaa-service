@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = app => {
-  const { imapFlag, fetchIndex, namespace, interval } = app.config.imap;
+  const { flag, fetchIndex, namespace, interval } = app.config.imap;
   return {
     schedule: {
       interval,
@@ -9,7 +9,7 @@ module.exports = app => {
       type: 'all',
     },
     async task(ctx) {
-      if (imapFlag !== 'Y') {
+      if (flag !== 'Y') {
         return;
       }
       try {

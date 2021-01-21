@@ -231,7 +231,7 @@ module.exports = app => {
         console.log('error=========================error');
         console.log(error);
         console.log('error=========================error');
-        message = 'Predefine fail';
+        message = error;
         pass = false;
       }
 
