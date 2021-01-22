@@ -24,6 +24,7 @@ module.exports = (options, app) => {
       ctx.authUser = {
         id: user.id,
         name: user.displayname,
+        email: user.email,
       };
       await next();
       const option = { content: { username: user.sAMAccountName }, expiresIn: app.config.jwt.expiresIn };
