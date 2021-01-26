@@ -151,6 +151,12 @@ module.exports = appInfo => {
     iss: process.env.npm_config_jwtIss,
   };
 
+  config.mailGroup = {
+    T1: process.env.npm_config_t1,
+    T2: process.env.npm_config_t2,
+    T6: process.env.npm_config_t6,
+  };
+
 
   // ===================================
   //           其他 设置

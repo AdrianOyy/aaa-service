@@ -113,7 +113,7 @@ function getInsertSQL(formKey, version, data) {
 function getUpdateSQL(formKey, version, data, where) {
   let fieldValue = '';
   for (const key in data) {
-    if (key !== 'id' && key !== 'checkState') {
+    if (key !== 'id' && key !== 'checkState' && key !== 'checkName') {
       if ((key === 'createdAt' || key === 'updatedAt') && data[key].value) {
         const [ date, time ] = data[key].value.split('T');
         const [ f ] = time.split('.');
