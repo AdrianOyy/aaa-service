@@ -428,33 +428,51 @@ module.exports = app => {
     //
     // }
     async JsonToVMMarm(list, str, startIndex) {
-      const start = 'ok: [localhost] =>';
-      const end = 'TASK';
-      const endAll = 'PLAY';
-      let isAll = false;
-      const startOf = str.indexOf(start, startIndex);
-      let endOf = str.indexOf(end, startOf);
-      if (endOf === -1) {
-        endOf = str.indexOf(endAll, startOf);
-        isAll = true;
+      try {
+        const start = 'ok: [localhost] =>';
+        const end = 'TASK';
+        const endAll = 'PLAY';
+        let isAll = false;
+        const startOf = str.indexOf(start, startIndex);
+        let endOf = str.indexOf(end, startOf);
+        if (endOf === -1) {
+          endOf = str.indexOf(endAll, startOf);
+          isAll = true;
+        }
+        const msg = str.substring(startOf + start.length, endOf);
+        const msgJson = JSON.parse(msg);
+        list.push(msgJson.msg);
+        if (!isAll) {
+          await this.JsonToVMMarm(list, str, startOf + start.length);
+        }
+        return list;
+      } catch (err) {
+        console.log('VMMarm解析失败');
+        console.log('==============================');
+        console.log(str);
+        console.log('==============================');
+        console.log(err);
+        return [];
       }
-      const msg = str.substring(startOf + start.length, endOf);
-      const msgJson = JSON.parse(msg);
-      list.push(msgJson.msg);
-      if (!isAll) {
-        await this.JsonToVMMarm(list, str, startOf + start.length);
-      }
-      return list;
     }
 
     async JsonToHCI(str) {
-      const start = 'ok: [localhost] => {';
-      const end = 'PLAY';
-      const startOf = str.indexOf(start);
-      const endOf = str.indexOf(end, startOf);
-      const msg = str.substring(startOf + start.length - 1, endOf);
-      const msgJson = JSON.parse(msg);
-      return msgJson.msg;
+      try {
+        const start = 'ok: [localhost] => {';
+        const end = 'PLAY';
+        const startOf = str.indexOf(start);
+        const endOf = str.indexOf(end, startOf);
+        const msg = str.substring(startOf + start.length - 1, endOf);
+        const msgJson = JSON.parse(msg);
+        return msgJson.msg;
+      } catch (err) {
+        console.log('HCI解析失败');
+        console.log('==============================');
+        console.log(str);
+        console.log('==============================');
+        console.log(err);
+        return [];
+      }
     }
 
     async setVMMare(names) {
@@ -555,7 +573,7 @@ module.exports = app => {
 
 
     async getVMMareAll(names) {
-      // names = [ 'devesxi03cs', 'devesxi02cs' ];
+      names = [ 'devesxi03cs', 'devesxi02cs' ];
       const name = names.join();
       const str = await this.getAnsibleVMWare({ vClusters: name });
       if (str) {
