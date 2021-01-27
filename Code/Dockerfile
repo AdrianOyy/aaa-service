@@ -64,6 +64,9 @@ CMD [ \
 --jwtIss=${jwtIss} \
 --loadFlag=${loadFlag} \
 --loadCron=${loadCron} \
+--t1=${t1} \
+--t2=${t2} \
+--t6=${t3} \
 --imapFlag=${imapFlag} \
 --imapFetchIndex=${imapFetchIndex} \
 --imapNamespace=${imapNamespace} \
