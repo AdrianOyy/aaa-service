@@ -429,30 +429,30 @@ module.exports = app => {
     // }
     async JsonToVMMarm(list, str, startIndex) {
       try {
-        const start = 'ok: [localhost] =>';
+        const start = 'ok: [localhost] => {';
         const end = 'TASK';
-        const endAll = 'PLAY';
-        let isAll = false;
         const startOf = str.indexOf(start, startIndex);
-        let endOf = str.indexOf(end, startOf);
-        if (endOf === -1) {
-          endOf = str.indexOf(endAll, startOf);
-          isAll = true;
-        }
-        const msg = str.substring(startOf + start.length, endOf);
-        const msgJson = JSON.parse(msg);
-        list.push(msgJson.msg);
-        if (!isAll) {
+        if (startOf !== -1) {
+          const endOf = str.indexOf(end, startOf);
+          if (endOf === -1) {
+            return list;
+          }
+          const msg = str.substring(startOf + start.length - 1, endOf);
+          const msgJson = JSON.parse(msg);
+          list.push(msgJson.msg);
+          // 往下处理
           await this.JsonToVMMarm(list, str, startOf + start.length);
+          return list;
         }
         return list;
+
       } catch (err) {
         console.log('VMMarm解析失败');
         console.log('==============================');
         console.log(str);
         console.log('==============================');
         console.log(err);
-        return [];
+        return list;
       }
     }
 
@@ -462,6 +462,9 @@ module.exports = app => {
         const end = 'PLAY';
         const startOf = str.indexOf(start);
         const endOf = str.indexOf(end, startOf);
+        if (endOf === -1) {
+          return [];
+        }
         const msg = str.substring(startOf + start.length - 1, endOf);
         const msgJson = JSON.parse(msg);
         return msgJson.msg;
@@ -558,48 +561,52 @@ module.exports = app => {
     }
 
     async getHCIAll(names) {
-      const name = names.join();
-      const str = await this.getAnsibleHCI({ vClusters: name });
-      if (str) {
-        const msgs = await this.JsonToHCI(str);
-        const HCI = [];
-        for (const msg of msgs) {
-          HCI.push(setColoumn(msg));
+      if (names && names.length > 0) {
+        const name = names.join();
+        const str = await this.getAnsibleHCI({ vClusters: name });
+        if (str) {
+          const msgs = await this.JsonToHCI(str);
+          console.log(msgs);
+          const HCI = [];
+          for (const msg of msgs) {
+            HCI.push(setColoumn(msg));
+          }
+          return HCI;
         }
-        return HCI;
       }
       return [];
     }
 
 
     async getVMMareAll(names) {
-      names = [ 'devesxi03cs', 'devesxi02cs' ];
-      const name = names.join();
-      const str = await this.getAnsibleVMWare({ vClusters: name });
-      if (str) {
-        const msgs = await this.JsonToVMMarm([], str, 0);
-        const masters = [];
-        for (const name of names) {
-          const msg = msgs.filter(t => t['Cluster Name'].trim() === name);
-          if (msg.length > 0) {
-            const master = {
-              ClusterName: name,
-              ESXiDetails: [],
-              DatastoreDetails: [],
-            };
+      if (names && names.length > 0) {
+        const name = names.join();
+        const str = await this.getAnsibleVMWare({ vClusters: name });
+        if (str) {
+          const msgs = await this.JsonToVMMarm([], str, 0);
+          const masters = [];
+          for (const name of names) {
             const msg = msgs.filter(t => t['Cluster Name'].trim() === name);
-            for (const detail of msg) {
-              if (detail['ESXi Details']) {
-                master.ESXiDetails = detail['ESXi Details'];
+            if (msg.length > 0) {
+              const master = {
+                ClusterName: name,
+                ESXiDetails: [],
+                DatastoreDetails: [],
+              };
+              const msg = msgs.filter(t => t['Cluster Name'].trim() === name);
+              for (const detail of msg) {
+                if (detail['ESXi Details']) {
+                  master.ESXiDetails = detail['ESXi Details'];
+                }
+                if (detail['Datastore Details']) {
+                  master.DatastoreDetails = detail['Datastore Details'];
+                }
               }
-              if (detail['Datastore Details']) {
-                master.DatastoreDetails = detail['Datastore Details'];
-              }
+              masters.push(master);
             }
-            masters.push(master);
           }
+          return masters;
         }
-        return masters;
       }
       return [];
     }
