@@ -237,7 +237,7 @@ module.exports = app => {
       let errorMessage = '';
       try {
         const { application_types, locations, platforms, phases } = await this.getSelect(ctx);
-        const url = cpsurl + cpsId;
+        const url = cpsurl + '/' + cpsId;
         const result = await ctx.service.syncActiviti.curl(url, { method: 'GET' }, ctx);
         const data = result.data;
         const code = data[0].adhoc[0].project_code;
@@ -328,7 +328,7 @@ module.exports = app => {
 
       const vms = [];
       const tenant = {};
-      const url = cpsurl + '5b1f7144625da9b4c2ef54c1';
+      const url = cpsurl + '/5b1f7144625da9b4c2ef54c1';
       try {
         const { application_types, locations, platforms, phases } = await this.getSelect(ctx);
         console.log('1 select list:-------------');

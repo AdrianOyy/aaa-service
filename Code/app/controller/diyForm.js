@@ -2,6 +2,18 @@
 
 module.exports = app => {
   return class extends app.Controller {
+    async list() {
+      const { ctx } = this;
+      let { formKey, startTime, endTime } = ctx.query;
+      if (startTime && endTime && (new Date(startTime) - new Date(endTime) > 0)) {
+        const tmp = startTime;
+        startTime = endTime;
+        endTime = tmp;
+      }
+      const res = await ctx.service.diyForm.getDIYFormDetailByDateRange(formKey, startTime, endTime);
+      ctx.success(res);
+    }
+
     async create() {
       const { ctx } = this;
       const {
