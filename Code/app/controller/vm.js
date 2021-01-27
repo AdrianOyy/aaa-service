@@ -194,10 +194,10 @@ module.exports = app => {
 
         for (let i = 0; i < childTable.length; i++) {
           const el = childTable[i];
-          if (el.application_type && el.application_type.name && pass) {
-            const list = hostnameMap.get(el.application_type.name).get(el.hostnamePrefix);
+          if (el.application_type && el.application_type.code && pass) {
+            const list = hostnameMap.get(el.application_type.code).get(el.hostnamePrefix);
             el.hostname = list[0];
-            hostnameMap.get(el.application_type.name).set(el.hostnamePrefix, list.slice(1));
+            hostnameMap.get(el.application_type.code).set(el.hostnamePrefix, list.slice(1));
           }
           if (el.data_center && el.data_center.id && pass) {
             const CList = CIPMap.get(el.data_center.id);

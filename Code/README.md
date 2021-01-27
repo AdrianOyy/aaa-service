@@ -84,6 +84,9 @@ https://cps-dev-api.cldpaast71.serverdev.hadev.org.hk
 | mailPort        |                                                           |
 | imapUser        |                                                           |
 | mailPass        |                                                           |
+| t1              | T1 组名                                                   |
+| t2              | T2 组名                                                   |
+| t6              | T6 组名                                                   |
 
 
 
