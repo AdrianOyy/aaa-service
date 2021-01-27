@@ -55,14 +55,22 @@ module.exports = app => {
     const fixturesPath = 'app/model/fixtures/';
     console.log('Start initializing database');
     console.log('=============================================');
+    if (!await model.dynamicForm.findOne()) {
+      console.log('Now: dynamicForm');
+      await sequelizeFixtures.loadFile(fixturesPath + 'dynamicForm.js', model);
+    }
+    if (!await model.dynamicFormDetail.findOne()) {
+      console.log('Now: dynamicFormDetail');
+      await sequelizeFixtures.loadFile(fixturesPath + 'dynamicFormDetail.js', model);
+    }
     if (!await model.group.findOne()) {
       console.log('Now: group');
       await sequelizeFixtures.loadFile(fixturesPath + 'group.js', model);
     }
-    if (!await model.vm_platform_type.findOne()) {
-      console.log('Now: vm_platform_type');
-      await sequelizeFixtures.loadFile(fixturesPath + 'vm_platform_type.js', model);
-    }
+    // if (!await model.vm_platform_type.findOne()) {
+    //   console.log('Now: vm_platform_type');
+    //   await sequelizeFixtures.loadFile(fixturesPath + 'vm_platform_type.js', model);
+    // }
     if (!await model.inventoryStatus.findOne()) {
       console.log('Now: inventoryStatus');
       await sequelizeFixtures.loadFile(fixturesPath + 'inventoryStatus.js', model);
@@ -71,10 +79,10 @@ module.exports = app => {
       console.log('Now: equipType');
       await sequelizeFixtures.loadFile(fixturesPath + 'equipType.js', model);
     }
-    if (!await model.vm_cdc.findOne()) {
-      console.log('Now: vm_cdc');
-      await sequelizeFixtures.loadFile(fixturesPath + 'vm_cdc.js', model);
-    }
+    // if (!await model.vm_cdc.findOne()) {
+    //   console.log('Now: vm_cdc');
+    //   await sequelizeFixtures.loadFile(fixturesPath + 'vm_cdc.js', model);
+    // }
     if (!await model.account_type.findOne()) {
       console.log('Now: account_type');
       await sequelizeFixtures.loadFile(fixturesPath + 'account_type.js', model);
