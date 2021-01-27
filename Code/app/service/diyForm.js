@@ -26,6 +26,46 @@ module.exports = app => {
       return SQLList;
     }
 
+    async getLatestVersion(formKey) {
+      const sql = `SELECT version FROM dynamicForm WHERE formKey='${formKey}' ORDER BY version + 0 DESC LIMIT 1;`;
+      const [[ target ]] = await app.model.query(sql);
+      return target ? target.version : null;
+    }
+
+    async getChildFormTable(parentFormKey, version) {
+      const sql = `SELECT * FROM dynamicForm where parentId=(SELECT id FROM dynamicForm WHERE version="${version}" AND formKey="${parentFormKey}");`;
+      const [[ target ]] = await app.model.query(sql);
+      return target;
+    }
+
+    async getDIYFormDetailByDateRange(formKey, startDay, endDay) {
+      const latestVersion = await this.getLatestVersion(formKey);
+      if (!latestVersion) return null;
+      const childTable = await this.getChildFormTable(formKey, latestVersion);
+      let parentSQL;
+      if (startDay && !endDay) {
+        parentSQL = `SELECT * FROM ${formKey}${latestVersion} WHERE createdAt >= "${startDay}" `;
+      } else if (!startDay && endDay) {
+        parentSQL = `SELECT * FROM ${formKey}${latestVersion} WHERE createdAt <= "${endDay}"`;
+      } else if (!startDay && !endDay) {
+        parentSQL = `SELECT * FROM ${formKey}${latestVersion}`;
+      } else {
+        parentSQL = `SELECT * FROM ${formKey}${latestVersion} WHERE createdAt BETWEEN "${startDay}" AND "${endDay}"`;
+      }
+      const [ parentDataList ] = await app.model.query(parentSQL);
+      if (!parentDataList || !parentDataList.length) return null;
+      if (childTable && childTable.formKey) {
+        for (const parentData of parentDataList) {
+          const parentId = parentData.id;
+          const [ childDataList ] = await app.model.query(`SELECT * FROM ${childTable.formKey}${latestVersion} WHERE parentId=${parentId}`);
+          if (childDataList && childDataList.length) {
+            parentData.childDataList = childDataList;
+          }
+        }
+      }
+      return parentDataList;
+    }
+
     /**
     * get dynamic form detail by pid
     * @param {string | number} pid

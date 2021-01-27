@@ -1,8 +1,9 @@
 'use strict';
 
 module.exports = app => {
-  const { outbound, adService, jwt } = app.config;
+  const { outbound, adService, cps, jwt } = app.config;
   const adURL = outbound.url + adService.prefix;
+  const cpsurl = outbound.url + cps.prefix + cps.api.alladhoc;
 
   return class extends app.Service {
     async authenticate(username, password) {
@@ -36,11 +37,21 @@ module.exports = app => {
       return response.data.data;
     }
 
-    async findUser(username) {
+    async findUser(username, type) {
       const { ctx } = this;
-      const url = adURL + adService.api.findUser + '?username=' + username;
-      const response = await ctx.service.syncActiviti.curl(url, { method: 'GET' }, ctx);
-      return response.data.data;
+      let res;
+      if (type === 'cps') {
+        const url = cpsurl + '/' + username;
+        const { data } = ctx.service.common.request(url, {
+          method: 'GET',
+        });
+        res = data;
+      } else {
+        const url = adURL + adService.api.findUser + '?username=' + username;
+        const response = await ctx.service.syncActiviti.curl(url, { method: 'GET' }, ctx);
+        res = response.data.data;
+      }
+      return res;
     }
 
     async findUsers(email) {

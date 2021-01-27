@@ -93,8 +93,8 @@ module.exports = app => {
 
     async findUser() {
       const { ctx } = this;
-      const { username } = ctx.request.body;
-      const user = await ctx.service.adService.findUser(username);
+      const { username, type } = ctx.request.body;
+      const user = await ctx.service.adService.findUser(username, type);
       ctx.success(user);
     }
 
