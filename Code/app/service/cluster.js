@@ -428,33 +428,51 @@ module.exports = app => {
     //
     // }
     async JsonToVMMarm(list, str, startIndex) {
-      const start = 'ok: [localhost] =>';
-      const end = 'TASK';
-      const endAll = 'PLAY';
-      let isAll = false;
-      const startOf = str.indexOf(start, startIndex);
-      let endOf = str.indexOf(end, startOf);
-      if (endOf === -1) {
-        endOf = str.indexOf(endAll, startOf);
-        isAll = true;
+      try {
+        const start = 'ok: [localhost] =>';
+        const end = 'TASK';
+        const endAll = 'PLAY';
+        let isAll = false;
+        const startOf = str.indexOf(start, startIndex);
+        let endOf = str.indexOf(end, startOf);
+        if (endOf === -1) {
+          endOf = str.indexOf(endAll, startOf);
+          isAll = true;
+        }
+        const msg = str.substring(startOf + start.length, endOf);
+        const msgJson = JSON.parse(msg);
+        list.push(msgJson.msg);
+        if (!isAll) {
+          await this.JsonToVMMarm(list, str, startOf + start.length);
+        }
+        return list;
+      } catch (err) {
+        console.log('VMMarm解析失败');
+        console.log('==============================');
+        console.log(str);
+        console.log('==============================');
+        console.log(err);
+        return [];
       }
-      const msg = str.substring(startOf + start.length, endOf);
-      const msgJson = JSON.parse(msg);
-      list.push(msgJson.msg);
-      if (!isAll) {
-        await this.JsonToVMMarm(list, str, startOf + start.length);
-      }
-      return list;
     }
 
     async JsonToHCI(str) {
-      const start = 'ok: [localhost] => {';
-      const end = 'PLAY';
-      const startOf = str.indexOf(start);
-      const endOf = str.indexOf(end, startOf);
-      const msg = str.substring(startOf + start.length - 1, endOf);
-      const msgJson = JSON.parse(msg);
-      return msgJson.msg;
+      try {
+        const start = 'ok: [localhost] => {';
+        const end = 'PLAY';
+        const startOf = str.indexOf(start);
+        const endOf = str.indexOf(end, startOf);
+        const msg = str.substring(startOf + start.length - 1, endOf);
+        const msgJson = JSON.parse(msg);
+        return msgJson.msg;
+      } catch (err) {
+        console.log('HCI解析失败');
+        console.log('==============================');
+        console.log(str);
+        console.log('==============================');
+        console.log(err);
+        return [];
+      }
     }
 
     async setVMMare(names) {
@@ -586,69 +604,6 @@ module.exports = app => {
       return [];
     }
 
-    async getHCI() {
-      const msg = 'PLAY [Get HCI Cluster Resources Info] ******************************************\n' +
-        '\n' +
-        'TASK [Get target HCI Cluster Resources Info] ***********************************\n' +
-        'changed: [localhost] => (item=[\'160.85.116.3\', \'WTSTNHC03CS\'])\n' +
-        'changed: [localhost] => (item=[\'160.85.116.13\', \'WTSTNHC02CS\'])\n' +
-        '\n' +
-        'TASK [set_fact] ****************************************************************\n' +
-        'ok: [localhost] => (item=None)\n' +
-        'ok: [localhost] => (item=None)\n' +
-        'ok: [localhost]\n' +
-        '\n' +
-        'TASK [Print out HCI details] ***************************************************\n' +
-        'ok: [localhost] => {\n' +
-        '    "msg": [\n' +
-        '        [\n' +
-        '            "Cluster Name: WTSTNHC03CS",\n' +
-        '            "8 nodes cluster",\n' +
-        '            "WTSTNHC03A  normal",\n' +
-        '            "WTSTNHC03B  normal",\n' +
-        '            "WTSTNHC03C  normal",\n' +
-        '            "WTSTNHC03D  normal",\n' +
-        '            "WTSTNHC03E  normal",\n' +
-        '            "WTSTNHC03F  normal",\n' +
-        '            "WTSTNHC03G  normal",\n' +
-        '            "WTSTNHC03H  normal",\n' +
-        '            "Total VM: 146",\n' +
-        '            "CPU Resource Left: 28",\n' +
-        '            "No. of CPU Used: 356",\n' +
-        '            "Number of CPU: 384",\n' +
-        '            "Free Memory: 1197.7763671875GB",\n' +
-        '            "Total Memory: 2395.587890625GB",\n' +
-        '            "Free Disk Size: 62258.90625GB",\n' +
-        '            "Total Disk Size: 93147.1875GB"\n' +
-        '        ],\n' +
-        '        [\n' +
-        '            "Cluster Name: WTSTNHC02CS",\n' +
-        '            "8 nodes cluster",\n' +
-        '            "WTSTNHC02A  normal",\n' +
-        '            "WTSTNHC02B  normal",\n' +
-        '            "WTSTNHC02C  normal",\n' +
-        '            "WTSTNHC02D  normal",\n' +
-        '            "WTSTNHC02E  normal",\n' +
-        '            "WTSTNHC02F  normal",\n' +
-        '            "WTSTNHC02G  normal",\n' +
-        '            "WTSTNHC02H  normal",\n' +
-        '            "Total VM: 35",\n' +
-        '            "CPU Resource Left: 178",\n' +
-        '            "No. of CPU Used: 142",\n' +
-        '            "Number of CPU: 320",\n' +
-        '            "Free Memory: 1094.666015625GB",\n' +
-        '            "Total Memory: 2395.587890625GB",\n' +
-        '            "Free Disk Size: 69330.9375GB",\n' +
-        '            "Total Disk Size: 93147.1875GB"\n' +
-        '        ]\n' +
-        '    ]\n' +
-        '}\n' +
-        '\n' +
-        'PLAY RECAP *********************************************************************\n' +
-        'localhost                  : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0 \n';
-      return msg;
-    }
-
     async getAnsibleHCI(data) {
       const url = app.config.activiti.url + '/getAnsibleHCIResource';
       // action task
@@ -661,18 +616,6 @@ module.exports = app => {
         data,
       };
       const hci = await ctx.service.syncActiviti.curl(url, options, ctx);
-      // const hci = await axios
-      //   .get(url + '/getAnsibleHCIResource', params, options)
-      //   .then(function(response) {
-      //     return new Promise(resolve => {
-      //       resolve(response.data);
-      //     });
-      //   }).catch(function(error) {
-      //     console.log(error.message);
-      //     return new Promise(resolve => {
-      //       resolve(null);
-      //     });
-      //   });
       return hci.data;
     }
 
@@ -688,212 +631,7 @@ module.exports = app => {
         data,
       };
       const hci = await ctx.service.syncActiviti.curl(url, options, ctx);
-
-      // const hci = await axios
-      //   .get(url + '/getAnsibleVMWareResource', params, options)
-      //   .then(function(response) {
-      //     return new Promise(resolve => {
-      //       resolve(response.data);
-      //     });
-      //   }).catch(function(error) {
-      //     console.log(error.message);
-      //     return new Promise(resolve => {
-      //       resolve(null);
-      //     });
-      //   });
       return hci.data;
-    }
-
-    async getVMMare() {
-      const msg = 'SSH password: \n' +
-        'BECOME password[defaults to SSH password]: \n' +
-        'Vault password: \n' +
-        '\n' +
-        'PLAY [Get the VM list from vCenter] ********************************************\n' +
-        '\n' +
-        'TASK [Gathering Facts] *********************************************************\n' +
-        'ok: [localhost]\n' +
-        '\n' +
-        'TASK [include_tasks] ***********************************************************\n' +
-        '. . . . . .\n' +
-        '. . . . . .\n' +
-        '. . . . . . \n' +
-        'TASK [Try to merge list] *******************************************************\n' +
-        'ok: [localhost]\n' +
-        '\n' +
-        'TASK [Print out the ESXi details in devesxi02cs] *******************************\n' +
-        'ok: [localhost] => {\n' +
-        '        "msg": {\n' +
-        '        "Cluster Name": "devesxi02cs", \n' +
-        '        "ESXi Details": [\n' +
-        '            {\n' +
-        '                "Esxi Name": "devesxi02a.corpdev.hadev.org.hk", \n' +
-        '                "Free Memory": "7924.03GB ", \n' +
-        '                "No. of CPU Used": 44, \n' +
-        '                "Number of CPU": 78, \n' +
-        '                "Total Memory": "10233.42GB"\n' +
-        '            }, \n' +
-        '            {\n' +
-        '                "Esxi Name": "devesxi02b.corpdev.hadev.org.hk", \n' +
-        '                "Free Memory": "8114.45GB ", \n' +
-        '                "No. of CPU Used": 47, \n' +
-        '                "Number of CPU": 56, \n' +
-        '                "Total Memory": "10233.42GB"\n' +
-        '            }\n' +
-        '        ]\n' +
-        '    }\n' +
-        '}\n' +
-        'TASK [Print out the datastore details in devesxi02cs] **************************\n' +
-        'ok: [localhost] => {\n' +
-        '    "msg": {\n' +
-        '        "Cluster Name": "devesxi02cs", \n' +
-        '        "Datastore Details": [\n' +
-        '            {\n' +
-        '                "free": "517.12 GB", \n' +
-        '                "name": "02CS_CSV01", \n' +
-        '                "total": "2.00 TB"\n' +
-        '            }, \n' +
-        '            {\n' +
-        '                "free": "1.13 TB", \n' +
-        '                "name": "02CS_CSV02", \n' +
-        '                "total": "2.00 TB"\n' +
-        '            }, \n' +
-        '            {\n' +
-        '                "free": "861.41 GB", \n' +
-        '                "name": "02CS_CSV03_Encrypted", \n' +
-        '                "total": "2.00 TB"\n' +
-        '            }, \n' +
-        '            {\n' +
-        '                "free": "789.55 GB", \n' +
-        '                "name": "02CS_CSV04_Encrypted", \n' +
-        '                "total": "2.00 TB"\n' +
-        '            }, \n' +
-        '            {\n' +
-        '                "free": "514.26 GB", \n' +
-        '                "name": "02CS_CSV05_Encrypted", \n' +
-        '                "total": "2.00 TB"\n' +
-        '            }, \n' +
-        '            {\n' +
-        '                "free": "351.39 GB", \n' +
-        '                "name": "02CS_CSV06_Encrypted", \n' +
-        '                "total": "2.00 TB"\n' +
-        '            }, \n' +
-        '            {\n' +
-        '                "free": "952.03 GB", \n' +
-        '                "name": "02CS_CSV07", \n' +
-        '                "total": "2.00 TB"\n' +
-        '            }, \n' +
-        '            {\n' +
-        '                "free": "2.00 TB", \n' +
-        '                "name": "02CS_CSV08", \n' +
-        '                "total": "2.00 TB"\n' +
-        '            }, \n' +
-        '            {\n' +
-        '                "free": "1.96 TB", \n' +
-        '                "name": "02CS_CSV09", \n' +
-        '                "total": "2.00 TB"\n' +
-        '            }, \n' +
-        '            {\n' +
-        '                "free": "2.00 TB", \n' +
-        '                "name": "02CS_CSV10", \n' +
-        '                "total": "2.00 TB"\n' +
-        '            }\n' +
-        '        ]\n' +
-        '    }\n' +
-        '}\n' +
-        'TASK [Set Cluster Name] ********************************************************\n' +
-        'ok: [localhost]\n' +
-        '\n' +
-        'TASK [Get the vCenter cluster Info] ********************************************\n' +
-        'ok: [localhost -> localhost]\n' +
-        '. . . . .  .\n' +
-        '. . . . . .\n' +
-        '. . . . . .\n' +
-        'TASK [Try to merge list] *******************************************************\n' +
-        'ok: [localhost]\n' +
-        '\n' +
-        'TASK [Print out the ESXi details in  devesxi03cs] ******************************\n' +
-        'ok: [localhost] => {\n' +
-        '    "msg": {\n' +
-        '        "Cluster Name": " devesxi03cs", \n' +
-        '        "ESXi Details": [\n' +
-        '            {\n' +
-        '                "Esxi Name": "devesxi03a.corpdev.hadev.org.hk", \n' +
-        '                "Free Memory": "8109.22GB ", \n' +
-        '                "No. of CPU Used": 49, \n' +
-        '                "Number of CPU": 56, \n' +
-        '                "Total Memory": "10235.92GB"\n' +
-        '            }, \n' +
-        '            {\n' +
-        '                "Esxi Name": "devesxi03b.corpdev.hadev.org.hk", \n' +
-        '                "Free Memory": "8438.87GB ", \n' +
-        '                "No. of CPU Used": 38, \n' +
-        '                "Number of CPU": 56, \n' +
-        '                "Total Memory": "10235.92GB"\n' +
-        '            }\n' +
-        '        ]\n' +
-        '    }\n' +
-        '}\n' +
-        '\n' +
-        'TASK [Print out the datastore details in  devesxi03cs] *************************\n' +
-        'ok: [localhost] => {\n' +
-        '    "msg": {\n' +
-        '        "Cluster Name": " devesxi03cs", \n' +
-        '        "Datastore Details": [\n' +
-        '            {\n' +
-        '                "free": "720.49 GB", \n' +
-        '                "name": "03CS_CSV01", \n' +
-        '                "total": "2.00 TB"\n' +
-        '            }, \n' +
-        '            {\n' +
-        '                "free": "625.80 GB", \n' +
-        '                "name": "03CS_CSV02", \n' +
-        '                "total": "2.00 TB"\n' +
-        '            }, \n' +
-        '            {\n' +
-        '                "free": "648.13 GB", \n' +
-        '                "name": "03CS_CSV03", \n' +
-        '                "total": "2.00 TB"\n' +
-        '            }, \n' +
-        '            {\n' +
-        '                "free": "1.72 TB", \n' +
-        '                "name": "03CS_CSV04_Encrypted", \n' +
-        '                "total": "2.00 TB"\n' +
-        '            }, \n' +
-        '            {\n' +
-        '                "free": "1.16 TB", \n' +
-        '                "name": "03CS_CSV05_Encrypted", \n' +
-        '                "total": "2.00 TB"\n' +
-        '            }, \n' +
-        '            {\n' +
-        '                "free": "663.79 GB", \n' +
-        '                "name": "03CS_CSV06", \n' +
-        '                "total": "2.00 TB"\n' +
-        '            }, \n' +
-        '            {\n' +
-        '                "free": "2.00 TB", \n' +
-        '                "name": "03CS_CSV07", \n' +
-        '                "total": "2.00 TB"\n' +
-        '            }, \n' +
-        '            {\n' +
-        '                "free": "2.00 TB", \n' +
-        '                "name": "03CS_CSV08", \n' +
-        '                "total": "2.00 TB"\n' +
-        '            }, \n' +
-        '            {\n' +
-        '                "free": "2.00 TB", \n' +
-        '                "name": "03CS_CSV09", \n' +
-        '                "total": "2.00 TB"\n' +
-        '            }\n' +
-        '        ]\n' +
-        '    }\n' +
-        '\n' +
-        '}\n' +
-        '\n' +
-        'PLAY RECAP *********************************************************************\n' +
-        'localhost                  : ok=31   changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   \n';
-      // console.log(msg);
-      return msg;
     }
   };
 };

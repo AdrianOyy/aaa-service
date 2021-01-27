@@ -181,6 +181,13 @@ module.exports = appInfo => {
     port: null,
   };
 
+
+  config.mailGroup = {
+    T1: 'IOS.ISMS',
+    T2: 'IOS.ISMS',
+    T6: 'IOS.ISMS',
+  };
+
   config.mailer = {
     host: 'smtp.mxhichina.com',
     port: 25,

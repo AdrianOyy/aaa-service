@@ -31,6 +31,9 @@ docker run -dit \
 -e jwtExpiresIn=10m \
 -e jwtSecret=1234567abc \
 -e jwtIss=SENSEPLATFORM \
+-e t1=IOS.ISMS \
+-e t2=IOS.ISMS \
+-e t6=IOS.ISMS \
 -e imapFlag=Y \
 -e imapUser=gitlab@apjcorp.com \
 -e imapPass=apj.com666 \
