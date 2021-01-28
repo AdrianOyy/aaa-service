@@ -20,7 +20,7 @@ module.exports = app => {
         if (!messages || messages.length <= 0) {
           return;
         }
-        const token = await ctx.service.jwtUtils.getToken({ content: { username: 'shenchengan' }, expiresIn: app.config.jwt.expiresIn });
+        const token = await ctx.service.jwtUtils.getToken({ content: { username: '' }, expiresIn: app.config.jwt.expiresIn });
         console.log(new Date(), 'get ActionMessage And OtherUIDS');
         const { actionMessage, otherUIDS } = await ctx.service.imap.getActionMessageAndOtherUIDS(ctx, messages);
         // action task

@@ -122,7 +122,7 @@ module.exports = app => {
           activitiData.variables.manager_user_id = userIds;
         } else {
           const res = await ctx.service.adService.findUsersByCn(emails);
-          const token = await ctx.service.jwtUtils.getToken({ content: { username: 'shenchengan' }, expiresIn: app.config.jwt.expiresIn });
+          const token = await ctx.service.jwtUtils.getToken({ content: { username: ctx.authUser.sAMAccountName }, expiresIn: app.config.jwt.expiresIn });
           for (let i = 0; i < res.length; i++) {
             const auth = {};
             auth.token = token;
