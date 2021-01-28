@@ -252,7 +252,6 @@ module.exports = app => {
 
     async check() {
       const { ctx } = this;
-      console.log('====================start Check', new Date());
       const { formKey, parentData, version, childData } = ctx.request.body;
       if (!formKey || !parentData || !version || !childData) {
         ctx.error();
@@ -263,6 +262,7 @@ module.exports = app => {
         formId = parentData.id.value;
       }
       const fileList = [];
+      let jobId = '';
       const dynamicForm = await ctx.service.dynamicForm.getDetailByKey(formKey, version, formId);
       const { tenant } = dynamicForm;
       const tenantId = tenant.id;
@@ -271,12 +271,13 @@ module.exports = app => {
       const hostname = childData.hostname.value;
       const environment_type = childData.environment_type.value;
       const network_zone = childData.network_zone.value;
-      const data_storage_request_number = childData.data_storage_request_number.value;
       // TODO 1. 根据新的 application type 计算新的 hostname 列表
       const hostname_prefix = await ctx.service.hostname.getPrefixByTypeZone(environment_type, network_zone);
-      const applicationTypelabel = childData.application_type.label;
+      const applicationTypeId = childData.application_type.value;
+      const application = await ctx.model.models.vm_applicationType.findOne({ where: { id: applicationTypeId } });
+      console.log(application);
       const typeCount = {
-        applicationType: applicationTypelabel,
+        applicationType: application ? application.code : '',
         hostname_prefix,
         requestNum: 1,
       };
@@ -286,18 +287,21 @@ module.exports = app => {
         error: false,
         message: null,
       };
+      console.log(list);
       if (!list) {
         appResult.error = true;
         appResult.message = `Tenant \`${tenantName}\` with Application type  hostname is not enough`;
+        fileList.push(appResult);
       }
+      console.log(hostname);
       // TODO 1.1 验证新的 hostname list 是否为计算出来的 hostname list 的子集
       if (list && hostname) {
         if (list.indexOf(hostname) === -1) {
           appResult.error = true;
           appResult.message = `Tenant \`${tenantName}\` with Application type  hostname is not found in hostnameList`;
+          fileList.push(appResult);
         }
       }
-      fileList.push(appResult);
       const dcResult = {
         fieldName: 'dc',
         error: false,
@@ -318,8 +322,8 @@ module.exports = app => {
       if (!dc) {
         dcResult.error = true;
         dcResult.message = 'Data Center with Environment Type and Network Zone is not enough';
+        fileList.push(dcResult);
       }
-      fileList.push(dcResult);
       // T0D0 2.1 验证新ip是否在
       const os_ip = childData.os_ip.value;
       const atl_ip = childData.atl_ip.value;
@@ -358,19 +362,30 @@ module.exports = app => {
         });
       }
       // TODO 3. 确定新的 vm type
-      const type = await ctx.service.defineVMType.defineVMType(network_zone, environment_type, data_storage_request_number);
       // TODO 4. 根据 data center 验证 vm cluster 和 vm master 的正确性
       const clusterList = await ctx.service.cluster.checkClusterList(dc, applicationType);
-      console.log('====================Get Cluster Name', new Date());
       const vm_cluster = childData.vm_cluster.value;
       const cluster = clusterList.indexOf(vm_cluster);
       if (cluster > -1) {
-        const vm_master = childData.vm_master.value;
-        const ram_request_number = childData.ram_request_number.value;
-        const cpu_request_number = childData.cpu_request_number.value;
-        const vmResult = await ctx.service.cluster.getCheck(vm_cluster, vm_master, data_storage_request_number, ram_request_number, cpu_request_number, type);
-        console.log('====================Check VM Cluster End', vmResult.message, new Date());
-        fileList.push(vmResult);
+        if (fileList.length === 0) {
+          // call jobid
+          const vclusters = { vClusters: vm_cluster };
+          jobId = await ctx.service.cluster.getAnsibleJob(vclusters);
+          console.log(jobId);
+          if (!jobId) {
+            fileList.push({
+              fieldName: 'jobId',
+              error: true,
+              message: 'get jobId is error',
+            });
+          }
+        }
+        // const vm_master = childData.vm_master.value;
+        // const ram_request_number = childData.ram_request_number.value;
+        // const cpu_request_number = childData.cpu_request_number.value;
+        // const vmResult = await ctx.service.cluster.getCheck(vm_cluster, vm_master, data_storage_request_number, ram_request_number, cpu_request_number, type);
+        // console.log('====================Check VM Cluster End', vmResult.message, new Date());
+        // fileList.push(vmResult);
       } else {
         fileList.push({
           fieldName: 'vm_cluster',
@@ -378,9 +393,43 @@ module.exports = app => {
           message: 'vm_cluster is not found by data center',
         });
       }
-      console.log('====================End Check', new Date());
+      // if (cluster  -1) {
+      //   const vm_master = childData.vm_master.value;
+      //   const ram_request_number = childData.ram_request_number.value;
+      //   const cpu_request_number = childData.cpu_request_number.value;
+      //   const vmResult = await ctx.service.cluster.getCheck(vm_cluster, vm_master, data_storage_request_number, ram_request_number, cpu_request_number, type);
+      //   console.log('====================Check VM Cluster End', vmResult.message, new Date());
+      //   fileList.push(vmResult);
+      // } else {
+      //   fileList.push({
+      //     fieldName: 'vm_cluster',
+      //     error: true,
+      //     message: 'vm_cluster is not found by data center',
+      //   });
+      // }
       // TODO 5. 根据 data center
-      ctx.success(fileList);
+      const data = {
+        success: fileList.length === 0,
+        message: fileList.length !== 0 ? fileList[0].message : '',
+        jobId,
+      };
+      ctx.success(data);
+    }
+
+    async getResource() {
+      const { ctx } = this;
+      const { form, jobId } = ctx.request.body;
+      const { childData } = form;
+      const environment_type = childData.environment_type.value;
+      const network_zone = childData.network_zone.value;
+      const data_storage_request_number = childData.data_storage_request_number.value;
+      const type = await ctx.service.defineVMType.defineVMType(network_zone, environment_type, data_storage_request_number);
+      const vm_master = childData.vm_master.value;
+      const ram_request_number = childData.ram_request_number.value;
+      const cpu_request_number = childData.cpu_request_number.value;
+      const vm_cluster = childData.vm_cluster.value;
+      const vmResult = await ctx.service.cluster.getCheck(vm_cluster, vm_master, data_storage_request_number, ram_request_number, cpu_request_number, type, jobId);
+      ctx.success({ done: vmResult.done, success: !vmResult.error, message: vmResult.message });
     }
   };
 };

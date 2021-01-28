@@ -180,7 +180,6 @@ module.exports = app => {
         childFormKey,
         childDataList,
         version,
-        isSentMail,
         taskId,
       } = ctx.request.body;
       // 获取父表插入SQL
@@ -200,7 +199,13 @@ module.exports = app => {
       // 发送邮件
       await ctx.service.mailer.sentT3bySkile(childDataList);
       // 下一步启动
-      await ctx.service.syncActiviti.actionTask({ taskId, variables: { pass: true } }, { headers: ctx.headers });
+      ctx.service.syncActiviti.actionTask({ taskId, variables: { pass: true } }, { headers: ctx.headers });
+      // 延时2s
+      await new Promise(resolve => {
+        setTimeout(() => {
+          resolve();
+        }, 2000);
+      });
       // ctx.success();
       if (!res.success) {
         ctx.error();

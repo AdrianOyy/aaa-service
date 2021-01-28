@@ -215,7 +215,21 @@ module.exports = app => {
       return data;
     }
 
-    async getCheck(vm_cluster, vm_master, data_storage_request_number, ram_request_number, cpu_request_number, type) {
+    // async getCheck(vm_cluster, vm_master, data_storage_request_number, ram_request_number, cpu_request_number, type) {
+    //   const vm = {
+    //     vm_cluster,
+    //     vm_master,
+    //     data_storage_request_number,
+    //     ram_request_number,
+    //     cpu_request_number,
+    //   };
+    //   if (type === 'HCI') {
+    //     return this.getCheckHCI(vm);
+    //   }
+    //   return this.getCheckVMMare(vm);
+    //
+    // }
+    async getCheck(vm_cluster, vm_master, data_storage_request_number, ram_request_number, cpu_request_number, type, jobId) {
       const vm = {
         vm_cluster,
         vm_master,
@@ -224,11 +238,82 @@ module.exports = app => {
         cpu_request_number,
       };
       if (type === 'HCI') {
-        return this.getCheckHCI(vm);
+        // return this.getCheckHCI(vm);
       }
-      return this.getCheckVMMare(vm);
+      return this.getCheckVMMare(vm, jobId);
 
     }
+
+    async getCheckVMMare(vm, jobId) {
+      console.log('====================Check VM Cluster', new Date());
+      const vmResult = {
+        fieldName: 'vm_cluster',
+        error: false,
+        done: false,
+        message: null,
+      };
+      const vmmList = await this.setCheckVMMare(vm.vm_cluster, jobId);
+      if (vmmList.length > 0) {
+        // 保存 HCIList
+        await this.saveVMMare(vmmList);
+        const vmm = vmmList[0];
+        vmResult.error = false;
+        vmResult.done = true;
+        vmResult.message = '';
+        // if (vm.vm_cluster === 'devesxi02cs') {
+        //   vmm = vmmList[1];
+        // }
+        if (vmm.totalRam * 0.2 > vmm.freeRam - vm.data_storage_request_number * 1024) {
+          vmResult.error = true;
+          vmResult.done = true;
+          vmResult.message = ' vm_cluster data_storage_request_number beyond 80% ';
+          return vmResult;
+        }
+        if (vmm.TotalMemory * 0.2 > vmm.FreeMemory - vm.ram_request_number * 1024) {
+          vmResult.error = true;
+          vmResult.done = true;
+          vmResult.message = ' vm_cluster data_storage_request_number beyond 80% ';
+          return vmResult;
+        }
+        if (vmm.NumberofCPU * 2 * 0.2 > vmm.NumberofCPU * 2 - vm.cpu_request_number - vmm.NoCPUUsed) {
+          vmResult.error = true;
+          vmResult.done = true;
+          vmResult.message = ' vm_cluster data_storage_request_number beyond 80% ';
+          return vmResult;
+        }
+        // 判断VM MASTER
+        const master = vmm.ESXiDetails.find(t => t['Esxi Name'] === vm.vm_master);
+        if (master) {
+          if (master.TotalMemory * 0.2 > master.FreeMemory - vm.ram_request_number * 1024) {
+            vmResult.fieldName = 'vm_master';
+            vmResult.error = true;
+            vmResult.done = true;
+            vmResult.message = ' vm_master ram_request_number beyond 80% ';
+            return vmResult;
+          }
+          if (master.NumberofCPU * 2 * 0.2 > master.NumberofCPU * 2 - vm.cpu_request_number - master.NoCPUUsed) {
+            vmResult.fieldName = 'vm_master';
+            vmResult.error = true;
+            vmResult.done = true;
+            vmResult.message = ' vm_master cpu beyond 80% ';
+            return vmResult;
+          }
+        } else {
+          vmResult.fieldName = 'vm_master';
+          vmResult.error = true;
+          vmResult.done = true;
+          vmResult.message = ' vm_master can not be found ';
+          return vmResult;
+        }
+      } else {
+        vmResult.error = true;
+        vmResult.done = false;
+        vmResult.message = ' vm_cluster can not be found ';
+        return vmResult;
+      }
+      return vmResult;
+    }
+
 
     async getCheckHCI(vm) {
       const hciList = await this.setHCI([ vm.vm_cluster ]);
@@ -264,64 +349,64 @@ module.exports = app => {
       return hciResult;
     }
 
-    async getCheckVMMare(vm) {
-      console.log('====================Check VM Cluster', new Date());
-      const vmResult = {
-        fieldName: 'vm_cluster',
-        error: false,
-        message: null,
-      };
-      const vmmList = await this.setVMMare([ vm.vm_cluster ]);
-      if (vmmList.length > 0) {
-        // 保存 HCIList
-        await this.saveVMMare(vmmList);
-        let vmm = vmmList[0];
-        if (vm.vm_cluster === 'devesxi02cs') {
-          vmm = vmmList[1];
-        }
-        if (vmm.totalRam * 0.2 > vmm.freeRam - vm.data_storage_request_number * 1024) {
-          vmResult.error = true;
-          vmResult.message = ' vm_cluster data_storage_request_number beyond 80% ';
-          return vmResult;
-        }
-        if (vmm.TotalMemory * 0.2 > vmm.FreeMemory - vm.ram_request_number * 1024) {
-          vmResult.error = true;
-          vmResult.message = ' vm_cluster data_storage_request_number beyond 80% ';
-          return vmResult;
-        }
-        if (vmm.NumberofCPU * 2 * 0.2 > vmm.NumberofCPU * 2 - vm.cpu_request_number - vmm.NoCPUUsed) {
-          vmResult.error = true;
-          vmResult.message = ' vm_cluster data_storage_request_number beyond 80% ';
-          return vmResult;
-        }
-        // 判断VM MASTER
-        const master = vmm.ESXiDetails.find(t => t['Esxi Name'] === vm.vm_master);
-        if (master) {
-          if (master.TotalMemory * 0.2 > master.FreeMemory - vm.ram_request_number * 1024) {
-            vmResult.fieldName = 'vm_master';
-            vmResult.error = true;
-            vmResult.message = ' vm_master ram_request_number beyond 80% ';
-            return vmResult;
-          }
-          if (master.NumberofCPU * 2 * 0.2 > master.NumberofCPU * 2 - vm.cpu_request_number - master.NoCPUUsed) {
-            vmResult.fieldName = 'vm_master';
-            vmResult.error = true;
-            vmResult.message = ' vm_master cpu beyond 80% ';
-            return vmResult;
-          }
-        } else {
-          vmResult.fieldName = 'vm_master';
-          vmResult.error = true;
-          vmResult.message = ' vm_master can not be found ';
-          return vmResult;
-        }
-      } else {
-        vmResult.error = true;
-        vmResult.message = ' vm_cluster can not be found ';
-        return vmResult;
-      }
-      return vmResult;
-    }
+    // async getCheckVMMare(vm) {
+    //   console.log('====================Check VM Cluster', new Date());
+    //   const vmResult = {
+    //     fieldName: 'vm_cluster',
+    //     error: false,
+    //     message: null,
+    //   };
+    //   const vmmList = await this.setVMMare([ vm.vm_cluster ]);
+    //   if (vmmList.length > 0) {
+    //     // 保存 HCIList
+    //     await this.saveVMMare(vmmList);
+    //     let vmm = vmmList[0];
+    //     if (vm.vm_cluster === 'devesxi02cs') {
+    //       vmm = vmmList[1];
+    //     }
+    //     if (vmm.totalRam * 0.2 > vmm.freeRam - vm.data_storage_request_number * 1024) {
+    //       vmResult.error = true;
+    //       vmResult.message = ' vm_cluster data_storage_request_number beyond 80% ';
+    //       return vmResult;
+    //     }
+    //     if (vmm.TotalMemory * 0.2 > vmm.FreeMemory - vm.ram_request_number * 1024) {
+    //       vmResult.error = true;
+    //       vmResult.message = ' vm_cluster data_storage_request_number beyond 80% ';
+    //       return vmResult;
+    //     }
+    //     if (vmm.NumberofCPU * 2 * 0.2 > vmm.NumberofCPU * 2 - vm.cpu_request_number - vmm.NoCPUUsed) {
+    //       vmResult.error = true;
+    //       vmResult.message = ' vm_cluster data_storage_request_number beyond 80% ';
+    //       return vmResult;
+    //     }
+    //     // 判断VM MASTER
+    //     const master = vmm.ESXiDetails.find(t => t['Esxi Name'] === vm.vm_master);
+    //     if (master) {
+    //       if (master.TotalMemory * 0.2 > master.FreeMemory - vm.ram_request_number * 1024) {
+    //         vmResult.fieldName = 'vm_master';
+    //         vmResult.error = true;
+    //         vmResult.message = ' vm_master ram_request_number beyond 80% ';
+    //         return vmResult;
+    //       }
+    //       if (master.NumberofCPU * 2 * 0.2 > master.NumberofCPU * 2 - vm.cpu_request_number - master.NoCPUUsed) {
+    //         vmResult.fieldName = 'vm_master';
+    //         vmResult.error = true;
+    //         vmResult.message = ' vm_master cpu beyond 80% ';
+    //         return vmResult;
+    //       }
+    //     } else {
+    //       vmResult.fieldName = 'vm_master';
+    //       vmResult.error = true;
+    //       vmResult.message = ' vm_master can not be found ';
+    //       return vmResult;
+    //     }
+    //   } else {
+    //     vmResult.error = true;
+    //     vmResult.message = ' vm_cluster can not be found ';
+    //     return vmResult;
+    //   }
+    //   return vmResult;
+    // }
 
     async getFormDetailList(formKey, formId) {
       const { ctx } = this;
@@ -480,6 +565,63 @@ module.exports = app => {
       }
     }
 
+    async setCheckVMMare(name, jobId) {
+      const cluserMasters = await this.getVMMareByCheck(name, jobId);
+      for (const msg of cluserMasters) {
+        if (msg) {
+          // 循环 Master
+          let FreeMemory = 0;
+          let NoCPUUsed = 0;
+          let NumberofCPU = 0;
+          let TotalMemory = 0;
+          for (const master of msg.ESXiDetails) {
+            const free = setDiskByMb(master['Free Memory']);
+            const total = setDiskByMb(master['Total Memory']);
+            FreeMemory += free;
+            NoCPUUsed += master['No. of CPU Used'];
+            NumberofCPU += master['Number of CPU'];
+            TotalMemory += total;
+            master.FreeMemory = free;
+            master.NoCPUUsed = master['No. of CPU Used'];
+            master.NumberofCPU = master['Number of CPU'];
+            master.TotalMemory = total;
+            master.byMemory = setFloat(free, total);
+            master.byCPU = setFloat(master['No. of CPU Used'], master['Number of CPU'], 'CPU');
+          }
+          msg.FreeMemory = FreeMemory;
+          msg.NoCPUUsed = NoCPUUsed;
+          msg.NumberofCPU = NumberofCPU;
+          msg.TotalMemory = TotalMemory;
+          msg.orderByMemory = setFloat(FreeMemory, TotalMemory);
+          msg.orderByCPU = setFloat(NoCPUUsed, NumberofCPU, 'CPU');
+          // 循环硬盘
+          let freeRam = 0;
+          let totalRam = 0;
+          let isRamCsv = false;
+          for (const ram of msg.DatastoreDetails) {
+            // 判断硬盘信息
+            const freeRamData = setDiskByMb(ram.free);
+            const totalRamData = setDiskByMb(ram.total);
+            if ((totalRamData * 0.2) > (freeRamData - (150 * 1024))) {
+              isRamCsv = true;
+              ram.isCsv = true;
+            } else {
+              ram.isCsv = false;
+            }
+            ram.orderByCsv = setFloat(freeRamData, totalRamData);
+            freeRam += freeRamData;
+            totalRam += totalRamData;
+          }
+          msg.isRamCsv = isRamCsv;
+          msg.freeRam = freeRam;
+          msg.totalRam = totalRam;
+          msg.orderByRam = setFloat(freeRam, totalRam);
+        }
+      }
+      return cluserMasters;
+    }
+
+
     async setVMMare(names) {
       console.log('====================Get VM Cluster By Anb', new Date());
       const cluserMasters = await this.getVMMareAll(names);
@@ -583,6 +725,37 @@ module.exports = app => {
       return [];
     }
 
+    async getVMMareByCheck(name, jobId) {
+      if (jobId) {
+        const str = await this.getAnsibleVMWareByJobId(jobId);
+        if (str) {
+          const msgs = await this.JsonToVMMarm([], str, 0);
+          const masters = [];
+          const msg = msgs.filter(t => t['Cluster Name'].trim() === name);
+          if (msg.length > 0) {
+            const master = {
+              ClusterName: name,
+              ESXiDetails: [],
+              DatastoreDetails: [],
+            };
+            const msg = msgs.filter(t => t['Cluster Name'].trim() === name);
+            for (const detail of msg) {
+              if (detail['ESXi Details']) {
+                master.ESXiDetails = detail['ESXi Details'];
+              }
+              if (detail['Datastore Details']) {
+                master.DatastoreDetails = detail['Datastore Details'];
+              }
+            }
+            masters.push(master);
+          }
+          return masters;
+        }
+        return [];
+      }
+      return [];
+    }
+
 
     async getVMMareAll(names) {
       console.log(names);
@@ -624,7 +797,7 @@ module.exports = app => {
       const { ctx } = this;
       try {
         const token = await ctx.service.jwtUtils.getToken({
-          content: { username: '' },
+          content: { username: ctx.authUser.sAMAccountName },
           expiresIn: app.config.jwt.expiresIn,
         });
         const options = {
@@ -642,13 +815,59 @@ module.exports = app => {
       }
     }
 
-    async getAnsibleVMWare(data) {
-      const url = app.config.activiti.url + '/getAnsibleVMWareResource';
+    async getAnsibleJob(data) {
+      const url = app.config.activiti.url + '/getAnsibleJob';
 
       const { ctx } = this;
       try {
         const token = await ctx.service.jwtUtils.getToken({
-          content: { username: '' },
+          content: { username: ctx.authUser.sAMAccountName },
+          expiresIn: app.config.jwt.expiresIn,
+        });
+        const options = {
+          method: 'GET',
+          timeout: 1000 * 60,
+          headers: { Authorization: 'Bearer ' + token },
+          data,
+        };
+        const job = await ctx.service.syncActiviti.curl(url, options, ctx);
+        console.log(job);
+        return job.data;
+      } catch (err) {
+        console.log(err);
+        return '';
+      }
+    }
+
+    async getAnsibleVMWareByJobId(jobId) {
+      const url = app.config.activiti.url + '/getVMWareResource';
+      const { ctx } = this;
+      try {
+        const token = await ctx.service.jwtUtils.getToken({
+          content: { username: ctx.authUser.sAMAccountName },
+          expiresIn: app.config.jwt.expiresIn,
+        });
+        const options = {
+          method: 'GET',
+          dataType: 'text',
+          timeout: 1000 * 60,
+          headers: { Authorization: 'Bearer ' + token },
+          data: { job: jobId },
+        };
+        const hci = await ctx.service.syncActiviti.curl(url, options, ctx);
+        return hci.data;
+      } catch (err) {
+        console.log(err);
+        return null;
+      }
+    }
+
+    async getAnsibleVMWare(data) {
+      const url = app.config.activiti.url + '/getAnsibleVMWareResource';
+      const { ctx } = this;
+      try {
+        const token = await ctx.service.jwtUtils.getToken({
+          content: { username: ctx.authUser.sAMAccountName },
           expiresIn: app.config.jwt.expiresIn,
         });
         const options = {
