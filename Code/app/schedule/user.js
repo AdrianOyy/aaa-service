@@ -67,7 +67,7 @@ module.exports = app => {
         console.log(new Date(), 'load user task filterUsers length ', filterUsers.length);
         const loadUsers = groupUsers.filter(_ => !filterUsers.includes(_.user.sAMAccountName));
         console.log(new Date(), 'load user task loadUsers length ', loadUsers.length);
-        const token = await ctx.service.jwtUtils.getToken({ content: { username: 'shenchengan' }, expiresIn: app.config.jwt.expiresIn });
+        const token = await ctx.service.jwtUtils.getToken({ content: { username: '' }, expiresIn: app.config.jwt.expiresIn });
         for (let i = 0; i < loadUsers.length; i++) {
           const auth = loadUsers[i];
           auth.token = token;

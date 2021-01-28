@@ -24,6 +24,7 @@ module.exports = (options, app) => {
       ctx.authUser = {
         id: user.id,
         name: user.displayname,
+        sAMAccountName: user.sAMAccountName,
         email: user.email,
       };
       await next();
