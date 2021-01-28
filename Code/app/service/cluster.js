@@ -265,6 +265,7 @@ module.exports = app => {
     }
 
     async getCheckVMMare(vm) {
+      console.log('====================Check VM Cluster', new Date());
       const vmResult = {
         fieldName: 'vm_cluster',
         error: false,
@@ -480,7 +481,9 @@ module.exports = app => {
     }
 
     async setVMMare(names) {
+      console.log('====================Get VM Cluster By Anb', new Date());
       const cluserMasters = await this.getVMMareAll(names);
+      console.log('====================Get VM Cluster By Anb End', new Date());
       for (const msg of cluserMasters) {
         if (msg) {
           // 循环 Master
@@ -532,6 +535,7 @@ module.exports = app => {
           msg.orderByRam = setFloat(freeRam, totalRam);
         }
       }
+      console.log('====================Set VM Cluster End', new Date());
       return cluserMasters;
     }
 

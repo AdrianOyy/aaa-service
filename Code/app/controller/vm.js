@@ -252,6 +252,7 @@ module.exports = app => {
 
     async check() {
       const { ctx } = this;
+      console.log('====================start Check', new Date());
       const { formKey, parentData, version, childData } = ctx.request.body;
       if (!formKey || !parentData || !version || !childData) {
         ctx.error();
@@ -360,6 +361,7 @@ module.exports = app => {
       const type = await ctx.service.defineVMType.defineVMType(network_zone, environment_type, data_storage_request_number);
       // TODO 4. 根据 data center 验证 vm cluster 和 vm master 的正确性
       const clusterList = await ctx.service.cluster.checkClusterList(dc, applicationType);
+      console.log('====================Get Cluster Name', new Date());
       const vm_cluster = childData.vm_cluster.value;
       const cluster = clusterList.indexOf(vm_cluster);
       if (cluster > -1) {
@@ -367,6 +369,7 @@ module.exports = app => {
         const ram_request_number = childData.ram_request_number.value;
         const cpu_request_number = childData.cpu_request_number.value;
         const vmResult = await ctx.service.cluster.getCheck(vm_cluster, vm_master, data_storage_request_number, ram_request_number, cpu_request_number, type);
+        console.log('====================Check VM Cluster End', vmResult.message, new Date());
         fileList.push(vmResult);
       } else {
         fileList.push({
@@ -375,6 +378,7 @@ module.exports = app => {
           message: 'vm_cluster is not found by data center',
         });
       }
+      console.log('====================End Check', new Date());
       // TODO 5. 根据 data center
       ctx.success(fileList);
     }
