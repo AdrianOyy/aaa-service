@@ -272,13 +272,13 @@ module.exports = app => {
         if (vmm.TotalMemory * 0.2 > vmm.FreeMemory - vm.ram_request_number * 1024) {
           vmResult.error = true;
           vmResult.done = true;
-          vmResult.message = ' vm_cluster data_storage_request_number beyond 80% ';
+          vmResult.message = ' vm_cluster ram_request_number beyond 80% ';
           return vmResult;
         }
         if (vmm.NumberofCPU * 2 * 0.2 > vmm.NumberofCPU * 2 - vm.cpu_request_number - vmm.NoCPUUsed) {
           vmResult.error = true;
           vmResult.done = true;
-          vmResult.message = ' vm_cluster data_storage_request_number beyond 80% ';
+          vmResult.message = ' vm_cluster cpu_request_number beyond 80% ';
           return vmResult;
         }
         // 判断VM MASTER
@@ -520,7 +520,10 @@ module.exports = app => {
         const end = 'TASK';
         const startOf = str.indexOf(start, startIndex);
         if (startOf !== -1) {
-          const endOf = str.indexOf(end, startOf);
+          let endOf = str.indexOf(end, startOf);
+          if (endOf === -1) {
+            endOf = str.indexOf('PLAY', startOf);
+          }
           if (endOf === -1) {
             return list;
           }
@@ -567,6 +570,7 @@ module.exports = app => {
 
     async setCheckVMMare(name, jobId) {
       const cluserMasters = await this.getVMMareByCheck(name, jobId);
+      console.log(cluserMasters);
       for (const msg of cluserMasters) {
         if (msg) {
           // 循环 Master
@@ -661,7 +665,7 @@ module.exports = app => {
             // 判断硬盘信息
             const freeRamData = setDiskByMb(ram.free);
             const totalRamData = setDiskByMb(ram.total);
-            if ((totalRamData * 0.2) > (freeRamData - (150 * 1024))) {
+            if ((totalRamData * 0.2) < (freeRamData - (150 * 1024))) {
               isRamCsv = true;
               ram.isCsv = true;
             } else {
@@ -867,7 +871,7 @@ module.exports = app => {
       const { ctx } = this;
       try {
         const token = await ctx.service.jwtUtils.getToken({
-          content: { username: ctx.authUser.sAMAccountName },
+          content: { username: '' },
           expiresIn: app.config.jwt.expiresIn,
         });
         const options = {
