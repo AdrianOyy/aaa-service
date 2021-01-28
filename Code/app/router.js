@@ -50,9 +50,11 @@ module.exports = app => {
   router.get(`${prefix}/user/list`, controller.user.list);
   router.get(`${prefix}/user/detail`, controller.user.detail);
   router.post(`${prefix}/user/login`, controller.user.login);
+  router.post(`${prefix}/AAA/user/login`, controller.user.login);
   router.post(`${prefix}/user/findUser`, controller.user.findUser);
   router.post(`${prefix}/user/getUsersForGroup`, controller.user.getUsersForGroup);
   router.get(`${prefix}/user/findUserByTenant`, controller.user.findUserByTenant);
+
 
   router.get(`${prefix}/user_group_mapping/list`, controller.userGourpMapping.list);
   router.get(`${prefix}/user_group_mapping/detail`, controller.userGourpMapping.detail);
@@ -168,4 +170,6 @@ module.exports = app => {
   router.get(`${prefix}/role/list`, controller.role.list);
 
   router.get(`${prefix}/procedure/call`, controller.procedure.call);
+
+  router.get('/test/test', controller.test.test);
 };

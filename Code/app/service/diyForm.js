@@ -26,12 +26,6 @@ module.exports = app => {
       return SQLList;
     }
 
-    async getLatestVersion(formKey) {
-      const sql = `SELECT version FROM dynamicForm WHERE formKey='${formKey}' ORDER BY version + 0 DESC LIMIT 1;`;
-      const [[ target ]] = await app.model.query(sql);
-      return target ? target.version : null;
-    }
-
     async getChildFormTable(parentFormKey, version) {
       const sql = `SELECT * FROM dynamicForm where parentId=(SELECT id FROM dynamicForm WHERE version="${version}" AND formKey="${parentFormKey}");`;
       const [[ target ]] = await app.model.query(sql);
@@ -67,12 +61,13 @@ module.exports = app => {
     }
 
     /**
-    * get dynamic form detail by pid
-    * @param {string | number} pid
-    * @param {string} formKey
-    * @param {string} childFormKey
-    * @return {Promise<{object}>}
-    */
+     * get dynamic form detail by pid
+     * @param {String | Number} pid
+     * @param {String} formKey
+     * @param {String} childFormKey
+     * @param {String} version
+     * @return {Promise<{object}>}
+     */
     async getDIYFormDetail(pid, formKey, childFormKey, version) {
       const parentSQL = `SELECT * FROM ${formKey}${version} WHERE pid = ${pid}`;
       const [ parentDataList ] = await app.model.query(parentSQL);
@@ -121,6 +116,121 @@ module.exports = app => {
         SQLList.push(getUpdateSQL(childFormKey, version, childDataList[i], whereSql));
       }
       return SQLList;
+    }
+
+
+    async getLatestVersion(formKey) {
+      const sql = `SELECT version FROM dynamicForm WHERE formKey='${formKey}' ORDER BY version + 0 DESC LIMIT 1;`;
+      const [[ target ]] = await app.model.query(sql);
+      return target ? target.version : null;
+    }
+
+    /**
+     * Get workflow table by form key and version
+     * @param {String}formKey form key
+     * @param {String} version version
+     * @return {Promise<Array<Object>>} tableDetail table Detail
+     */
+    async getWorkflowTableDetail(formKey, version) {
+      const SQL = `SELECT dynamicForm.id _id, dynamicForm.formKey _formKey, detail.* FROM dynamicForm LEFT JOIN dynamicFormDetail detail on dynamicForm.id = detail.dynamicFormId WHERE dynamicForm.formKey='${formKey}' AND dynamicForm.version='${version}'`;
+      const [ detail ] = await app.model.query(SQL);
+      return detail;
+    }
+
+    async getChildTableDetail(parentId, version) {
+      const SQL = `SELECT dynamicForm.id _id, dynamicForm.formKey _formKey, detail.* FROM dynamicForm LEFT JOIN dynamicFormDetail detail on dynamicForm.id = detail.dynamicFormId WHERE dynamicForm.parentId='${parentId}' AND dynamicForm.version='${version}'`;
+      const [ detail ] = await app.model.query(SQL);
+      return detail;
+    }
+
+    async getForeignData(tableName) {
+      const SQL = `SELECT * FROM ${tableName} WHERE deletedAt IS NULL`;
+      const [ dataList ] = await app.model.query(SQL);
+      return dataList;
+    }
+
+    async getForeignValue(data, map, datalist) {
+      for (const key in data) {
+        if (map.get(key) && map.get(key).foreignKey) {
+          const foreignData = datalist.get(map.get(key).foreignTable);
+          const target = foreignData.find(el => el[map.get(key).foreignKey] + '' === data[key] + '');
+          data[key] = target;
+        }
+      }
+    }
+
+    /**
+     * Get workflow information by formKey filter with date range
+     * @param {String} formKey form key
+     * @param { String | undefined | null } startTime start time
+     * @param { String | undefined | null } endTime end time
+     * @return {Promise<Object>} form information
+     */
+    async getWorkflowInformation(formKey, startTime, endTime) {
+      const latestVersion = await this.getLatestVersion(formKey);
+      if (!latestVersion) return null;
+      const parentTable = await this.getWorkflowTableDetail(formKey, latestVersion);
+      if (!parentTable || !parentTable.length) return null;
+      const parentDataTableName = formKey + latestVersion + '';
+      let childDataTableName = '';
+      const childTable = await this.getChildTableDetail(parentTable[0]._id, latestVersion);
+      const parentForeignTable = new Map();
+      const childForeignTable = new Map();
+      const foreignDataList = new Map();
+      for (const table of parentTable) {
+        if (table.foreignTable) {
+          parentForeignTable.set(table.fieldName, {
+            foreignKey: table.foreignKey,
+            foreignTable: table.foreignTable,
+            foreignDisplayKey: table.foreignDisplayKey,
+          });
+          if (!foreignDataList.has(table.foreignTable)) {
+            const foreignData = await this.getForeignData(table.foreignTable);
+            foreignDataList.set(table.foreignTable, foreignData);
+          }
+        }
+      }
+      if (childTable && childTable.length) {
+        childDataTableName = childTable[0]._formKey + latestVersion + '';
+        for (const table of childTable) {
+          if (table.foreignTable) {
+            childForeignTable.set(table.fieldName, {
+              foreignKey: table.foreignKey,
+              foreignTable: table.foreignTable,
+              foreignDisplayKey: table.foreignDisplayKey,
+            });
+            if (!foreignDataList.has(table.foreignTable)) {
+              const foreignData = await this.getForeignData(table.foreignTable);
+              foreignDataList.set(table.foreignTable, foreignData);
+            }
+          }
+        }
+      }
+      let parentSQL;
+      if (startTime && !endTime) {
+        parentSQL = `SELECT * FROM ${parentDataTableName} WHERE createdAt >= "${startTime}" `;
+      } else if (!startTime && endTime) {
+        parentSQL = `SELECT * FROM ${parentDataTableName} WHERE createdAt <= "${endTime}"`;
+      } else if (!startTime && !endTime) {
+        parentSQL = `SELECT * FROM ${parentDataTableName}`;
+      } else {
+        parentSQL = `SELECT * FROM ${parentDataTableName} WHERE createdAt BETWEEN "${startTime}" AND "${endTime}"`;
+      }
+      const [ parentDataList ] = await app.model.query(parentSQL);
+      for (const parentData of parentDataList) {
+        await this.getForeignValue(parentData, parentForeignTable, foreignDataList);
+        const parentId = parentData.id;
+        if (childDataTableName) {
+          const [ childDataList ] = await app.model.query(`SELECT * FROM ${childDataTableName} WHERE parentId=${parentId}`);
+          if (childDataList && childDataList.length) {
+            for (const childData of childDataList) {
+              await this.getForeignValue(childData, childForeignTable, foreignDataList);
+            }
+            parentData.childDataList = childDataList;
+          }
+        }
+      }
+      return parentDataList;
     }
   };
 };
