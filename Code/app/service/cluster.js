@@ -160,6 +160,7 @@ module.exports = app => {
           if (vm.data_center && vm.application_type) {
             // 根据applicationType 获取 Cluster
             const typeClusters = await ctx.model.models.vm_cluster_applicationType.findAll({ where: { applicationTypeId: vm.application_type.id } });
+            console.log(typeClusters);
             // console.log(appCluster);
             // 根据 typeId 和 zoomId 获取 dc，根据dc获取 Cluster
             const dcClusters = await ctx.model.models.vm_cluster_dc_mapping.findAll({
@@ -561,6 +562,7 @@ module.exports = app => {
     }
 
     async getHCIAll(names) {
+      console.log(names);
       if (names && names.length > 0) {
         const name = names.join();
         const str = await this.getAnsibleHCI({ vClusters: name });
@@ -579,6 +581,7 @@ module.exports = app => {
 
 
     async getVMMareAll(names) {
+      console.log(names);
       if (names && names.length > 0) {
         const name = names.join();
         const str = await this.getAnsibleVMWare({ vClusters: name });
@@ -615,30 +618,48 @@ module.exports = app => {
       const url = app.config.activiti.url + '/getAnsibleHCIResource';
       // action task
       const { ctx } = this;
-      const token = await ctx.service.jwtUtils.getToken({ content: { username: '' }, expiresIn: app.config.jwt.expiresIn });
-      const options = {
-        method: 'GET',
-        dataType: 'text',
-        headers: { Authorization: 'Bearer ' + token },
-        data,
-      };
-      const hci = await ctx.service.syncActiviti.curl(url, options, ctx);
-      return hci.data;
+      try {
+        const token = await ctx.service.jwtUtils.getToken({
+          content: { username: '' },
+          expiresIn: app.config.jwt.expiresIn,
+        });
+        const options = {
+          method: 'GET',
+          dataType: 'text',
+          timeout: 1000 * 60,
+          headers: { Authorization: 'Bearer ' + token },
+          data,
+        };
+        const hci = await ctx.service.syncActiviti.curl(url, options, ctx);
+        return hci.data;
+      } catch (err) {
+        console.log(err);
+        return null;
+      }
     }
 
     async getAnsibleVMWare(data) {
       const url = app.config.activiti.url + '/getAnsibleVMWareResource';
 
       const { ctx } = this;
-      const token = await ctx.service.jwtUtils.getToken({ content: { username: '' }, expiresIn: app.config.jwt.expiresIn });
-      const options = {
-        method: 'GET',
-        dataType: 'text',
-        headers: { Authorization: 'Bearer ' + token },
-        data,
-      };
-      const hci = await ctx.service.syncActiviti.curl(url, options, ctx);
-      return hci.data;
+      try {
+        const token = await ctx.service.jwtUtils.getToken({
+          content: { username: '' },
+          expiresIn: app.config.jwt.expiresIn,
+        });
+        const options = {
+          method: 'GET',
+          dataType: 'text',
+          timeout: 1000 * 60,
+          headers: { Authorization: 'Bearer ' + token },
+          data,
+        };
+        const hci = await ctx.service.syncActiviti.curl(url, options, ctx);
+        return hci.data;
+      } catch (err) {
+        console.log(err);
+        return null;
+      }
     }
   };
 };
