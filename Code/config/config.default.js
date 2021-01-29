@@ -5,6 +5,7 @@ module.exports = appInfo => {
   const config = exports;
   config.prefix = '';
   config.keys = appInfo.name + '_20200702134922';
+  config.apiKey = 'f72cfe7c-df85-4123-beaf-ee9c34d8c1c0';
 
   config.logger = {
     dir: path.join(__dirname, '../logs'),

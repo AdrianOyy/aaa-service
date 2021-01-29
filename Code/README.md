@@ -118,3 +118,4 @@ https://cps-dev-api.cldpaast71.serverdev.hadev.org.hk
 | imapFetchIndex	| 1:* |  |
 | imapNamespace	| null |  |
 | imapInterval	| 60s |  |
+| apiKey        | f72cfe7c-df85-4123-beaf-ee9c34d8c1c0 | api 密钥 |

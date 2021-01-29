@@ -1,9 +1,14 @@
 'use strict';
 const sequelizeFixtures = require('sequelize-fixtures');
 
-module.exports = app => {
-  app.beforeStart(async function() {
-    // 输入配置信息
+class AppBootHook {
+  constructor(app) {
+    this.app = app;
+  }
+  configWillLoad() {
+    console.time();
+    const { app } = this;
+    console.log(new Date(), '\tConfigure will load...');
     console.log('\n');
     console.log('Configure:');
     console.log('=============================================================================================================');
@@ -26,6 +31,11 @@ module.exports = app => {
     console.log('Mail port:\t\t\t\t', app.config.mailer.port);
     console.log('=============================================================================================================');
     console.log('\n');
+  }
+
+  async didLoad() {
+    console.log(new Date(), '\tConfigure Loaded...');
+    const { app } = this;
     // 同步模型
     const syncModels = [
       'ad_group', 'groupType', 'role', 'group', 'tenant', 'user', 'user_group_mapping',
@@ -41,94 +51,47 @@ module.exports = app => {
       'account_type', 'apply_for', 'apply_for_internet', 'authentication_method', 'clinical_applications',
       'is_same', 'owa_webmail', 'yes_no', 'staff_type', 'non_clinical_applications',
     ];
-    console.log('Start syncing model');
-    console.log('=============================================');
+    console.log(new Date(), '\tSyncing model start');
+    console.log('=============================================================================================================');
     for (const syncModel of syncModels) {
-      console.log('Now: ', syncModel);
+      console.log(new Date(), '\tNow: ', syncModel);
       await app.model.models[syncModel].sync();
     }
-    console.log('=============================================');
-    console.log('End syncing model');
-    console.log('\n');
+    console.log('=============================================================================================================');
+    console.log(new Date(), '\tSyncing model end');
+
+
     // 初始化数据
     const model = app.model.models;
     const fixturesPath = 'app/model/fixtures/';
-    console.log('Start initializing database');
-    console.log('=============================================');
-    if (!await model.dynamicForm.findOne()) {
-      console.log('Now: dynamicForm');
-      await sequelizeFixtures.loadFile(fixturesPath + 'dynamicForm.js', model);
+    console.log(new Date(), '\tInitializing database start ');
+    console.log('=============================================================================================================');
+    const initModels = [
+      'dynamicForm', 'dynamicFormDetail', 'group', 'inventoryStatus',
+      'equipType', 'account_type', 'apply_for', 'apply_for_internet',
+      'authentication_method', 'clinical_applications', 'is_same',
+      'non_clinical_applications', 'owa_webmail', 'staff_type',
+      'yes_no', 'role',
+    ];
+    for (const initModel of initModels) {
+      if (!await model[initModel].findOne()) {
+        console.log(new Date(), `\tNow: ${initModel}`);
+        await sequelizeFixtures.loadFile(fixturesPath + initModel + '.js', model);
+      }
     }
-    if (!await model.dynamicFormDetail.findOne()) {
-      console.log('Now: dynamicFormDetail');
-      await sequelizeFixtures.loadFile(fixturesPath + 'dynamicFormDetail.js', model);
-    }
-    if (!await model.group.findOne()) {
-      console.log('Now: group');
-      await sequelizeFixtures.loadFile(fixturesPath + 'group.js', model);
-    }
-    // if (!await model.vm_platform_type.findOne()) {
-    //   console.log('Now: vm_platform_type');
-    //   await sequelizeFixtures.loadFile(fixturesPath + 'vm_platform_type.js', model);
-    // }
-    if (!await model.inventoryStatus.findOne()) {
-      console.log('Now: inventoryStatus');
-      await sequelizeFixtures.loadFile(fixturesPath + 'inventoryStatus.js', model);
-    }
-    if (!await model.equipType.findOne()) {
-      console.log('Now: equipType');
-      await sequelizeFixtures.loadFile(fixturesPath + 'equipType.js', model);
-    }
-    // if (!await model.vm_cdc.findOne()) {
-    //   console.log('Now: vm_cdc');
-    //   await sequelizeFixtures.loadFile(fixturesPath + 'vm_cdc.js', model);
-    // }
-    if (!await model.account_type.findOne()) {
-      console.log('Now: account_type');
-      await sequelizeFixtures.loadFile(fixturesPath + 'account_type.js', model);
-    }
-    if (!await model.apply_for.findOne()) {
-      console.log('Now: apply_for');
-      await sequelizeFixtures.loadFile(fixturesPath + 'apply_for.js', model);
-    }
-    if (!await model.apply_for_internet.findOne()) {
-      console.log('Now: apply_for_internet');
-      await sequelizeFixtures.loadFile(fixturesPath + 'apply_for_internet.js', model);
-    }
-    if (!await model.authentication_method.findOne()) {
-      console.log('Now: authentication_method');
-      await sequelizeFixtures.loadFile(fixturesPath + 'authentication_method.js', model);
-    }
-    if (!await model.clinical_applications.findOne()) {
-      console.log('Now: clinical_applications');
-      await sequelizeFixtures.loadFile(fixturesPath + 'clinical_applications.js', model);
-    }
-    if (!await model.is_same.findOne()) {
-      console.log('Now: is_same');
-      await sequelizeFixtures.loadFile(fixturesPath + 'is_same.js', model);
-    }
-    if (!await model.non_clinical_applications.findOne()) {
-      console.log('Now: non_clinical_applications');
-      await sequelizeFixtures.loadFile(fixturesPath + 'non_clinical_applications.js', model);
-    }
-    if (!await model.owa_webmail.findOne()) {
-      console.log('Now: owa_webmail');
-      await sequelizeFixtures.loadFile(fixturesPath + 'owa_webmail.js', model);
-    }
-    if (!await model.staff_type.findOne()) {
-      console.log('Now: staff_type');
-      await sequelizeFixtures.loadFile(fixturesPath + 'staff_type.js', model);
-    }
-    if (!await model.yes_no.findOne()) {
-      console.log('Now: yes_no');
-      await sequelizeFixtures.loadFile(fixturesPath + 'yes_no.js', model);
-    }
-    if (!await model.role.findOne()) {
-      console.log('Now: role');
-      await sequelizeFixtures.loadFile(fixturesPath + 'role.js', model);
-    }
-    console.log('=============================================');
-    console.log('End initializing database');
+    console.log('=============================================================================================================');
+    console.log(new Date(), '\tInitializing Database end ');
     console.log('\n');
-  });
-};
+  }
+
+  async willReady() {
+    console.log(new Date(), '\tAPP will ready...');
+  }
+
+  async serverDidReady() {
+    console.log(new Date(), '\tAPP readied!');
+    console.timeEnd();
+  }
+}
+
+module.exports = AppBootHook;

@@ -78,5 +78,6 @@ CMD [ \
 --mailHost=${mailHost} \
 --mailPort=${mailPort} \
 --mailUser=${mailUser} \
+--apiKey=${apiKey} \
 --mailPass=${mailPass}" \
 ]
