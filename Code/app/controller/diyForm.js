@@ -206,11 +206,11 @@ module.exports = app => {
       await ctx.service.mailer.sentT3bySkile(childDataList);
       // 下一步启动
       ctx.service.syncActiviti.actionTask({ taskId, variables: { pass: true } }, { headers: ctx.headers });
-      // 延时2s
+      // 延时3s
       await new Promise(resolve => {
         setTimeout(() => {
           resolve();
-        }, 2000);
+        }, 3000);
       });
       // ctx.success();
       if (!res.success) {
