@@ -88,7 +88,7 @@ module.exports = appInfo => {
   //             内部服务 设置
   // ===================================
   config.activiti = {
-    url: 'http://10.231.131.123:3004',
+    url: 'http://10.231.133.165:8888',
     rejectUnauthorized: 'N',
   };
 
@@ -140,7 +140,7 @@ module.exports = appInfo => {
   // ===================================
   //           全局 中间件 设置
   // ===================================
-  config.middleware = [ 'auth' ];
+  config.middleware = [ 'errorLog', 'auth' ];
   config.auth = {
     ignore: [
       '/user/login',
@@ -150,6 +150,8 @@ module.exports = appInfo => {
       '/expiry/checkUser',
       '/vm/preDefine',
       '/test/error',
+      '/test/test',
+      '/diyForm/list',
     ],
   };
 

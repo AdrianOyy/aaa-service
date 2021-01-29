@@ -5,6 +5,7 @@ class AppBootHook {
   constructor(app) {
     this.app = app;
   }
+
   configWillLoad() {
     console.time();
     const { app } = this;
