@@ -140,6 +140,7 @@ module.exports = app => {
       }
       // 流程发起人Email
       activitiData.variables.start_email = ctx.authUser.email;
+      activitiData.variables.start_corp = ctx.authUser.sAMAccountName;
       // 启动流程
       const { pid, message, error } = await ctx.service.syncActiviti.startProcess(activitiData, { headers: ctx.headers });
       if (error) {
