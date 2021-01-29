@@ -5,6 +5,7 @@ module.exports = appInfo => {
   const config = exports;
   config.prefix = '';
   config.keys = appInfo.name + '_20200702134922';
+  config.apiKey = process.env.npm_config_apiKey || 'f72cfe7c-df85-4123-beaf-ee9c34d8c1c0';
 
   // ===================================
   //             ORM 设置
@@ -138,7 +139,12 @@ module.exports = appInfo => {
   // ===================================
   config.middleware = [ 'log', 'auth' ];
   config.auth = {
-    ignore: [ '/user/login', '/tenant/getCps', '/tenant/testCps' ],
+    ignore: [
+      '/user/login',
+      '/tenant/getCps',
+      '/tenant/testCps',
+      '/diyForm/list',
+    ],
   };
 
 

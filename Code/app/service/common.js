@@ -62,5 +62,9 @@ module.exports = app => {
       );
       return JSON.parse(res.data);
     }
+
+    checkApiKey() {
+      return this.ctx.headers['x-apikey'] === app.config.apiKey;
+    }
   };
 };

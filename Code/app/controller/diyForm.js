@@ -4,6 +4,15 @@ module.exports = app => {
   return class extends app.Controller {
     async list() {
       const { ctx } = this;
+      if (!ctx.service.common.checkApiKey()) {
+        ctx.status = 401;
+        ctx.body = {
+          success: false,
+          data: null,
+          message: 'Unauthorized',
+        };
+        return;
+      }
       let { formKey, startTime, endTime } = ctx.query;
       if (startTime && isNaN(parseInt(new Date(startTime).getTime())) || endTime && isNaN(parseInt(new Date(endTime).getTime()))) {
         ctx.success([]);
