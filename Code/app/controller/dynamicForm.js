@@ -201,6 +201,37 @@ module.exports = app => {
       else ctx.success(res);
     }
 
+    async getDetailByVm() {
+      const { ctx } = this;
+      const { formKey, formId, version } = ctx.query;
+      if (!formKey || !formId) ctx.error();
+      const res = await ctx.service.dynamicForm.getDetailByKey(formKey, version, formId);
+      if (res && res.tenant && res.tenant.manager_group_id) {
+        const manager_group = await ctx.model.models.ad_group.findOne({
+          raw: true,
+          attributes: [ 'name' ],
+          where: {
+            id: res.tenant.manager_group_id,
+          },
+        });
+        manager_group ? res.tenant.manager_group_name = manager_group.name : undefined;
+      }
+      if (res && res.childTable && res.childTable.length > 0) {
+        const { childTable } = res;
+        for (const child of childTable) {
+          const where = {
+            clusterName: child.vm_cluster,
+            cdcId: child.data_center ? child.data_center.id : 0,
+            applicationTypeId: child.application_type ? child.application_type.id : 0,
+          };
+          const dcMapper = await ctx.model.models.vm_cluster_dc_mapping.findOne({ where });
+          child.dcMapper = dcMapper;
+        }
+      }
+      if (!res) ctx.error();
+      else ctx.success(res);
+    }
+
     async verifyApplicationType() {
       const { ctx } = this;
       try {

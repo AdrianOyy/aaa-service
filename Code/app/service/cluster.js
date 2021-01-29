@@ -606,15 +606,20 @@ module.exports = app => {
             // 判断硬盘信息
             const freeRamData = setDiskByMb(ram.free);
             const totalRamData = setDiskByMb(ram.total);
-            if ((totalRamData * 0.2) > (freeRamData - (150 * 1024))) {
-              isRamCsv = true;
-              ram.isCsv = true;
+            if (ram.name.indexOf('Encrypted') === -1) {
+              if ((totalRamData * 0.2) < (freeRamData - (150 * 1024))) {
+                isRamCsv = true;
+                ram.isCsv = true;
+              } else {
+                ram.isCsv = false;
+              }
+              ram.orderByCsv = setFloat(freeRamData, totalRamData);
+              freeRam += freeRamData;
+              totalRam += totalRamData;
             } else {
               ram.isCsv = false;
+              ram.orderByCsv = setFloat(freeRamData, totalRamData);
             }
-            ram.orderByCsv = setFloat(freeRamData, totalRamData);
-            freeRam += freeRamData;
-            totalRam += totalRamData;
           }
           msg.isRamCsv = isRamCsv;
           msg.freeRam = freeRam;
@@ -665,15 +670,20 @@ module.exports = app => {
             // 判断硬盘信息
             const freeRamData = setDiskByMb(ram.free);
             const totalRamData = setDiskByMb(ram.total);
-            if ((totalRamData * 0.2) < (freeRamData - (150 * 1024))) {
-              isRamCsv = true;
-              ram.isCsv = true;
+            if (ram.name.indexOf('Encrypted') === -1) {
+              if ((totalRamData * 0.2) < (freeRamData - (150 * 1024))) {
+                isRamCsv = true;
+                ram.isCsv = true;
+              } else {
+                ram.isCsv = false;
+              }
+              ram.orderByCsv = setFloat(freeRamData, totalRamData);
+              freeRam += freeRamData;
+              totalRam += totalRamData;
             } else {
               ram.isCsv = false;
+              ram.orderByCsv = setFloat(freeRamData, totalRamData);
             }
-            ram.orderByCsv = setFloat(freeRamData, totalRamData);
-            freeRam += freeRamData;
-            totalRam += totalRamData;
           }
           msg.isRamCsv = isRamCsv;
           msg.freeRam = freeRam;
