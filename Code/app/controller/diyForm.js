@@ -5,12 +5,16 @@ module.exports = app => {
     async list() {
       const { ctx } = this;
       let { formKey, startTime, endTime } = ctx.query;
+      if (startTime && isNaN(parseInt(new Date(startTime).getTime())) || endTime && isNaN(parseInt(new Date(endTime).getTime()))) {
+        ctx.success([]);
+        return;
+      }
       if (startTime && endTime && (new Date(startTime) - new Date(endTime) > 0)) {
         const tmp = startTime;
         startTime = endTime;
         endTime = tmp;
       }
-      const res = await ctx.service.diyForm.getDIYFormDetailByDateRange(formKey, startTime, endTime);
+      const res = await ctx.service.diyForm.getWorkflowInformation(formKey, startTime, endTime);
       ctx.success(res);
     }
 
@@ -136,6 +140,7 @@ module.exports = app => {
       }
       // 流程发起人Email
       activitiData.variables.start_email = ctx.authUser.email;
+      activitiData.variables.start_corp = ctx.authUser.sAMAccountName;
       // 启动流程
       const { pid, message, error } = await ctx.service.syncActiviti.startProcess(activitiData, { headers: ctx.headers });
       if (error) {
@@ -180,6 +185,7 @@ module.exports = app => {
         childFormKey,
         childDataList,
         version,
+        // isSentMail,
         taskId,
       } = ctx.request.body;
       // 获取父表插入SQL
