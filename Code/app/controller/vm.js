@@ -182,6 +182,7 @@ module.exports = app => {
         const DCCountList = await ctx.service.ipAssign.countByDC(childTable);
         for (let i = 0; i < DCCountList.length; i++) {
           const list = await ctx.service.ipAssign.assign(DCCountList[i].dataCenter, DCCountList[i].requestNum);
+          console.log(list);
           if (!list) {
             pass = false;
             message += 'IP is not enough\n';
@@ -275,7 +276,6 @@ module.exports = app => {
       const hostname_prefix = await ctx.service.hostname.getPrefixByTypeZone(environment_type, network_zone);
       const applicationTypeId = childData.application_type.value;
       const application = await ctx.model.models.vm_applicationType.findOne({ where: { id: applicationTypeId } });
-      console.log(application);
       const typeCount = {
         applicationType: application ? application.code : '',
         hostname_prefix,
@@ -287,13 +287,11 @@ module.exports = app => {
         error: false,
         message: null,
       };
-      console.log(list);
       if (!list) {
         appResult.error = true;
         appResult.message = `Tenant \`${tenantName}\` with Application type  hostname is not enough`;
         fileList.push(appResult);
       }
-      console.log(hostname);
       // TODO 1.1 验证新的 hostname list 是否为计算出来的 hostname list 的子集
       if (list && hostname) {
         if (list.indexOf(hostname) === -1) {
@@ -369,15 +367,36 @@ module.exports = app => {
       if (cluster > -1) {
         if (fileList.length === 0) {
           // call jobid
-          const vclusters = { vClusters: vm_cluster };
-          jobId = await ctx.service.cluster.getAnsibleJob(vclusters);
-          console.log(jobId);
-          if (!jobId) {
-            fileList.push({
-              fieldName: 'jobId',
-              error: true,
-              message: 'get jobId is error',
-            });
+          const data_storage_request_number = childData.data_storage_request_number.value;
+          const type = await ctx.service.defineVMType.defineVMType(network_zone, environment_type, data_storage_request_number);
+          if (type === 'VMWare') {
+            const vclusters = { vClusters: vm_cluster };
+            jobId = await ctx.service.cluster.getAnsibleJob(vclusters);
+            if (!jobId) {
+              fileList.push({
+                fieldName: 'jobId',
+                error: true,
+                message: 'get jobId is error',
+              });
+            }
+          } else {
+            const where = {
+              clusterName: vm_cluster,
+              cdcId: dc,
+              applicationTypeId: applicationType,
+            };
+            const center = await ctx.model.models.vm_cluster_dc_mapping.findOne({ where });
+            const hicData = { vClusters: vm_cluster, vSiteIPs: center.vCenter };
+            jobId = await ctx.service.hciResource.getAnsibleJobByHCI(hicData);
+            console.log(jobId);
+            if (!jobId) {
+              fileList.push({
+                fieldName: 'jobId',
+                error: true,
+                message: 'get jobId is error',
+              });
+            }
+            // 验证HCI
           }
         }
         // const vm_master = childData.vm_master.value;

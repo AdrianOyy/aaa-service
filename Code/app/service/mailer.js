@@ -45,7 +45,7 @@ module.exports = app => {
           '</div>' +
           '<br />' +
           '<div style="margin-top: 10px;">Regards,</div>' +
-          '<div style="margin-top: 10px;"><span style="color:red">HO IT&HI ISD</span> SENSE <span style="color:red">Platform</span> on behalf of T3 team</div>' +
+          '<div style="margin-top: 10px;"><span style="color:#ff0000">HO IT&HI ISD</span> SENSE <span style="color:red">Platform</span> on behalf of T3 team</div>' +
           '</body>' +
           '</html>';
       return html;

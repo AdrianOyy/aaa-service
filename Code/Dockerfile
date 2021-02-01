@@ -67,6 +67,7 @@ CMD [ \
 --t1=${t1} \
 --t2=${t2} \
 --t6=${t3} \
+--frontEndUrl=${frontEndUrl} \
 --imapFlag=${imapFlag} \
 --imapFetchIndex=${imapFetchIndex} \
 --imapNamespace=${imapNamespace} \
