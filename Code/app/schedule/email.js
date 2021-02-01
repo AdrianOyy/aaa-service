@@ -27,7 +27,7 @@ module.exports = app => {
         console.log(new Date(), 'get Email Folder');
         const result = await ctx.service.syncActiviti.getEmailFolder(actionMessage, { headers: { Authorization: 'Bearer ' + token } });
         console.log(new Date(), 'get Folders');
-        const folders = await ctx.service.imap.getFolders(result, otherUIDS);
+        const folders = await ctx.service.imap.getFolders(result, otherUIDS, actionMessage);
         console.log(new Date(), 'before moveTo', folders);
         await ctx.service.imap.moveTo(folders);
         console.log(new Date(), 'after moveTo');

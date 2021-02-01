@@ -211,14 +211,9 @@ module.exports = app => {
       };
     }
 
-    async getFolders(result, otherUIDS) {
+    async getFolders(result, otherUIDS, actionMessage) {
       const folders = [];
-      if (otherUIDS && otherUIDS.length > 0) {
-        folders.push({
-          uids: otherUIDS,
-          boxTo: 'Other',
-        });
-      }
+
       const completedUIDS = [];
       const incorrectUIDS = [];
       if (result.status === 200 && result.data) {
@@ -241,6 +236,24 @@ module.exports = app => {
             boxTo: 'Incorrect Approval',
           });
         }
+        if (otherUIDS && otherUIDS.length > 0) {
+          folders.push({
+            uids: otherUIDS,
+            boxTo: 'Other',
+          });
+        }
+      } else if (result.status === 500) {
+        console.log(new Date(), '-----complete work error, please check workflow----- message: ', result.message);
+        const allOthers = [];
+        const actionMessages = actionMessage && actionMessage.actionMessages ? actionMessage.actionMessages : [];
+        console.log(new Date(), '-----complete work error, actionMessages: ', actionMessages);
+        for (const _ of actionMessages) {
+          allOthers.push(parseInt(_.uid));
+        }
+        folders.push({
+          uids: allOthers,
+          boxTo: 'Other',
+        });
       }
 
       return folders;
