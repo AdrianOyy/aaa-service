@@ -87,8 +87,8 @@ https://cps-dev-api.cldpaast71.serverdev.hadev.org.hk
 | mailPass        |                                                           |
 | t1              | T1 组名                                                   |
 | t2              | T2 组名                                                   |
-| t6              | T6 组名                                                   |
-
+| t6              | T6 组名  
+| lint            | UAT域名 例如  http://10.231.131.123                        |
 
 
 
