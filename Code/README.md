@@ -34,7 +34,7 @@ docker run -dit \
 -e t1=IOS.ISMS \
 -e t2=IOS.ISMS \
 -e t6=IOS.ISMS \
--e lint=http://10.231.131.123 \
+-e frontEndUrl=http://10.231.131.123 \
 -e imapFlag=Y \
 -e imapUser=gitlab@apjcorp.com \
 -e imapPass=apj.com666 \
@@ -87,8 +87,8 @@ https://cps-dev-api.cldpaast71.serverdev.hadev.org.hk
 | mailPass        |                                                           |
 | t1              | T1 组名                                                   |
 | t2              | T2 组名                                                   |
-| t6              | T6 组名  
-| lint            | UAT域名 例如  http://10.231.131.123                        |
+| t6              | T6 组名                                                   |
+| frontEndUrl     | UAT域名 例如  http://10.231.131.123                        |
 
 
 

@@ -41,7 +41,7 @@ module.exports = app => {
       }
       html += '<br />' +
           '<div style="margin-top: 10px;">' +
-              '<a href="' + app.config.mailGroup.Lint + '" target="_blank">' + app.config.mailGroup.Lint + '</a>' +
+              '<a href="' + app.config.mailGroup.frontEndUrl + '" target="_blank">' + app.config.mailGroup.frontEndUrl + '</a>' +
           '</div>' +
           '<br />' +
           '<div style="margin-top: 10px;">Regards,</div>' +
