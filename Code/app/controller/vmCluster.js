@@ -110,7 +110,8 @@ module.exports = app => {
         const projectContact = data.tenant.contact_person;
         const projectManager = data.tenant.project_owner;
         const vmGuests = [];
-        const childTable = data.childTable.filter(_ => _.status === 'confirmed');
+        console.log(new Date(), ' update resource childTable', data.childTable);
+        const childTable = data.childTable.filter(_ => _.status === 'Successfully');
         for (const _ of childTable) {
           const vmGuest = {};
           vmGuest.serialNumber = _.pid;
@@ -123,7 +124,7 @@ module.exports = app => {
           vmGuest.status = _.status;
           vmGuest.hostname = _.hostname;
           vmGuest.OS = _.platform.name;
-          vmGuest.serverRole = _.application_type.name;
+          vmGuest.serverRole = _.application_type.code;
           vmGuest.hostIP = _.os_ip;
           vmGuest.ATLIP = _.atl_ip;
           vmGuest.magementHost = null;
@@ -153,6 +154,7 @@ module.exports = app => {
               VMMaster.freeMemory = VMMaster.freeMemory - vmGuest.assignedMemory;
               VMMaster.freeNumberOfCPU = VMMaster.freeNumberOfCPU - vmGuest.assignedCPUCores;
               VMMaster.updatedAt = new Date();
+              console.log(new Date(), ' update resource update VMMaster', VMMaster);
               await newModel.update(VMMaster);
             }
           }
@@ -170,9 +172,11 @@ module.exports = app => {
               VMCluster.freeTotalNumbeOfCPU = VMCluster.freeTotalNumbeOfCPU - vmGuest.assignedCPUCores;
               VMCluster.freeStoragePoolSize = VMCluster.freeStoragePoolSize - vmGuest.diskSize;
               VMCluster.updatedAt = new Date();
+              console.log(new Date(), ' update resource update VMCluster', VMCluster);
               await newModel.update(VMCluster);
             }
           }
+          console.log(new Date(), ' update resource create vmGuest', vmGuest);
           vmGuests.push(vmGuest);
         }
         await ctx.model.models.vm_guest.bulkCreate(vmGuests);
