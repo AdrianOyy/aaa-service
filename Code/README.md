@@ -34,6 +34,7 @@ docker run -dit \
 -e t1=IOS.ISMS \
 -e t2=IOS.ISMS \
 -e t6=IOS.ISMS \
+-e lint=http://10.231.131.123 \
 -e imapFlag=Y \
 -e imapUser=gitlab@apjcorp.com \
 -e imapPass=apj.com666 \

@@ -88,7 +88,8 @@ module.exports = appInfo => {
   //             内部服务 设置
   // ===================================
   config.activiti = {
-    url: 'http://10.231.133.165:8888',
+    url: 'http://localhost:8888',
+    // url: 'http://10.231.133.165:8888',
     rejectUnauthorized: 'N',
   };
 
@@ -189,6 +190,7 @@ module.exports = appInfo => {
     T1: 'IOS.ISMS',
     T2: 'IOS.ISMS',
     T6: 'IOS.ISMS',
+    Lint: 'http://10.231.131.123/',
   };
 
   config.mailer = {

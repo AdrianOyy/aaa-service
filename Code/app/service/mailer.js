@@ -17,6 +17,40 @@ module.exports = app => {
       return info;
     }
 
+    async getBody(checkName) {
+      let html = '<!DOCTYPE html>' +
+      '<html xmlns="http://www.w3.org/1999/xhtml">' +
+      '<head>' +
+      '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />' +
+      '<title></title>' +
+      '</head>' +
+      '<body>' +
+      '<div style="margin-top: 10px;">Dear ' + checkName + ' support,</div><br />';
+      switch (checkName) {
+        case 'T1':
+          html += '<div style="margin-top: 10px;">Please handle project code creation for the following provisioning request:</div>';
+          break;
+        case 'T2':
+          html += '<div style="margin-top: 10px;">Please handle the following Linux VM provisioning request:</div>';
+          break;
+        case 'T6':
+          html += '<div style="margin-top: 10px;">Please handle the following Cloud namespace provisioning request:</div>';
+          break;
+        default:
+          break;
+      }
+      html += '<br />' +
+          '<div style="margin-top: 10px;">' +
+              '<a href="' + app.config.mailGroup.Lint + '" target="_blank">' + app.config.mailGroup.Lint + '</a>' +
+          '</div>' +
+          '<br />' +
+          '<div style="margin-top: 10px;">Regards,</div>' +
+          '<div style="margin-top: 10px;"><span style="color:red">HO IT&HI ISD</span> SENSE <span style="color:red">Platform</span> on behalf of T3 team</div>' +
+          '</body>' +
+          '</html>';
+      return html;
+    }
+
     async getGrouptoEmail(checkName) {
       const { ctx } = this;
       if (app.config.mailGroup[checkName]) {
@@ -26,7 +60,8 @@ module.exports = app => {
           // eslint-disable-next-line no-empty
           for (const user of groups) {
             if (user.mail) {
-              this.sentMail(user.mail, `${checkName}`, `${checkName} html`);
+              const html = await this.getBody(checkName);
+              this.sentMail(user.mail, 'A VM allocation request is pending for your handle.', html);
             }
           }
         }
