@@ -107,6 +107,7 @@ module.exports = app => {
           updateTree: '',
           manager_user_id: [ ctx.authUser.id.toString() ],
           manager_group_id: [ manager_group_id.toString() ],
+          process: false,
         },
         startUser: ctx.authUser.id,
       };
