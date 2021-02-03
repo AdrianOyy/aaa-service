@@ -1,4 +1,5 @@
 'use strict';
+const { CREATE } = require('../constant/stepName');
 
 module.exports = app => {
   return class extends app.Service {
@@ -225,7 +226,7 @@ module.exports = app => {
       return dynamicForm;
     }
 
-    async getDynamicFormWithForeignTable(deploymentId) {
+    async getDynamicFormWithForeignTable(deploymentId, stepName) {
       const dynamicForm = await this.getDynamicForm({ deploymentId });
       if (!dynamicForm) return false;
       const { workflowName, formKey, dynamicFormDetail, childTable, version } = dynamicForm;
@@ -236,7 +237,7 @@ module.exports = app => {
         let itemList = null;
         const el = dynamicFormDetail[i];
         if (el.foreignTable !== null && el.foreignTable !== '') {
-          itemList = await this.getForeignData(el.foreignTable);
+          itemList = await this.getForeignData(el.foreignTable, stepName);
         }
         parentFormDetail.push(Object.assign(el.dataValues, { itemList, label: el.fieldDisplayName, type: el.inputType, labelField: el.foreignDisplayKey, valueField: el.foreignKey }));
       }
@@ -248,7 +249,7 @@ module.exports = app => {
           let itemList = null;
           const el = childTable[0].dynamicFormDetail[i];
           if (el.foreignTable !== null && el.foreignTable !== '') {
-            itemList = await this.getForeignData(el.foreignTable);
+            itemList = await this.getForeignData(el.foreignTable, stepName);
           }
           childFormDetail.push(Object.assign(el.dataValues, { itemList, label: el.fieldDisplayName, type: el.inputType, labelField: el.foreignDisplayKey, valueField: el.foreignKey }));
         }
@@ -310,13 +311,14 @@ module.exports = app => {
     }
 
     // 根据不同的外键关联表名来获取对应的数据列表
-    async getForeignData(tableName) {
+    async getForeignData(tableName, stepName) {
       const { ctx } = this;
       let foreignList = null;
       switch (tableName) {
         case 'tenant':
-          foreignList = await ctx.service.tenant.getUserTenantList(ctx.authUser.id);
-          // foreignList = await ctx.service.tenant.getUserTenantList(ctx.authUser.id);
+          stepName !== CREATE ?
+            foreignList = await ctx.service.tenant.getUserTenantList(ctx.authUser.id) :
+            foreignList = await ctx.service.tenant.getAllTenant();
           break;
         default:
           foreignList = (await app.model.query(`SELECT * FROM \`${tableName}\` WHERE deletedAt IS NULL`))[0];
