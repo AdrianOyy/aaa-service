@@ -137,7 +137,7 @@ module.exports = appInfo => {
   // ===================================
   //           全局 中间件 设置
   // ===================================
-  config.middleware = [ 'log', 'errorLog', 'auth' ];
+  config.middleware = [ 'log', 'auth', 'errorLog' ];
   config.auth = {
     ignore: [
       '/user/login',

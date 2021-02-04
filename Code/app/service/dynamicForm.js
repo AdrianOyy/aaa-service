@@ -316,7 +316,7 @@ module.exports = app => {
       let foreignList = null;
       switch (tableName) {
         case 'tenant':
-          stepName !== CREATE ?
+          stepName === CREATE ?
             foreignList = await ctx.service.tenant.getUserTenantList(ctx.authUser.id) :
             foreignList = await ctx.service.tenant.getAllTenant();
           break;
