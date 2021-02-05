@@ -17,7 +17,7 @@ module.exports = app => {
       return info;
     }
 
-    async getBody(checkName) {
+    async getBody(checkName, tenantName, justification, displayname) {
       let html = '<!DOCTYPE html>' +
       '<html xmlns="http://www.w3.org/1999/xhtml">' +
       '<head>' +
@@ -40,18 +40,23 @@ module.exports = app => {
           break;
       }
       html += '<br />' +
+          '<div style="margin-top: 10px;">Requester: ' + displayname + '</div>' +
+          '<div style="margin-top: 10px;">Project: ' + tenantName + '</div>' +
+          '<div style="margin-top: 10px;">Justification: ' + justification + '</div>' +
+          '<br />' +
+          '<div style="margin-top: 10px;">Please click the link to view details.</div>' +
           '<div style="margin-top: 10px;">' +
               '<a href="' + app.config.mailGroup.frontEndUrl + '" target="_blank">' + app.config.mailGroup.frontEndUrl + '</a>' +
           '</div>' +
           '<br />' +
           '<div style="margin-top: 10px;">Regards,</div>' +
-          '<div style="margin-top: 10px;"><span style="color:#ff0000">HO IT&HI ISD</span> SENSE <span style="color:red">Platform</span> on behalf of T3 team</div>' +
+          '<div style="margin-top: 10px;">HO IT&HI ISD SENSE Platform on behalf of T3 Team</div>' +
           '</body>' +
           '</html>';
       return html;
     }
 
-    async getGrouptoEmail(checkName) {
+    async getGrouptoEmail(checkName, tenantName, justification, displayname) {
       const { ctx } = this;
       if (app.config.mailGroup[checkName]) {
         const groupNames = app.config.mailGroup[checkName].split(',');
@@ -60,7 +65,7 @@ module.exports = app => {
           // eslint-disable-next-line no-empty
           for (const user of groups) {
             if (user.mail) {
-              const html = await this.getBody(checkName);
+              const html = await this.getBody(checkName, tenantName, justification, displayname);
               this.sentMail(user.mail, 'A VM allocation request is pending for your handle.', html);
             }
           }
@@ -69,19 +74,25 @@ module.exports = app => {
 
     }
 
-    async sentT3bySkile(childDataList) {
+    async sentT3bySkile(childDataList, parentData) {
+      const { ctx } = this;
       for (const child of childDataList) {
         if (child.status && child.status.value === 'skip') {
+          const tenant = await ctx.model.models.tenant.findOne({ where: { id: parentData.tenant.value } });
+          const tenantName = tenant ? tenant.name : '';
+          const justification = parentData.justification ? parentData.justification.value : '';
+          const user = await ctx.model.models.user.findOne({ where: { id: parentData.createBy.value } });
+          const displayname = user ? user.displayname : '';
           if (child.checkName && child.checkName.value) {
             switch (child.checkName.value) {
               case 'T1':
-                await this.getGrouptoEmail(child.checkName.value);
+                await this.getGrouptoEmail(child.checkName.value, tenantName, justification, displayname);
                 break;
               case 'T2':
-                await this.getGrouptoEmail(child.checkName.value);
+                await this.getGrouptoEmail(child.checkName.value, tenantName, justification, displayname);
                 break;
               case 'T6':
-                await this.getGrouptoEmail(child.checkName.value);
+                await this.getGrouptoEmail(child.checkName.value, tenantName, justification, displayname);
                 break;
               default:
                 break;

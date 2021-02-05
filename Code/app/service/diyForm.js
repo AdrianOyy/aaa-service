@@ -8,8 +8,8 @@ module.exports = app => {
      * @param {object} parentData parent table data
      * @return {Promise<string>} insetSQL parent table's insert SQL
      */
-    async getParentFormInsetSQL(formKey, version, parentData) {
-      return getInsertSQL(formKey, version, parentData);
+    async getParentFormInsetSQL(formKey, version, parentData, userId) {
+      return getInsertSQL(formKey, version, parentData, userId);
     }
 
     /**
@@ -18,10 +18,10 @@ module.exports = app => {
      * @param {object[]} childDataList child table data
      * @return {Promise<string[]>} insetSQL child table's insert SQL list
      */
-    async getChildFormInsertSQLList(childFormKey, version, childDataList) {
+    async getChildFormInsertSQLList(childFormKey, version, childDataList, userId) {
       const SQLList = [];
       for (let i = 0; i < childDataList.length; i++) {
-        SQLList.push(getInsertSQL(childFormKey, version, childDataList[i]));
+        SQLList.push(getInsertSQL(childFormKey, version, childDataList[i], userId));
       }
       return SQLList;
     }
@@ -241,15 +241,15 @@ module.exports = app => {
  * @param {object} data  table data
  * @return {Promise<string>} insetSQL table's insert SQL
  */
-function getInsertSQL(formKey, version, data) {
+function getInsertSQL(formKey, version, data, userId) {
   let fieldType = '';
   let fieldValue = '';
   for (const key in data) {
     fieldType += `\`${key}\`,`;
     fieldValue += !data[key] || !data[key].value ? 'null,' : data[key].value !== '' ? `\'${data[key].value}\',` : 'null,';
   }
-  fieldType += '\`createdAt\`,\`updatedAt\`';
-  fieldValue += `\'${getNow()}\',\'${getNow()}\'`;
+  fieldType += '\`createdAt\`,\`updatedAt\`,\`createBy\`,\`updateBy\`';
+  fieldValue += `\'${getNow()}\',\'${getNow()}\',\'${userId}\',\'${userId}\'`;
   return `INSERT INTO ${formKey}${version}(${fieldType}) VALUES (${fieldValue})`;
 }
 
@@ -263,7 +263,7 @@ function getInsertSQL(formKey, version, data) {
 function getUpdateSQL(formKey, version, data, where) {
   let fieldValue = '';
   for (const key in data) {
-    if (key !== 'id' && key !== 'checkState' && key !== 'checkName') {
+    if (key !== 'id' && key !== 'checkState' && key !== 'checkName' && key !== 'createBy' && key !== 'updateBy') {
       if ((key === 'createdAt' || key === 'updatedAt') && data[key].value) {
         const [ date, time ] = data[key].value.split('T');
         const [ f ] = time.split('.');

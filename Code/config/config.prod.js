@@ -161,7 +161,7 @@ module.exports = appInfo => {
     T1: process.env.npm_config_t1,
     T2: process.env.npm_config_t2,
     T6: process.env.npm_config_t6,
-    Lint: process.env.npm_config_frontEndUrl,
+    frontEndUrl: process.env.npm_config_frontEndUrl,
   };
 
 

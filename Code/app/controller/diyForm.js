@@ -42,7 +42,7 @@ module.exports = app => {
       } = ctx.request.body;
       // ctx.success();
       // 获取父表插入SQL
-      const parentInsertSQL = await ctx.service.diyForm.getParentFormInsetSQL(formKey, version, parentData);
+      const parentInsertSQL = await ctx.service.diyForm.getParentFormInsetSQL(formKey, version, parentData, ctx.authUser.id);
 
       // 获取子表插入SQL
       for (const childData of childDataList) {
@@ -53,7 +53,7 @@ module.exports = app => {
           label: dc,
         };
       }
-      const childInsertSQLList = await ctx.service.diyForm.getChildFormInsertSQLList(childFormKey, version, childDataList);
+      const childInsertSQLList = await ctx.service.diyForm.getChildFormInsertSQLList(childFormKey, version, childDataList, ctx.authUser.id);
 
       const insertSQLList = [ parentInsertSQL, ...childInsertSQLList ];
 
@@ -208,11 +208,11 @@ module.exports = app => {
         childUpdateSQLList = await ctx.service.diyForm.getChildFormUpdateSQLList(childFormKey, version, childDataList);
       }
 
-      const updateSQLList = [ parentUpdateSQL, ...childUpdateSQLList ];
+      const updateSQLList = [ parentUpdateSQL, ...childUpdateSQLList ]; 3;
       // console.log(updateSQLList);
       const res = await ctx.service.sql.transaction(updateSQLList);
       // 发送邮件
-      await ctx.service.mailer.sentT3bySkile(childDataList);
+      await ctx.service.mailer.sentT3bySkile(childDataList, parentData);
       // 下一步启动
       ctx.service.syncActiviti.actionTask({ taskId, variables: { pass: true } }, { headers: ctx.headers });
       // 延时3s

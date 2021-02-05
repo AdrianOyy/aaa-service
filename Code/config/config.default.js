@@ -190,7 +190,7 @@ module.exports = appInfo => {
     T1: 'IOS.ISMS',
     T2: 'IOS.ISMS',
     T6: 'IOS.ISMS',
-    Lint: 'http://10.231.131.123/',
+    frontEndUrl: 'http://10.231.131.123/',
   };
 
   config.mailer = {
