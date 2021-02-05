@@ -107,6 +107,10 @@ module.exports = app => {
           updateTree: '',
           manager_user_id: [ ctx.authUser.id.toString() ],
           manager_group_id: [ manager_group_id.toString() ],
+          process: false,
+          start_name: ctx.authUser.name, // 流程发起人Display Name
+          start_email: ctx.authUser.email, // 流程发起人email
+          start_corp: ctx.authUser.sAMAccountName, // 流程发起人Corp Id
         },
         startUser: ctx.authUser.id,
       };
@@ -147,9 +151,6 @@ module.exports = app => {
           activitiData.variables.manager_user_id = userIds;
         }
       }
-      // 流程发起人Email
-      activitiData.variables.start_email = ctx.authUser.email;
-      activitiData.variables.start_corp = ctx.authUser.sAMAccountName;
       // 启动流程
       const { pid, message, error } = await ctx.service.syncActiviti.startProcess(activitiData, { headers: ctx.headers });
       if (error) {

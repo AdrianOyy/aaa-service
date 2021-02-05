@@ -38,6 +38,12 @@ module.exports = app => {
       }
       return tenantList;
     }
+
+    async getAllTenant() {
+      const { ctx } = this;
+      const itemList = await ctx.model.models.tenant.findAll();
+      return itemList;
+    }
   };
 };
 

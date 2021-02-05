@@ -89,7 +89,7 @@ module.exports = appInfo => {
   // ===================================
   config.activiti = {
     url: 'http://localhost:8888',
-    // url: 'http://10.231.133.165:8888',
+    // url: 'http://10.231.131.123:3004',
     rejectUnauthorized: 'N',
   };
 
@@ -141,7 +141,7 @@ module.exports = appInfo => {
   // ===================================
   //           全局 中间件 设置
   // ===================================
-  config.middleware = [ 'errorLog', 'auth' ];
+  config.middleware = [ 'auth', 'errorLog' ];
   config.auth = {
     ignore: [
       '/user/login',

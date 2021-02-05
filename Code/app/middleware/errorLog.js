@@ -8,6 +8,7 @@ module.exports = () => {
       console.log(error);
       console.log('====================================================================================================');
       ctx.logger.error(error);
+      ctx.error();
     }
   };
 };
