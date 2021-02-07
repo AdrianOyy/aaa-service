@@ -96,7 +96,7 @@ module.exports = app => {
           manager_group_id = ad_group.name;
         }
       }
-
+      const frontEndUrl = app.config.mailGroup.frontEndUrl;
       const activitiData = {
         processDefinitionId,
         variables: {
@@ -111,6 +111,8 @@ module.exports = app => {
           start_name: ctx.authUser.name, // 流程发起人Display Name
           start_email: ctx.authUser.email, // 流程发起人email
           start_corp: ctx.authUser.sAMAccountName, // 流程发起人Corp Id
+          workflowName,
+          frontEndUrl,
         },
         startUser: ctx.authUser.id,
       };
