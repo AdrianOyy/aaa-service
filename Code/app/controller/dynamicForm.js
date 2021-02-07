@@ -232,6 +232,63 @@ module.exports = app => {
       else ctx.success(res);
     }
 
+    async getDetailByAM() {
+      const { ctx } = this;
+      const { formKey, formId, version } = ctx.query;
+      if (!formKey || !formId) ctx.error();
+      const res = await ctx.service.dynamicForm.getDetailByKey(formKey, version, formId);
+      if (res && res.tenant && res.tenant.manager_group_id) {
+        const manager_group = await ctx.model.models.ad_group.findOne({
+          raw: true,
+          attributes: [ 'name' ],
+          where: {
+            id: res.tenant.manager_group_id,
+          },
+        });
+        manager_group ? res.tenant.manager_group_name = manager_group.name : undefined;
+      }
+      if (res) {
+        if (res.owa_hospital_web) {
+          const owaWebmail = await ctx.model.models.owa_webmail.findOne({ where: { type: res.owa_hospital_web } });
+          res.owa_hospital_web = owaWebmail ? owaWebmail.code : res.owa_hospital_web;
+        }
+        if (res.clinical_applications) {
+          const clinicalApplications = await ctx.model.models.clinical_applications.findAll({});
+          const disClinicals = res.clinical_applications.split('!@#');
+          let ca = '';
+          for (const clinical of disClinicals) {
+            const applications = clinicalApplications.find(t => t.type === clinical);
+            if (applications) {
+              ca += applications.code + '!@#';
+            } else {
+              // eslint-disable-next-line no-unused-vars
+              ca += clinical + '!@#';
+            }
+          }
+          ca = ca.substring(0, ca.length - 3);
+          res.clinical_applications = ca;
+        }
+        if (res.nonclinical_applications) {
+          const noclinicalApplications = await ctx.model.models.non_clinical_applications.findAll({});
+          const disClinicals = res.nonclinical_applications.split('!@#');
+          let noa = '';
+          for (const clinical of disClinicals) {
+            const applications = noclinicalApplications.find(t => t.type === clinical);
+            if (applications) {
+              noa += applications.code + '!@#';
+            } else {
+              // eslint-disable-next-line no-unused-vars
+              noa += clinical + '!@#';
+            }
+          }
+          noa = noa.substring(0, noa.length - 3);
+          res.nonclinical_applications = noa;
+        }
+      }
+      if (!res) ctx.error();
+      else ctx.success(res);
+    }
+
     async verifyApplicationType() {
       const { ctx } = this;
       try {

@@ -6,6 +6,7 @@ module.exports = app => {
   const owa_webmail = app.model.define('owa_webmail', {
     id: { type: INTEGER, autoIncrement: true, primaryKey: true, cnName: 'ID' },
     type: { type: STRING(256), allowNull: false, cnName: '名称', comment: '名称' },
+    code: { type: STRING(256), allowNull: false, cnName: '编号', comment: '编号' },
   }, {
     paranoid: true,
     tableName: 'owa_webmail',
