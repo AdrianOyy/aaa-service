@@ -35,9 +35,9 @@ module.exports = app => {
         const inClusters = inList.filter(t => t.vm_cluster === hci.name);
         if (inClusters.length > 0) {
           for (const inCluster of inClusters) {
-            hci.NoCPUUsed = hci.NoCPUUsed + inCluster.cpu_request_number;
-            hci.FreeMemory = hci.FreeMemory - inCluster.ram_request_number * 1024;
-            hci.FreeDiskSize = hci.FreeDiskSize - inCluster.data_storage_request_number * 1024;
+            hci.NoCPUUsed = hci.NoCPUUsed + parseInt(inCluster.cpu_request_number);
+            hci.FreeMemory = hci.FreeMemory - parseInt(inCluster.ram_request_number) * 1024;
+            hci.FreeDiskSize = hci.FreeDiskSize - parseInt(inCluster.data_storage_request_number) * 1024;
           }
         }
         if ((hci.TotalDiskSize * 0.2) > (hci.FreeDiskSize - vm.data_storage_request_number * 1024)) {

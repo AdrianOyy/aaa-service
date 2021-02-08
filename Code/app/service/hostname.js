@@ -90,6 +90,27 @@ module.exports = app => {
     }
 
     /**
+     * @param {string} tenantId
+     * @param {object} typeCount
+     * @return {string[]} hostname hostname
+     */
+    async generateCheckHostname(tenantId, typeCount) {
+      const hostNameList = [];
+      const { applicationType, hostname_prefix } = typeCount;
+      if (!hostname_prefix) return false;
+      const referenceList = await this.getReferenceList(tenantId);
+      if (!referenceList) return false;
+      for (let i = 0; i < referenceList.length; i++) {
+        const lastCharList = await this.getLastCharList(applicationType, referenceList[i]);
+        for (let j = 0; j < lastCharList.length; j++) {
+          const hostName = `${hostname_prefix}${applicationType}${referenceList[i]}${lastCharList[j]}`;
+          hostNameList.push(hostName);
+        }
+      }
+      return hostNameList;
+    }
+
+    /**
      * @param {Object[]} vmList VM list
      * @return {Promise<Object[]>} typeCountList
      */

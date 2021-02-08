@@ -21,9 +21,9 @@ module.exports = app => {
         const inClusters = inList.filter(t => t.vm_cluster === vmm.ClusterName);
         if (inClusters.length > 0) {
           for (const inCluster of inClusters) {
-            vmm.NoCPUUsed = vmm.NoCPUUsed + inCluster.cpu_request_number;
-            vmm.FreeMemory = vmm.FreeMemory - inCluster.ram_request_number * 1024;
-            vmm.freeRam = vmm.freeRam - inCluster.data_storage_request_number * 1024;
+            vmm.NoCPUUsed = vmm.NoCPUUsed + parseInt(inCluster.cpu_request_number);
+            vmm.FreeMemory = vmm.FreeMemory - parseInt(inCluster.ram_request_number) * 1024;
+            vmm.freeRam = vmm.freeRam - parseInt(inCluster.data_storage_request_number) * 1024;
           }
         }
         if ((vmm.totalRam * 0.2) > (vmm.freeRam - vm.data_storage_request_number * 1024)) {
@@ -49,8 +49,8 @@ module.exports = app => {
           let isMaster = false;
           for (const master of masterList) {
             for (const inCluster of inClusters) {
-              master.NoCPUUsed = master.NoCPUUsed + inCluster.cpu_request_number;
-              master.FreeMemory = master.FreeMemory - inCluster.ram_request_number * 1024;
+              master.NoCPUUsed = master.NoCPUUsed + parseInt(inCluster.cpu_request_number);
+              master.FreeMemory = master.FreeMemory - parseInt(inCluster.ram_request_number) * 1024;
             }
             if (master.TotalMemory * 0.2 > master.FreeMemory - vm.ram_request_number * 1024) {
               continue;
@@ -123,7 +123,6 @@ module.exports = app => {
           if (vm.data_center && vm.application_type) {
             // 根据applicationType 获取 Cluster
             const typeClusters = await ctx.model.models.vm_cluster_applicationType.findAll({ where: { applicationTypeId: vm.application_type.id } });
-            console.log(typeClusters);
             // console.log(appCluster);
             // 根据 typeId 和 zoomId 获取 dc，根据dc获取 Cluster
             const dcClusters = await ctx.model.models.vm_cluster_dc_mapping.findAll({
@@ -396,7 +395,6 @@ module.exports = app => {
 
     async setCheckVMMare(name, jobId) {
       const cluserMasters = await this.getVMMareByCheck(name, jobId);
-      console.log(cluserMasters);
       for (const msg of cluserMasters) {
         if (msg) {
           // 循环 Master
@@ -598,12 +596,12 @@ module.exports = app => {
         });
         const options = {
           method: 'GET',
+          dataType: 'text',
           timeout: 1000 * 60,
           headers: { Authorization: 'Bearer ' + token },
           data,
         };
         const job = await ctx.service.syncActiviti.curl(url, options, ctx);
-        console.log(job);
         return job.data;
       } catch (err) {
         console.log(err);

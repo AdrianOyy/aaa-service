@@ -281,7 +281,8 @@ module.exports = app => {
         hostname_prefix,
         requestNum: 1,
       };
-      const list = await ctx.service.hostname.generateHostname(tenantId, typeCount);
+      const list = await ctx.service.hostname.generateCheckHostname(tenantId, typeCount);
+      console.log(list);
       const appResult = {
         fieldName: 'hostname',
         error: false,
