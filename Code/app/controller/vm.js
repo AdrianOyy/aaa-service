@@ -312,7 +312,7 @@ module.exports = app => {
         const hostResult = {
           fieldName: 'hostname',
           error: true,
-          message: 'hostname is used',
+          message: 'Hostname is occupied',
         };
         fileList.push(hostResult);
       }
@@ -334,14 +334,14 @@ module.exports = app => {
           fileList.push({
             fieldName: 'os_ip',
             error: true,
-            message: 'os_ip is user',
+            message: 'OS IP is occupied',
           });
         }
       } else {
         fileList.push({
           fieldName: 'os_ip',
           error: true,
-          message: 'os_ip is not found ip assign',
+          message: 'OS IP is not found ip assign',
         });
       }
       if (atlResult) {
@@ -350,14 +350,14 @@ module.exports = app => {
           fileList.push({
             fieldName: 'atl_ip',
             error: true,
-            message: 'atl_ip is user',
+            message: 'ATL IP is occupied',
           });
         }
       } else {
         fileList.push({
           fieldName: 'atl_ip',
           error: true,
-          message: 'atl_ip is not found ip assign',
+          message: 'ATL IP is not found ip assign',
         });
       }
       // TODO 3. 确定新的 vm type
@@ -377,7 +377,7 @@ module.exports = app => {
               fileList.push({
                 fieldName: 'jobId',
                 error: true,
-                message: 'get jobId is error',
+                message: 'An error occurred during getting job ID',
               });
             }
           } else {
@@ -394,7 +394,7 @@ module.exports = app => {
               fileList.push({
                 fieldName: 'jobId',
                 error: true,
-                message: 'get jobId is error',
+                message: 'An error occurred during getting job ID',
               });
             }
             // 验证HCI
@@ -410,7 +410,7 @@ module.exports = app => {
         fileList.push({
           fieldName: 'vm_cluster',
           error: true,
-          message: 'vm_cluster is not found by data center',
+          message: 'VM cluster with selected data center is not found ',
         });
       }
       // if (cluster  -1) {
