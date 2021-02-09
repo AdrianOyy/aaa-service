@@ -218,10 +218,12 @@ module.exports = app => {
       const incorrectUIDS = [];
       if (result.status === 200 && result.data) {
         for (const _ of result.data) {
-          if (_.result) {
+          if (_.result === 'completed') {
             completedUIDS.push(parseInt(_.uid));
-          } else {
+          } else if (_.result === 'incorrect') {
             incorrectUIDS.push(parseInt(_.uid));
+          } else {
+            otherUIDS.push(parseInt(_.uid));
           }
         }
         if (completedUIDS.length > 0) {
