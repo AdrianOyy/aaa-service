@@ -218,6 +218,8 @@ module.exports = app => {
         const { quota } = oldModel;
         if (!quota || parseInt(quota) < parseInt(number)) throw new Error('request number is greater than quota');
         await oldModel.update({ quota: quota - number }, { transaction });
+        await transaction.commit();
+        ctx.success();
       } catch (error) {
         await transaction.rollback();
         ctx.error(error.message);
