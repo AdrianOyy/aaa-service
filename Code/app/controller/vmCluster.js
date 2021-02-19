@@ -176,6 +176,19 @@ module.exports = app => {
               await newModel.update(VMCluster);
             }
           }
+          const ip_assignment = await ctx.model.models.ip_assignment.findOne({
+            raw: true,
+            where: {
+              IP: vmGuest.ATLIP,
+            },
+            attributes: [ 'id' ],
+          });
+          const newModel = await ctx.model.models.ip_assignment.findByPk(ip_assignment.id);
+          ip_assignment.hostname = vmGuest.hostname;
+          ip_assignment.projectTeam = vmGuest.projectCode;
+          ip_assignment.assignedDate = new Date();
+          console.log(new Date(), ' update resource update ip_assignment', ip_assignment);
+          await newModel.update(ip_assignment);
           console.log(new Date(), ' update resource create vmGuest', vmGuest);
           vmGuests.push(vmGuest);
         }
