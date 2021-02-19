@@ -20,11 +20,11 @@ module.exports = app => {
         if (!messages || messages.length <= 0) {
           return;
         }
-        const token = await ctx.service.jwtUtils.getToken({ content: { username: '' }, expiresIn: app.config.jwt.expiresIn });
         console.log(new Date(), 'get ActionMessage And OtherUIDS');
-        const { actionMessage, otherUIDS } = await ctx.service.imap.getActionMessageAndOtherUIDS(ctx, messages);
+        const { actionMessage, otherUIDS, username } = await ctx.service.imap.getActionMessageAndOtherUIDS(ctx, messages);
         // action task
         console.log(new Date(), 'get Email Folder');
+        const token = await ctx.service.jwtUtils.getToken({ content: { username }, expiresIn: app.config.jwt.expiresIn });
         const result = await ctx.service.syncActiviti.getEmailFolder(actionMessage, { headers: { Authorization: 'Bearer ' + token } });
         console.log(new Date(), 'get Folders');
         const folders = await ctx.service.imap.getFolders(result, otherUIDS, actionMessage);

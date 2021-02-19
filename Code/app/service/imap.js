@@ -208,6 +208,7 @@ module.exports = app => {
           actionMessages: messages.filter(_ => !_.error),
         },
         otherUIDS,
+        username: users && users.length > 0 && users[0] ? users[0].sAMAccountName : '',
       };
     }
 
