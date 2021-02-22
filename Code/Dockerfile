@@ -19,7 +19,7 @@ COPY . /home/node-app/aaa-server
 
 # 安装npm依赖(使用淘宝的镜像源)
 # 如果使用的境外服务器，无需使用淘宝的镜像源，即改为`RUN npm i`。
-RUN npm --production --registry install
+RUN npm  --production install
 
 
 # 暴露容器端口
