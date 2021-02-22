@@ -29,16 +29,17 @@ module.exports = app => {
 
     /**
      *
-     * @param {string} appType VM application type, like 'IIS'
-     * @param {string} reference Table tenant_hostname_reference column reference
+     * @param {String} appType VM application type, like 'IIS'
+     * @param {String} reference Table tenant_hostname_reference column reference
+     * @param {String} prefix Hostname prefix
      * @return {Object} hostname last char list
      */
-    async getLastCharList(appType, reference) {
+    async getLastCharList(appType, reference, prefix) {
       const { ctx } = this;
       const { Op } = app.Sequelize;
       const vmGuestList = await ctx.model.models.vm_guest.findAll({
         where: {
-          hostname: { [Op.like]: `%${('WCDC' + appType + reference).toUpperCase()}%` },
+          hostname: { [Op.like]: `%${(prefix + appType + reference).toUpperCase()}%` },
           status: { [Op.ne]: 'fail' },
         },
         attributes: [ 'status', 'hostname' ],
@@ -50,8 +51,8 @@ module.exports = app => {
         'v', 'w', 'x', 'y', 'z',
       ];
       const alreadyUsedCharList = [];
-      for (let i = 0; i < vmGuestList.length; i++) {
-        alreadyUsedCharList.push(vmGuestList[i].hostname.charAt(vmGuestList[i].hostname.length - 1));
+      for (const vmGuest of vmGuestList) {
+        alreadyUsedCharList.push(vmGuest.hostname.split('').pop());
       }
       // 求差集
       return [ ...new Set([ ...new Set(lastCharList) ].filter(x => !new Set(alreadyUsedCharList).has(x))) ];
@@ -70,7 +71,7 @@ module.exports = app => {
       if (!referenceList) return false;
       let flag = false;
       for (let i = 0; i < referenceList.length; i++) {
-        const lastCharList = await this.getLastCharList(applicationType, referenceList[i]);
+        const lastCharList = await this.getLastCharList(applicationType, referenceList[i], hostname_prefix);
         for (let j = 0; j < lastCharList.length; j++) {
           const hostName = `${hostname_prefix}${applicationType}${referenceList[i]}${lastCharList[j]}`;
           hostNameList.push(hostName);
@@ -101,7 +102,7 @@ module.exports = app => {
       const referenceList = await this.getReferenceList(tenantId);
       if (!referenceList) return false;
       for (let i = 0; i < referenceList.length; i++) {
-        const lastCharList = await this.getLastCharList(applicationType, referenceList[i]);
+        const lastCharList = await this.getLastCharList(applicationType, referenceList[i], hostname_prefix);
         for (let j = 0; j < lastCharList.length; j++) {
           const hostName = `${hostname_prefix}${applicationType}${referenceList[i]}${lastCharList[j]}`;
           hostNameList.push(hostName);
@@ -145,17 +146,19 @@ module.exports = app => {
     }
 
     /**
-     * @param {string} vm
+     * @param {Object} vm
      * @return {Promise<string>} hostnamePrefix
      */
     async getPrefix(vm) {
       const { ctx } = this;
       const typeId = vm.environment_type ? vm.environment_type.id : 0;
       const zoneId = vm.network_zone ? vm.network_zone.id : 0;
+      const platformId = vm.platform ? vm.platform.id : 0;
       const vm_type_zone_cdc = await ctx.model.models.vm_type_zone_cdc.findOne({
         where: {
           typeId,
           zoneId,
+          platformId,
         },
       });
       let result = null;
