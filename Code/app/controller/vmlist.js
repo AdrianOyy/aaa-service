@@ -9,7 +9,9 @@ module.exports = app => {
       try {
         const idString = '(' + idList.join(',') + ')';
         const updateSql = `update ${childFormKey}${version} set status = '${status}' where id in ${idString}`;
+        console.log(new Date(), 'updateStatus: ' + updateSql);
         const [ updateResults ] = await app.model.query(updateSql);
+        ctx.logger.info(new Date(), 'updateStatus: ' + updateSql);
         ctx.success({ result: true, affectedRows: updateResults.affectedRows });
       } catch (error) {
         ctx.logger.error(error);
