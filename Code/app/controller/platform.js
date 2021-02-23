@@ -28,6 +28,13 @@ module.exports = app => {
             createdAt ? { createdAt } : undefined,
             updatedAt ? { updatedAt } : undefined
           ),
+          include: [
+            {
+              model: ctx.model.models.vm_platform_type,
+              as: 'vm_platform_type',
+              attributes: [ 'name' ],
+            },
+          ],
           order: Order,
           offset,
           limit,
