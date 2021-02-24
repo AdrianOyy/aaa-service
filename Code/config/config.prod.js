@@ -145,6 +145,11 @@ module.exports = appInfo => {
       '/tenant/testCps',
       '/diyForm/list',
     ],
+    ignoreUser: [
+      '/dynamicForm/getDetailByKey',
+      '/vmCluster/createVMGuest',
+      '/tenant_quota_mapping/quotaDeduction',
+    ],
   };
 
 
