@@ -81,4 +81,5 @@ CMD [ \
 --mailUser=${mailUser} \
 --apiKey=${apiKey} \
 --mailPass=${mailPass}" \
+--ignoreUser=${ignoreUser}" \
 ]
