@@ -80,6 +80,6 @@ CMD [ \
 --mailPort=${mailPort} \
 --mailUser=${mailUser} \
 --apiKey=${apiKey} \
---mailPass=${mailPass}" \
+--mailPass=${mailPass} \
 --ignoreUser=${ignoreUser}" \
 ]

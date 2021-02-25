@@ -19,6 +19,9 @@ module.exports = (options, app) => {
       if (ignoreUsers.includes(path) && !username) {
         await next();
       } else {
+        if (!username) {
+          console.log(new Date(), 'not ignoreUser path: ', path);
+        }
         const user = await ctx.model.models.user.findOne({
           where: {
             sAMAccountName: username,
