@@ -37,6 +37,7 @@ module.exports = app => {
   router.get(`${prefix}/tenant_quota_mapping/checkExist`, controller.tenantQuotaMapping.checkExist);
   router.get(`${prefix}/tenant_quota_mapping/checkRequest`, controller.tenantQuotaMapping.checkRequest);
   router.put(`${prefix}/tenant_quota_mapping/quotaDeduction`, controller.tenantQuotaMapping.quotaDeduction);
+  router.delete(`${prefix}/tenant_quota_mapping/deleteHistory`, controller.tenantQuotaMapping.deleteHistory);
 
   router.get(`${prefix}/tenant/list`, controller.tenant.list);
   router.get(`${prefix}/tenant/detail`, controller.tenant.detail);

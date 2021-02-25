@@ -5,8 +5,8 @@ module.exports = app => {
     async verifyQuota() {
       const { ctx } = this;
       const { Op } = app.Sequelize;
-      const { workflowId, formKey, version } = ctx.query;
-      const formId = await ctx.service.dynamicForm.getFormIdByPid(formKey, version, workflowId);
+      const { workflowId, formKey, version, formId } = ctx.query;
+      // const formId = await ctx.service.dynamicForm.getFormIdByPid(formKey, version, workflowId);
       if (!formId) {
         ctx.success({ pass: false });
         return;

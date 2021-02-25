@@ -188,41 +188,65 @@ module.exports = app => {
 
     async quotaDeduction() {
       const { ctx } = this;
-      const { type, number, year, tenantId } = ctx.request.body;
-      if (!type || !number || !year || !tenantId) {
-        ctx.error();
-        return;
-      }
-      if (!isInt(number)) {
-        ctx.error('Bad params "Number"');
-        return;
-      }
-      if (!isInt(year)) {
-        ctx.error('Bad params "Year"');
-        return;
-      }
-      if (!isInt(tenantId)) {
-        ctx.error('Bad Params "Tenant Id"');
-        return;
-      }
+      const { types, year, tenantId, workflowId } = ctx.request.body;
       const transaction = await this.ctx.model.transaction();
       try {
-        const oldModel = await ctx.model.models.tenant_quota_mapping.findOne({
+        await ctx.model.models.resource_request_history.destroy({
           where: {
-            type,
-            year,
-            tenantId,
+            workflowId,
+            status: 'pending',
           },
-        });
-        if (!oldModel) throw new Error('Can not find data');
-        const { quota } = oldModel;
-        if (!quota || parseInt(quota) < parseInt(number)) throw new Error('request number is greater than quota');
-        await oldModel.update({ quota: quota - number }, { transaction });
+        }, { transaction });
+        for (let index = 0; index < types.length; index++) {
+          const element = types[index];
+          const typeAndNumber = element.split(',');
+          const type = typeAndNumber[0];
+          const requestNum = typeAndNumber[1];
+          const tenant_quota_mapping = await ctx.model.models.tenant_quota_mapping.findOne({
+            where: {
+              type,
+              year,
+              tenantId,
+            },
+            raw: true,
+          }, { transaction });
+          if (!tenant_quota_mapping) throw new Error('Can not find tenant_quota_mapping type: ' + type + ', year: ' + year + ', tenantId: ' + tenantId);
+          const resource_request_history = {
+            workflowId,
+            tenantQuotaMappingId: tenant_quota_mapping.id,
+            status: 'success',
+            requestNum,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+          await ctx.model.models.resource_request_history.create(resource_request_history, { transaction });
+        }
         await transaction.commit();
-        ctx.success();
       } catch (error) {
         await transaction.rollback();
-        ctx.error(error.message);
+        console.log(error.message);
+      }
+      ctx.success();
+    }
+
+    async deleteHistory() {
+      const { ctx } = this;
+      const { workflowId } = ctx.query;
+      if (!workflowId) ctx.error();
+      try {
+        await ctx.model.models.resource_request_history.destroy({
+          where: {
+            workflowId,
+            status: 'pending',
+          },
+        });
+        console.log(new Date(), 'deleteHistory workflowId', workflowId);
+        ctx.success();
+      } catch (error) {
+        console.log('error==========================error');
+        console.log(error.message);
+        console.log('error==========================error');
+        ctx.error('service busy');
       }
     }
   };
