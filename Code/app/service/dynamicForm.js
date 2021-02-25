@@ -341,6 +341,29 @@ module.exports = app => {
       });
       return !!count;
     }
+
+    async getChildFormKey(formKey, version) {
+      const model = this.ctx.model.models;
+      const res = await model.dynamicForm.findOne({
+        where: {
+          formKey,
+          version,
+        },
+        include: {
+          model: model.dynamicForm,
+          required: true,
+          as: 'childTable',
+          attributes: [ 'id', 'formKey' ],
+        },
+      });
+      return (res && res.childTable && res.childTable[0] && res.childTable[0].formKey) || false;
+    }
+
+    async getFormIdByPid(formKey, version, pid) {
+      const SQL = `SELECT id FROM ${formKey}${version} WHERE pid='${pid}';`;
+      const [[ res ]] = await app.model.query(SQL);
+      return res ? res.id : false;
+    }
   };
 };
 
