@@ -6,6 +6,7 @@ module.exports = (options, app) => {
     const { ignore, ignoreUser } = options;
     const { url } = ctx.request;
     const path = url.split('?')[0];
+    const ignoreUsers = ignoreUser.split(',');
     if (!ignore.includes(path)) {
       const { authorization } = ctx.header;
       if (!authorization) {
@@ -15,7 +16,9 @@ module.exports = (options, app) => {
       const { username, iss, exp } = jwt.decode(authorization.slice(7), app.config.jwt.secret);
       if (iss !== app.config.jwt.iss) ctx.throw(401);
       if ((new Date() - 0) / 1000 - exp > 0) ctx.throw(401);
-      if (!ignoreUser.includes(path)) {
+      if (ignoreUsers.includes(path) && !username) {
+        await next();
+      } else {
         const user = await ctx.model.models.user.findOne({
           where: {
             sAMAccountName: username,
@@ -34,8 +37,6 @@ module.exports = (options, app) => {
         if (ctx.response.body) {
           Object.assign(ctx.response.body, { newToken });
         }
-      } else {
-        await next();
       }
     }
   };

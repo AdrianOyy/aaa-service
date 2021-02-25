@@ -13,25 +13,26 @@ module.exports = app => {
         return;
       }
       try {
-        console.log(new Date(), 'create box', 'namespace', namespace);
+        ctx.logger.info(new Date(), 'create box', 'namespace', namespace);
         await ctx.service.imap.createBox(namespace);
-        console.log(new Date(), 'fetch Messages', 'fetchIndex', fetchIndex);
+        ctx.logger.info(new Date(), 'fetch Messages', 'fetchIndex', fetchIndex);
         const messages = await ctx.service.imap.fetchMessages(fetchIndex);
         if (!messages || messages.length <= 0) {
           return;
         }
-        console.log(new Date(), 'get ActionMessage And OtherUIDS');
+        ctx.logger.info(new Date(), 'get ActionMessage And OtherUIDS');
         const { actionMessage, otherUIDS, username } = await ctx.service.imap.getActionMessageAndOtherUIDS(ctx, messages);
         // action task
-        console.log(new Date(), 'get Email Folder');
+        ctx.logger.info(new Date(), 'get Email Folder');
         const token = await ctx.service.jwtUtils.getToken({ content: { username }, expiresIn: app.config.jwt.expiresIn });
         const result = await ctx.service.syncActiviti.getEmailFolder(actionMessage, { headers: { Authorization: 'Bearer ' + token } });
-        console.log(new Date(), 'get Folders');
+        ctx.logger.info(new Date(), 'get Folders');
         const folders = await ctx.service.imap.getFolders(result, otherUIDS, actionMessage);
-        console.log(new Date(), 'before moveTo', folders);
+        ctx.logger.info(new Date(), 'before moveTo', folders);
         await ctx.service.imap.moveTo(folders);
-        console.log(new Date(), 'after moveTo');
+        ctx.logger.info(new Date(), 'after moveTo');
       } catch (error) {
+        ctx.logger.error(new Date(), 'task error', error);
         console.log(new Date(), 'task error', error);
       }
     },
