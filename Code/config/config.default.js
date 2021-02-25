@@ -154,6 +154,7 @@ module.exports = appInfo => {
       '/test/test',
       '/diyForm/list',
     ],
+    ignoreUser: process.env.npm_config_ignoreUser || '/dynamicForm/getDetailByKey,/vmCluster/createVMGuest,/tenant_quota_mapping/quotaDeduction',
   };
 
 
