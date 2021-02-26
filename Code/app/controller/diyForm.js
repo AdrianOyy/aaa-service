@@ -153,10 +153,22 @@ module.exports = app => {
           activitiData.variables.manager_user_id = userIds;
         }
       }
+      this.startProcess(ctx, activitiData, formKey, version, parentId, childInsertSQLList, childFormKey);
+      // 延时3秒
+      await new Promise(resolve => {
+        setTimeout(() => {
+          resolve();
+        }, 3000);
+      });
+      ctx.success();
+    }
+
+    async startProcess(ctx, activitiData, formKey, version, parentId, childInsertSQLList, childFormKey) {
       // 启动流程
       const { pid, message, error } = await ctx.service.syncActiviti.startProcess(activitiData, { headers: ctx.headers });
       if (error) {
         ctx.error(message);
+        console.log(new Date() + ' create processs startProcess error, message: ', message, ' pid: ', pid);
         return;
       }
 
@@ -167,12 +179,7 @@ module.exports = app => {
         const childUpdateSQL = `UPDATE ${childFormKey}${version} SET pid = ${pid} where parentId = ${parentId}`;
         updateSQL.push(childUpdateSQL);
       }
-      const updateFormRes = await ctx.service.sql.transaction(updateSQL);
-      if (updateFormRes.success) {
-        ctx.success();
-      } else {
-        ctx.error();
-      }
+      await ctx.service.sql.transaction(updateSQL);
     }
 
     async detail() {
