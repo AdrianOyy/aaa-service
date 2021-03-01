@@ -176,19 +176,38 @@ module.exports = app => {
               await newModel.update(VMCluster);
             }
           }
-          const ip_assignment = await ctx.model.models.ip_assignment.findOne({
+          const ip_assignment_atl = await ctx.model.models.ip_assignment.findOne({
             raw: true,
             where: {
               IP: vmGuest.ATLIP,
+              networkType: 'Cat F - ATL',
             },
             attributes: [ 'id' ],
           });
-          const newModel = await ctx.model.models.ip_assignment.findByPk(ip_assignment.id);
-          ip_assignment.hostname = vmGuest.hostname;
-          ip_assignment.projectTeam = vmGuest.projectCode;
-          ip_assignment.assignedDate = new Date();
-          console.log(new Date(), ' update resource update ip_assignment', ip_assignment);
-          await newModel.update(ip_assignment);
+          if (ip_assignment_atl) {
+            const newModel = await ctx.model.models.ip_assignment.findByPk(ip_assignment_atl.id);
+            ip_assignment_atl.hostname = vmGuest.hostname;
+            ip_assignment_atl.projectTeam = vmGuest.projectCode;
+            ip_assignment_atl.assignedDate = new Date();
+            console.log(new Date(), ' update resource update ip_assignment atl', ip_assignment_atl);
+            await newModel.update(ip_assignment_atl);
+          }
+          const ip_assignment_os= await ctx.model.models.ip_assignment.findOne({
+            raw: true,
+            where: {
+              IP: vmGuest.hostIP,
+              networkType: 'Cat C - OS',
+            },
+            attributes: [ 'id' ],
+          });
+          if (ip_assignment_os) {
+            const newModel = await ctx.model.models.ip_assignment.findByPk(ip_assignment_os.id);
+            ip_assignment_os.hostname = vmGuest.hostname;
+            ip_assignment_os.projectTeam = vmGuest.projectCode;
+            ip_assignment_os.assignedDate = new Date();
+            console.log(new Date(), ' update resource update ip_assignment os', ip_assignment_os);
+            await newModel.update(ip_assignment_os);
+          }
           console.log(new Date(), ' update resource create vmGuest', vmGuest);
           vmGuests.push(vmGuest);
         }
