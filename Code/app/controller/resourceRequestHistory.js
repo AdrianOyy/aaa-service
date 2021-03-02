@@ -60,20 +60,22 @@ module.exports = app => {
       }
       ctx.success({ pass });
       // 最后才更新资源
-      const modelList = [];
-      for (const tenantQuotaMapping of tenantQuotaMappingList) {
-        const { id, type } = tenantQuotaMapping;
-        const model = {
-          workflowId,
-          tenantQuotaMappingId: id,
-          status: 'pending',
-          requestNum: requestMap.get(type),
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        };
-        modelList.push(model);
+      if (pass) {
+        const modelList = [];
+        for (const tenantQuotaMapping of tenantQuotaMappingList) {
+          const { id, type } = tenantQuotaMapping;
+          const model = {
+            workflowId,
+            tenantQuotaMappingId: id,
+            status: 'pending',
+            requestNum: requestMap.get(type),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+          modelList.push(model);
+        }
+        ctx.model.models.resource_request_history.bulkCreate(modelList);
       }
-      ctx.model.models.resource_request_history.bulkCreate(modelList);
     }
   };
 };

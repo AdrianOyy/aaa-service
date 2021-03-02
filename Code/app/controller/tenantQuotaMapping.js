@@ -40,6 +40,24 @@ module.exports = app => {
           offset,
           limit,
         });
+        // 查询currentQuota
+        const resource_request_historys = await ctx.model.models.resource_request_history.findAll({
+          raw: true,
+          attributes: [ 'tenantQuotaMappingId', 'status' ],
+        });
+        if (res && res.rows && res.rows.length > 0) {
+          res.rows = res.rows.map(tenant_quota_mapping => {
+            let currentQuota = 0;
+            if (resource_request_historys) {
+              const filterPending = resource_request_historys.filter(_ => _.tenantQuotaMappingId === tenant_quota_mapping.dataValues.id && _.status === 'pending');
+              const filterSuccess = resource_request_historys.filter(_ => _.tenantQuotaMappingId === tenant_quota_mapping.dataValues.id && _.status === 'success');
+              currentQuota = filterPending ? (currentQuota + filterPending.length) : currentQuota;
+              currentQuota = filterSuccess ? (currentQuota + filterSuccess.length) : currentQuota;
+            }
+            tenant_quota_mapping.dataValues.currentQuota = currentQuota;
+            return tenant_quota_mapping;
+          });
+        }
         ctx.success(res);
       } catch (error) {
         ctx.logger.error(error);

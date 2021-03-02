@@ -31,6 +31,20 @@ module.exports = app => {
           offset,
           limit,
         });
+        // 根据tenantId查询tenant
+        const tenants = await ctx.model.models.tenant.findAll({
+          raw: true,
+          attributes: [ 'id', 'name', 'code' ],
+        });
+        if (tenants && res && res.rows && res.rows.length > 0) {
+          res.rows = res.rows.map(vm_guest => {
+            const filterTenants = tenants.filter(_ => _.id === vm_guest.dataValues.tenantId);
+            if (filterTenants && filterTenants[0] && filterTenants[0].name) {
+              vm_guest.dataValues.tenant = filterTenants[0].name;
+            }
+            return vm_guest;
+          });
+        }
         ctx.success(res);
       } catch (error) {
         ctx.logger.error(error);
