@@ -341,7 +341,7 @@ module.exports = app => {
         fileList.push({
           fieldName: 'os_ip',
           error: true,
-          message: 'OS IP is not found ip assign',
+          message: 'OS IP is not found',
         });
       }
       if (atlResult) {
@@ -357,7 +357,7 @@ module.exports = app => {
         fileList.push({
           fieldName: 'atl_ip',
           error: true,
-          message: 'ATL IP is not found ip assign',
+          message: 'ATL IP is not found',
         });
       }
       // TODO 3. 确定新的 vm type
