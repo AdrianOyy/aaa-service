@@ -63,9 +63,13 @@ module.exports = app => {
       try {
         const { username, password } = ctx.request.body;
         if (!username || !password) ctx.error();
+        ctx.logger.info('user login authenticate start');
         const auth = await ctx.service.adService.authenticate(username, password);
+        ctx.logger.info('user login authenticate end');
         if (auth) {
+          ctx.logger.info('user login loadUser start');
           const user = await ctx.service.user.loadUser(auth);
+          ctx.logger.info('user login loadUser end');
           if (user) {
             const groupList = [];
             // const userGroup = await ctx.model.models.user_group_mapping.findAll({ where: { userId: user.id } });
@@ -86,7 +90,7 @@ module.exports = app => {
           ctx.success(auth);
         }
       } catch (error) {
-        console.log(error.message);
+        ctx.logger.error(error.message);
         ctx.error();
       }
     }
