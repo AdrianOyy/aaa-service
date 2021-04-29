@@ -15,6 +15,7 @@ module.exports = app => {
         csv: '',
       };
       for (const vmm of vmmList) {
+        console.log(new Date() + ': getInMasterList vmm', vmm);
         if (!vmm.isRamCsv) {
           continue;
         }
@@ -40,6 +41,7 @@ module.exports = app => {
         vmm.orderByRam = setFloat(vmm.FreeDiskSize, vmm.TotalDiskSize);
         clusterInList.push(vmm);
       }
+      console.log(new Date() + ': getInMasterList clusterInList.length ', clusterInList);
       if (clusterInList.length > 0) {
         clusterInList = _.orderBy(clusterInList, [ 'orderByCPU', 'orderByMemory', 'orderByRam' ], [ 'desc', 'desc', 'desc' ]);
         for (const cluster of clusterInList) {
@@ -62,10 +64,12 @@ module.exports = app => {
             isMaster = true;
             break;
           }
+          console.log(new Date() + ': getInMasterList isMaster ' + isMaster);
           if (isMaster) {
             // 判断CSV
             const csvList = cluster.DatastoreDetails.filter(t => t.isCsv === true);
             const cList = _.orderBy(csvList, [ 'orderByCsv' ], [ 'desc' ]);
+            console.log(new Date() + ': getInMasterList cList length ' + cList.length);
             if (cList.length > 0) {
               rmaster.csv = cList[0].name;
               break;
