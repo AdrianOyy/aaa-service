@@ -46,7 +46,7 @@ module.exports = app => {
         if ((hci.TotalMemory * 0.2) > (hci.FreeMemory - vm.ram_request_number * 1024)) {
           continue;
         }
-        if ((hci.NumberofCPU * 2.5 * 0.2) > (hci.NumberofCPU * 2 - vm.cpu_request_number - hci.NoCPUUsed)) {
+        if ((hci.NumberofCPU * 2.5 * 0.2) > (hci.NumberofCPU * 2.5 - vm.cpu_request_number - hci.NoCPUUsed)) {
           continue;
         }
         hci.orderByMemory = setFloat(hci.FreeMemory, hci.TotalMemory);
@@ -306,7 +306,7 @@ module.exports = app => {
           hciResult.message = ' vm_cluster ram_request_number beyond 80% ';
           return hciResult;
         }
-        if (hci.NumberofCPU * 2.5 * 0.2 > hci.NumberofCPU * 2 - vm.cpu_request_number - hci.NoCPUUsed) {
+        if (hci.NumberofCPU * 2.5 * 0.2 > hci.NumberofCPU * 2.5 - vm.cpu_request_number - hci.NoCPUUsed) {
           hciResult.error = true;
           hciResult.done = true;
           hciResult.message = ' vm_cluster cpu beyond 80% ';
