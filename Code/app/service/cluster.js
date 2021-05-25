@@ -33,7 +33,7 @@ module.exports = app => {
         if ((vmm.TotalMemory * 0.2) > (vmm.FreeMemory - vm.ram_request_number * 1024)) {
           continue;
         }
-        if ((vmm.NumberofCPU * 2 * 0.25) > (vmm.NumberofCPU * 2 - vm.cpu_request_number - vmm.NoCPUUsed)) {
+        if ((vmm.NumberofCPU * 2.5 * 0.2) > (vmm.NumberofCPU * 2 - vm.cpu_request_number - vmm.NoCPUUsed)) {
           continue;
         }
         vmm.orderByMemory = setFloat(vmm.FreeMemory, vmm.TotalMemory);
@@ -57,7 +57,7 @@ module.exports = app => {
             if (master.TotalMemory * 0.2 > master.FreeMemory - vm.ram_request_number * 1024) {
               continue;
             }
-            if (master.NumberofCPU * 2 * 0.25 > master.NumberofCPU * 2 - vm.cpu_request_number - master.NoCPUUsed) {
+            if (master.NumberofCPU * 2.5 * 0.2 > master.NumberofCPU * 2 - vm.cpu_request_number - master.NoCPUUsed) {
               continue;
             }
             rmaster.vm_master = master['Esxi Name'];
@@ -253,7 +253,7 @@ module.exports = app => {
           vmResult.message = ' vm_cluster ram_request_number beyond 80% ';
           return vmResult;
         }
-        if (vmm.NumberofCPU * 2 * 0.25 > vmm.NumberofCPU * 2 - vm.cpu_request_number - vmm.NoCPUUsed) {
+        if (vmm.NumberofCPU * 2.5 * 0.2 > vmm.NumberofCPU * 2 - vm.cpu_request_number - vmm.NoCPUUsed) {
           vmResult.error = true;
           vmResult.done = true;
           vmResult.message = ' vm_cluster cpu_request_number beyond 80% ';
@@ -269,7 +269,7 @@ module.exports = app => {
             vmResult.message = ' vm_master ram_request_number beyond 80% ';
             return vmResult;
           }
-          if (master.NumberofCPU * 2 * 0.25 > master.NumberofCPU * 2 - vm.cpu_request_number - master.NoCPUUsed) {
+          if (master.NumberofCPU * 2.5 * 0.2 > master.NumberofCPU * 2 - vm.cpu_request_number - master.NoCPUUsed) {
             vmResult.fieldName = 'vm_master';
             vmResult.error = true;
             vmResult.done = true;
