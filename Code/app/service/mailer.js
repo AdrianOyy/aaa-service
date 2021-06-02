@@ -21,7 +21,7 @@ module.exports = app => {
       const transporter = nodemailer.createTransport(app.config.mailer);
 
       const mailOptions = {
-        from, // 发送人
+        from: from ? from : app.config.mailer.auth.user, // 发送人
         to, // 收件人
         cc, // 抄送人
         subject, // Subject line
