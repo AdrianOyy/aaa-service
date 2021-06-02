@@ -17,6 +17,20 @@ module.exports = app => {
       return info;
     }
 
+    async sentMailTask(from, to, cc, subject, html) {
+      const transporter = nodemailer.createTransport(app.config.mailer);
+
+      const mailOptions = {
+        from, // 发送人
+        to, // 收件人
+        cc, // 抄送人
+        subject, // Subject line
+        html, // html body
+      };
+      const info = await transporter.sendMail(mailOptions);
+      return info;
+    }
+
     async getBody(checkName, tenantName, justification, displayname) {
       let html = '<!DOCTYPE html>' +
       '<html xmlns="http://www.w3.org/1999/xhtml">' +

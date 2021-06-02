@@ -175,5 +175,7 @@ module.exports = app => {
 
   router.get(`${prefix}/procedure/call`, controller.procedure.call);
 
+  router.post(`${prefix}/mail/sendMail`, controller.mail.sendMail);
+
   router.get('/test/test', controller.test.test);
 };
