@@ -30,6 +30,16 @@ module.exports = app => {
       for (let i = startNum - front; i < startNum + num - front; i++) {
         closestList.push(IPList[i]);
       }
+      if (!closestList) {
+        console.log(new Date() + ' !closestList IPNumArr');
+        for (let i = 0; i < IPList.length; i++) {
+          console.log('IPNumArr ' + i + ' IPList[i].IP: ' + IPList[i].IP + ' IP2Num(IPList[i].IP): ' + IP2Num(IPList[i].IP));
+        }
+        for (let i = 1; i < IPNumArr.length; i++) {
+          console.log('distanceList ' + i + ' ' + (IPNumArr[i] - IPNumArr[i - 1]));
+        }
+        console.log(new Date() + ' windowWidth:', windowWidth, ' startNum:', startNum + ' startNum + num - distanceList.length - 1', (startNum + num - distanceList.length - 1));
+      }
       return closestList;
     }
 
@@ -63,7 +73,10 @@ module.exports = app => {
         attributes: [ 'id', 'IP', 'networkType' ],
         order: [[ 'IP', 'ASC' ]],
       });
-      if (IPList.length < requestNum * 2) return false;
+      if (IPList.length < requestNum * 2) {
+        console.log(new Date() + ' assign failed: IPList.length < requestNum * 2');
+        return false;
+      }
       const CList = [];
       const FList = [];
       IPList.forEach(el => {
@@ -73,7 +86,10 @@ module.exports = app => {
           FList.push(el.dataValues);
         }
       });
-      if (CList.length < requestNum || FList.length < requestNum) return false;
+      if (CList.length < requestNum || FList.length < requestNum) {
+        console.log(new Date() + ' assign failed: CList.length < requestNum || FList.length < requestNum', CList.length < requestNum, FList.length < requestNum);
+        return false;
+      }
 
       let Cres = [],
         Fres = [];
@@ -84,7 +100,10 @@ module.exports = app => {
         Cres = [ CList[0] ];
       } else {
         const closestList = await this.getClosest(CList, parseInt(requestNum));
-        if (!closestList) return false;
+        if (!closestList) {
+          console.log(new Date() + ' assign failed: CList getClosest return false');
+          return false;
+        }
         Cres = closestList;
       }
       if (FList.length === parseInt(requestNum)) {
@@ -93,7 +112,10 @@ module.exports = app => {
         Fres = [ FList[0] ];
       } else {
         const closestList = await this.getClosest(FList, parseInt(requestNum));
-        if (!closestList) return false;
+        if (!closestList) {
+          console.log(new Date() + ' assign failed: FList getClosest return false');
+          return false;
+        }
         Fres = closestList;
       }
       return [ Cres, Fres ];
