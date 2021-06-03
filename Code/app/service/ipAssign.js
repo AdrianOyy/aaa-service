@@ -73,8 +73,8 @@ module.exports = app => {
         attributes: [ 'id', 'IP', 'networkType' ],
         order: [[ 'IP', 'ASC' ]],
       });
-      if (IPList.length < requestNum * 2) {
-        console.log(new Date() + ' assign failed: IPList.length < requestNum * 2');
+      if (IPList.length < requestNum) {
+        console.log(new Date() + ' assign failed: IPList.length < requestNum');
         return false;
       }
       const CList = [];
