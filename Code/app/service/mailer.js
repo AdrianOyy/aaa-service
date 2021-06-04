@@ -54,10 +54,10 @@ module.exports = app => {
           break;
       }
       html += '<br />' +
-          '<div style="margin-top: 10px;">Requester: ' + displayname + '</div>' +
-          '<div style="margin-top: 10px;">Project: ' + tenantName + '</div>' +
-          '<div style="margin-top: 10px;">Justification: ' + justification + '</div>' +
-          '<br />' +
+          // '<div style="margin-top: 10px;">Requester: ' + displayname ? displayname : app.config.mailer.auth.user + '</div>' +
+          // '<div style="margin-top: 10px;">Project: ' + tenantName + '</div>' +
+          // '<div style="margin-top: 10px;">Justification: ' + justification + '</div>' +
+          // '<br />' +
           '<div style="margin-top: 10px;">Please click the link to view details.</div>' +
           '<div style="margin-top: 10px;">' +
               '<a href="' + app.config.mailGroup.frontEndUrl + '" target="_blank">' + app.config.mailGroup.frontEndUrl + '</a>' +
@@ -77,7 +77,8 @@ module.exports = app => {
         if (groupNames.length > 0) {
           const groups = await ctx.service.adService.getUsersForGroup(groupNames);
           // eslint-disable-next-line no-empty
-          for (const user of groups) {
+          // const groups = [{user:{mail:'rexshen@apjcorp.com'}}, {user:{mail:'adrianouyang@apjcorp.com'}}]
+          for (const { user } of groups) {
             if (user.mail) {
               const html = await this.getBody(checkName, tenantName, justification, displayname);
               this.sentMail(user.mail, 'A VM allocation request is pending for your handle.', html);

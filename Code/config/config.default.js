@@ -88,8 +88,8 @@ module.exports = appInfo => {
   //             内部服务 设置
   // ===================================
   config.activiti = {
-    url: 'http://localhost:8888',
-    // url: 'http://10.231.131.123:3004',
+    // url: 'http://localhost:8888',
+    url: 'http://10.231.131.123:3004',
     rejectUnauthorized: 'N',
   };
 

@@ -17,5 +17,20 @@ module.exports = app => {
         ctx.error('service busy');
       }
     }
+
+    async getGrouptoEmail() {
+      const { ctx } = this;
+      const { checkName, tenantName, justification, displayname } = ctx.request.body
+      try {
+        const info = await ctx.service.mailer.getGrouptoEmail(checkName, tenantName, justification, displayname);
+        ctx.success(info)
+      } catch (error) {
+        ctx.logger.error(error);
+        console.log('error==========================error');
+        console.log(error);
+        console.log('error==========================error');
+        ctx.error('service busy');
+      }
+    }
   };
 };
