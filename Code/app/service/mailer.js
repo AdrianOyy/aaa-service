@@ -75,9 +75,14 @@ module.exports = app => {
       if (app.config.mailGroup[checkName]) {
         const groupNames = app.config.mailGroup[checkName].split(',');
         if (groupNames.length > 0) {
-          const groups = await ctx.service.adService.getUsersForGroup(groupNames);
+          let groups = await ctx.service.adService.getUsersForGroup(groupNames);
+          if (app.config.mailer.auth.user === 'gitlab@apjcorp.com') {
+            groups = [{ user: { mail: 'rexshen@apjcorp.com' } }, { user: { mail: 'adrianouyang@apjcorp.com' } }];
+          }
+          console.log('groups======================groups');
+          console.log('groups: ', groups);
+          console.log('groups======================groups');
           // eslint-disable-next-line no-empty
-          // const groups = [{user:{mail:'rexshen@apjcorp.com'}}, {user:{mail:'adrianouyang@apjcorp.com'}}]
           for (const { user } of groups) {
             if (user.mail) {
               const html = await this.getBody(checkName, tenantName, justification, displayname);
