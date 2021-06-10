@@ -66,7 +66,7 @@ CMD [ \
 --loadCron=${loadCron} \
 --t1=${t1} \
 --t2=${t2} \
---t6=${t3} \
+--t6=${t6} \
 --frontEndUrl=${frontEndUrl} \
 --imapFlag=${imapFlag} \
 --imapFetchIndex=${imapFetchIndex} \
