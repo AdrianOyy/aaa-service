@@ -50,7 +50,7 @@ module.exports = app => {
         where: {
           DCId: DC,
           IP,
-          hostname: { [Op.is]: null },
+          hostname: { [Op.or]: [ null, '' ] },
           networkType: type,
         },
         order: [[ 'IP', 'ASC' ]],
@@ -67,7 +67,7 @@ module.exports = app => {
       const IPList = await ctx.model.models.ip_assignment.findAll({
         where: {
           DCId: DC,
-          hostname: { [Op.is]: null },
+          hostname: { [Op.or]: [ null, '' ] },
           networkType: { [Op.or]: [ 'Cat C - OS', 'Cat F - ATL' ] },
         },
         attributes: [ 'id', 'IP', 'networkType' ],
