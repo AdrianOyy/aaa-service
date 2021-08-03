@@ -13,14 +13,14 @@ docker run -dit \
 -p 3003:7001 \
 -e dbType=mysql \
 -e dbName=aaa_service \
--e dbHost=10.231.131.123 \
+-e dbHost=10.240.131.123 \
 -e dbPort=3306 \
 -e dbUser=admin \
 -e dbPassword=APJ@com123 \
 -e procedureDBName=nsr_gis_app \
--e activitiUrl=10.231.131.123:3004 \
--e transitionHost=10.231.131.123:3000 \
--e outboundUrl=10.231.131.123:8000 \
+-e activitiUrl=10.240.131.123:3004 \
+-e transitionHost=10.240.131.123:3000 \
+-e outboundUrl=10.240.131.123:8000 \
 -e adPrefix=/adService \
 -e cpsPrefix=/CPS \
 -e CUIDPrefix=/CUID \
@@ -32,7 +32,7 @@ docker run -dit \
 -e t1=IOS.ISMS \
 -e t2=IOS.ISMS \
 -e t6=IOS.ISMS \
--e frontEndUrl=http://10.231.131.123 \
+-e frontEndUrl=http://10.240.131.123 \
 -e imapFlag=Y \
 -e imapUser=gitlab@apjcorp.com \
 -e imapPass=apj.com666 \
@@ -86,7 +86,7 @@ https://cps-dev-api.cldpaast71.serverdev.hadev.org.hk
 | t1              | T1 组名                                                   |
 | t2              | T2 组名                                                   |
 | t6              | T6 组名                                                   |
-| frontEndUrl     | UAT域名 例如  http://10.231.131.123                        |
+| frontEndUrl     | UAT域名 例如  http://10.240.131.123                        |
 
 ###wwerwerwerwerwer
 

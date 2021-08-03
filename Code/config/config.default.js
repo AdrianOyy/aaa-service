@@ -20,7 +20,7 @@ module.exports = appInfo => {
         delegate: 'model',
         dialect: 'mysql', // support: mysql, mariadb, postgres, mssql
         database: 'aaa_service',
-        host: '10.231.131.123',
+        host: '10.240.131.123',
         port: '3306',
         username: 'admin',
         password: 'APJ@com123',
@@ -34,7 +34,7 @@ module.exports = appInfo => {
         delegate: 'procedureModel',
         dialect: 'mysql', // support: mysql, mariadb, postgres, mssql
         database: 'nsr_gis_app',
-        host: '10.231.131.123',
+        host: '10.240.131.123',
         port: '3306',
         username: 'admin',
         password: 'APJ@com123',
@@ -89,7 +89,7 @@ module.exports = appInfo => {
   // ===================================
   config.activiti = {
     // url: 'http://localhost:8888',
-    url: 'http://10.231.131.123:3004',
+    url: 'http://10.240.131.123:3004',
     rejectUnauthorized: 'N',
   };
 
@@ -102,7 +102,7 @@ module.exports = appInfo => {
   //             外部服务 设置
   // ===================================
   config.outbound = {
-    url: 'http://10.231.131.123:8000',
+    url: 'http://10.240.131.123:8000',
   };
 
   config.adService = {
@@ -191,7 +191,7 @@ module.exports = appInfo => {
     T1: 'IOS.ISMS',
     T2: 'IOS.ISMS',
     T6: 'IOS.ISMS',
-    frontEndUrl: 'http://10.231.131.123/',
+    frontEndUrl: 'http://10.240.131.123/',
   };
 
   config.mailer = {
