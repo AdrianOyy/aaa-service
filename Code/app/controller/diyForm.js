@@ -189,9 +189,17 @@ module.exports = app => {
         ctx.error();
         return;
       }
+      let detail;
       const dynamicForm = await ctx.model.models.dynamicForm.findOne({ where: { deploymentId, parentId: null } });
-      const childForm = await ctx.model.models.dynamicForm.findOne({ where: { parentId: dynamicForm.id } });
-      const detail = await ctx.service.diyForm.getDIYFormDetail(pid, dynamicForm.formKey, childForm ? childForm.formKey : null, dynamicForm.version);
+      if (dynamicForm) {
+        const childForm = await ctx.model.models.dynamicForm.findOne({ where: { parentId: dynamicForm.id } });
+        detail = await ctx.service.diyForm.getDIYFormDetail(pid, dynamicForm.formKey, childForm ? childForm.formKey : null, dynamicForm.version);
+      } else {
+        detail = {
+          parentData: {},
+          childDataList: null,
+        };
+      }
       ctx.success(detail);
     }
 
