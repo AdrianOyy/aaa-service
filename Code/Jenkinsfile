@@ -85,11 +85,9 @@ pipeline {
             }
 
         }
-        stage('Compile and build the image') {
+        stage('Build the mirror'){
             steps{
-                // 多了个dockerfile:build，就是激活插件生成镜像
-                sh 'cd Code && mvn clean package dockerfile:build'
-                echo '编译，构建镜像成功'
+                sh "docker build -t ${imageName} ./Code "
             }
         }
         stage('Label the image') {
@@ -135,7 +133,7 @@ pipeline {
                                         cleanRemote: false,
                                         excludes: '',
                                         // 参数说明  harbor仓库的url、harbor服务暴露的端口、项目名、容器标签、主机端口、容器端口、占位参
-                                        execCommand: "/opt/jenkins_shell/aaa-service-deploy.sh $harbor_url $harbor_project_name $project_name $tag $port $containerport placeholderparameter",
+                                        execCommand: "/opt/jenkins_shell/aaa-service-deploy.sh $harbor_url $harbor_project_name $project_name $tag $port $containerport ",
                                         execTimeout: 360000,
                                         flatten: false,
                                         makeEmptyDirs: false,
