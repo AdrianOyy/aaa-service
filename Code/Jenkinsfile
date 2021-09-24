@@ -1,0 +1,166 @@
+// git凭证id(在jenkins的全局凭证配置中可获取)
+def git_auth = 'a3e0fe22-1263-4e56-8648-0e7debe6642e'
+
+// git仓库地址
+def git_url = 'git@gitlab.apjcorp.com:ha/sense-platform/aaa-service.git'
+
+// 项目运行的端口
+def port = 3003
+
+// docker镜像对外暴露的端口
+def containerport = 7001
+
+//构建版本的名
+def tag = 'latest'
+
+//Harbor私服地址
+def harbor_url = '10.240.131.40:1180'
+
+//Harbor的项目名称
+def harbor_project_name = 'sense'
+
+//Harbor的凭证
+def harbor_auth = '2008c9e0-2f8d-4f39-a9d7-980685719cab'
+
+//定义镜像名称（构建成功的镜像名）
+def imageName = "${project_name}:${tag}"
+
+
+pipeline {
+    agent any
+    environment {
+        //根据自己的Jenkinssonarqube-scanner环境修改 （全局工具配置SonarQube Scanner）
+        scannerHome=tool 'SonarQubeScanner'
+    }
+    stages{
+        stage('Pull the source code') {
+            steps{
+                checkout([$class: 'GitSCM',
+                branches: [[name: "*/${branch}"]],
+                extensions: [],
+                userRemoteConfigs: [[
+                            credentialsId: "${git_auth}",
+                            url: "${git_url}"
+                        ]]
+                    ])
+                echo '拉取代码成功'
+           }
+        }
+        stage('Check the source code') {
+            steps{
+                //引入Jenkinssonarqube环境 （全局工具管理SonarQube servers）
+                withSonarQubeEnv('SonarQubeServer'){
+                    sh """
+                        ${scannerHome}/bin/sonar-scanner
+                    """
+                }
+                echo '源码审查完毕'
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+              script {
+                  Integer waitSeconds = 10
+                  Integer timeOutMinutes = 10
+                  Integer maxRetry = (timeOutMinutes * 60) / waitSeconds as Integer
+                  for (Integer i = 0; i < maxRetry; i++) {
+                    try {
+                      timeout(time: waitSeconds, unit: 'SECONDS') {
+                        def qg = waitForQualityGate()
+                        if (qg.status != 'OK') {
+                          error "Sonar quality gate status: ${qg.status}"
+                        } else {
+                          i = maxRetry
+                        }
+                      }
+                    } catch (Throwable e) {
+                      if (i == maxRetry - 1) {
+                        throw e
+                      }
+                    }
+                }
+              }
+               echo '成功获取扫描结果'
+            }
+
+        }
+        stage('Compile and build the image') {
+            steps{
+                // 多了个dockerfile:build，就是激活插件生成镜像
+                sh 'cd Code && mvn clean package dockerfile:build'
+                echo '编译，构建镜像成功'
+            }
+        }
+        stage('Label the image') {
+            steps{
+                //给镜像打标签
+                sh "docker tag ${imageName}  ${harbor_url}/${harbor_project_name}/${imageName}"
+            }
+        }
+        stage('Upload the image to the warehouse') {
+            steps{
+
+                //登录Harbor，并上传镜像
+                withCredentials([usernamePassword(
+                        credentialsId: "${harbor_auth}",
+                        passwordVariable: 'password',  // 就是这样的，不用替换，在jk中配置的
+                        usernameVariable: 'username')])
+                {
+                    //登录
+                    sh "docker login -u ${username} -p ${password} ${harbor_url}"
+                    //上传镜像
+                    sh "docker push ${harbor_url}/${harbor_project_name}/${imageName}"
+                    echo '镜像上传成功'
+                }
+            }
+        }
+        stage('Remove the mirror') {
+            steps{
+                //删除本地镜像
+                sh "docker rmi -f ${imageName}"
+                // 刪除打标签的镜像
+                sh "docker rmi -f ${harbor_url}/${harbor_project_name}/${imageName}"
+            }
+        }
+        stage("Remote deployment"){
+            steps{
+            //=====以下为远程调用进行项目部署========
+                sshPublisher(
+                        publishers: [
+                            sshPublisherDesc(
+                                configName: '10.240.131.123',
+                                transfers: [
+                                    sshTransfer(
+                                        cleanRemote: false,
+                                        excludes: '',
+                                        // 参数说明  harbor仓库的url、harbor服务暴露的端口、项目名、容器标签、主机端口、容器端口、占位参
+                                        execCommand: "/opt/jenkins_shell/aaa-service-deploy.sh $harbor_url $harbor_project_name $project_name $tag $port $containerport placeholderparameter",
+                                        execTimeout: 360000,
+                                        flatten: false,
+                                        makeEmptyDirs: false,
+                                        noDefaultExcludes: false,
+                                        patternSeparator: '[, ]+',
+                                        remoteDirectory: '',
+                                        remoteDirectorySDF: false,
+                                        removePrefix: '',
+                                        sourceFiles: ''
+                                )],
+                                usePromotionTimestamp: false,
+                                useWorkspaceInPromotion: false,
+                                verbose: false
+                            )])
+                }
+        }
+    }
+
+    post {
+        always {
+            emailext(
+                subject: '构建通知：${PROJECT_NAME} - Build # ${BUILD_NUMBER} -${BUILD_STATUS}!',
+                body: '${FILE,path="./Code/Email.html"}',
+                to: 'tomqi@apjcorp.com'
+            )
+        }
+    }
+}
