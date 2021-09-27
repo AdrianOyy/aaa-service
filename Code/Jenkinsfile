@@ -27,7 +27,11 @@ def imageName = "${project_name}:${tag}"
 
 
 pipeline {
-    agent any
+    agent {
+        node {
+            label "master"
+        }
+    }
     environment {
         //根据自己的Jenkinssonarqube-scanner环境修改 （全局工具配置SonarQube Scanner）
         scannerHome=tool 'SonarQubeScanner'
