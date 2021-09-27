@@ -4,7 +4,7 @@ const { CREATE } = require('../constant/stepName');
 module.exports = app => {
   return class extends app.Service {
     async getBasicSQL(formKey, list) {
-      let fieldList = '`id` int unsigned not null auto_increment primary key, `pid` int,';
+      let fieldList = '`id` int unsigned not null auto_increment primary key, `pid` varchar(512),';
       list.forEach(el => {
         let fieldType = '';
         switch (el.type) {
@@ -34,7 +34,7 @@ module.exports = app => {
     async getChildTableSQLList(parentFormKey, list) {
       const childTableSQLList = [];
       list.forEach(el => {
-        let fieldList = '`id` int unsigned not null auto_increment primary key, `pid` int, `parentId` int unsigned,';
+        let fieldList = '`id` int unsigned not null auto_increment primary key, `pid` varchar(512), `parentId` int unsigned,';
         for (const key in el.childTable) {
           let fieldType = '';
           switch (el.childTable[key]) {
@@ -64,7 +64,7 @@ module.exports = app => {
     }
 
     async getBasicNewSQL(formKey, list, version) {
-      let fieldList = '`id` int unsigned not null auto_increment primary key, `pid` int,';
+      let fieldList = '`id` int unsigned not null auto_increment primary key, `pid` varchar(512),';
       list.forEach(el => {
         let fieldType = '';
         switch (el.fieldType) {
@@ -92,7 +92,7 @@ module.exports = app => {
     }
 
     async getChildTableSQLChild(parentFormKey, childFormKey, list, version) {
-      let fieldList = '`id` int unsigned not null auto_increment primary key, `pid` int, `parentId` int unsigned,';
+      let fieldList = '`id` int unsigned not null auto_increment primary key, `pid` varchar(512), `parentId` int unsigned,';
       list.forEach(el => {
         let fieldType = '';
         switch (el.fieldType) {
