@@ -69,7 +69,7 @@ module.exports = app => {
      * @return {Promise<{object}>}
      */
     async getDIYFormDetail(pid, formKey, childFormKey, version) {
-      const parentSQL = `SELECT * FROM ${formKey}${version} WHERE pid = '${pid}''`;
+      const parentSQL = `SELECT * FROM ${formKey}${version} WHERE pid = '${pid}'`;
       const [ parentDataList ] = await app.model.query(parentSQL);
       if (parentDataList.length === 0) return false;
       const parentData = parentDataList[0];
@@ -98,7 +98,7 @@ module.exports = app => {
      * @return {Promise<string>} insetSQL parent table's insert SQL
      */
     async getParentFormUpdateSQL(formKey, version, parentData, pid) {
-      const whereSql = `pid = '${pid}''`;
+      const whereSql = `pid = '${pid}'`;
       return getUpdateSQL(formKey, version, parentData, whereSql);
     }
 
