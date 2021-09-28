@@ -42,6 +42,7 @@ CMD [ \
 --procedureDBUser=${procedureDBUser} \
 --procedureDBPassword=${procedureDBPassword} \
 --activitiUrl=${activitiUrl} \
+--camundaUrl=${camundaUrl} \
 --rejectUnauthorized=${rejectUnauthorized} \
 --transitionHost=${transitionHost} \
 --outboundUrl=${outboundUrl} \

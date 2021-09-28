@@ -19,6 +19,7 @@ docker run -dit \
 -e dbPassword=APJ@com123 \
 -e procedureDBName=nsr_gis_app \
 -e activitiUrl=10.240.131.123:3004 \
+-e camundaUrl=10.240.131.123:3006 \
 -e transitionHost=10.240.131.123:3000 \
 -e outboundUrl=10.240.131.123:8000 \
 -e adPrefix=/adService \
@@ -26,7 +27,7 @@ docker run -dit \
 -e CUIDPrefix=/CUID \
 -e CUIDAPIKey=244575dc-0731-4340-a3a2-29f1d9f7104d \
 -e procedureFn=sp_getLocationList \
--e jwtExpiresIn=10m \
+-e jwtExpiresIn=1000m \
 -e jwtSecret=1234567abc \
 -e jwtIss=SENSEPLATFORM \
 -e t1=IOS.ISMS \
@@ -42,7 +43,7 @@ docker run -dit \
 -e mailPort=25 \
 -e mailUser=gitlab@apjcorp.com \
 -e mailPass=apj.com666 \
-aaa-service
+aaa-service:20210621
 ````
 
 

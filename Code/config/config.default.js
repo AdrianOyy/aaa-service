@@ -93,6 +93,12 @@ module.exports = appInfo => {
     rejectUnauthorized: 'N',
   };
 
+  config.camunda = {
+    // url: 'http://localhost:8080',
+    url: 'http://10.240.131.123:3006',
+    rejectUnauthorized: 'N',
+  };
+
   config.log = {
     tsHost: '127.0.0.1:3001',
   };
@@ -162,7 +168,7 @@ module.exports = appInfo => {
   //           JSON WEB TOKEN 设置
   // ===================================
   config.jwt = {
-    expiresIn: '10m',
+    expiresIn: '1000m',
     secret: '1234567abc',
     iss: 'SENSEPLATFORM',
   };

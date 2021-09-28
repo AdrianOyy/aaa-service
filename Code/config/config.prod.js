@@ -88,6 +88,11 @@ module.exports = appInfo => {
     rejectUnauthorized: process.env.npm_config_rejectUnauthorized || 'N',
   };
 
+  config.camunda = {
+    url: process.env.npm_config_camundaUrl,
+    rejectUnauthorized: process.env.npm_config_rejectUnauthorized || 'N',
+  };
+
   config.log = {
     tsHost: process.env.npm_config_transitionHost,
   };

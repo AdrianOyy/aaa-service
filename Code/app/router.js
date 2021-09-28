@@ -132,6 +132,8 @@ module.exports = app => {
   router.post(`${prefix}/diyForm/update`, controller.diyForm.update);
   router.get(`${prefix}/diyForm/detail`, controller.diyForm.detail);
 
+  router.post(`${prefix}/camunda/start`, controller.camunda.start);
+
   router.get(`${prefix}/haDynamicForm/getInitData`, controller.haDynamicForm.getInitData);
 
   router.get(`${prefix}/inventory/list`, controller.inventory.list);
