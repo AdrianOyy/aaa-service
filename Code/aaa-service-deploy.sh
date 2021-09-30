@@ -50,6 +50,7 @@ docker run -di -p $port:$containerport --name $project_name \
 -e dbPassword=APJ@com123 \
 -e procedureDBName=nsr_gis_app \
 -e activitiUrl=10.240.131.123:3004 \
+-e camundaUrl=10.240.131.123:3006 \
 -e transitionHost=10.240.131.123:3000 \
 -e outboundUrl=10.240.131.123:8000 \
 -e adPrefix=/adService \
