@@ -6,6 +6,29 @@ module.exports = app => {
   const flag = !(!rejectUnauthorized || rejectUnauthorized === 'N');
   return class extends app.Service {
 
+    async loadUser(user, options) {
+      const { ctx } = this;
+      const url = app.config.camunda.url + '/user/loadUser';
+      options.data = user;
+      const result = await this.curl(url, options, ctx);
+      return result.data;
+    }
+
+    async deleteGroup(groupIds, headers) {
+      const { ctx } = this;
+      const url = app.config.camunda.url + '/user/deleteGroup';
+      const result = await this.curl(url, { headers, data: groupIds, method: 'DELETE' }, ctx);
+      return result.data;
+    }
+
+    async saveOrUpdateGroup(group, options) {
+      const { ctx } = this;
+      const url = app.config.camunda.url + '/user/saveOrUpdateGroup';
+      options.data = group;
+      const result = await this.curl(url, options, ctx);
+      return result.data;
+    }
+
     async startProcess(data, options) {
       const { ctx } = this;
       const url = app.config.camunda.url + '/process/startProcessTest';

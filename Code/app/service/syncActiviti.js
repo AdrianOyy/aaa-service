@@ -37,7 +37,6 @@ module.exports = app => {
     }
 
     async saveOrUpdateGroup(group, options) {
-      console.log(1111, group);
       const { ctx } = this;
       const url = app.config.activiti.url + '/user/saveOrUpdateGroup';
       options.data = group;

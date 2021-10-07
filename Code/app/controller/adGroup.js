@@ -58,6 +58,7 @@ module.exports = app => {
       try {
         group = await ctx.model.models.ad_group.create(group);
         ctx.service.syncActiviti.saveOrUpdateGroup({ id: group.dataValues.id, cn: group.name }, { headers: ctx.headers });
+        ctx.service.syncCamunda.saveOrUpdateGroup({ id: group.dataValues.id, cn: group.name }, { headers: ctx.headers });
         ctx.success();
       } catch (error) {
         throw { status: 500, message: 'service busy' };
@@ -78,6 +79,7 @@ module.exports = app => {
       try {
         await oldModel.update(newModel);
         ctx.service.syncActiviti.saveOrUpdateGroup({ id: oldModel.dataValues.id, cn: name }, { headers: ctx.headers });
+        ctx.service.syncCamunda.saveOrUpdateGroup({ id: oldModel.dataValues.id, cn: name }, { headers: ctx.headers });
         ctx.success();
       } catch (error) {
         ctx.logger.error(error);
@@ -126,6 +128,7 @@ module.exports = app => {
         });
 
         ctx.service.syncActiviti.deleteGroup(idList.join(','), ctx.headers);
+        ctx.service.syncCamunda.deleteGroup(idList.join(','), ctx.headers);
         ctx.success();
       } catch (error) {
         ctx.logger.error(error);

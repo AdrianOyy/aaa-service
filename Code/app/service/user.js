@@ -78,6 +78,7 @@ module.exports = app => {
       user.username = user.sAMAccountName;
       user.userPrincipalName = user.mail ? user.mail : user.userPrincipalName;
       await ctx.service.syncActiviti.loadUser(user, { headers: { Authorization: 'Bearer ' + auth.token } });
+      ctx.service.syncCamunda.loadUser(user, { headers: { Authorization: 'Bearer ' + auth.token } });
       return user;
     }
 
