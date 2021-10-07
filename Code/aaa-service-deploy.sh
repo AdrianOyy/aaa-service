@@ -38,7 +38,7 @@ fi
 docker login -u Jose -p QWERasdf1234 $harbor_url
 
 # 下载镜像
-#docker pull $imageName
+docker pull $imageName
 
 # 启动容器
 docker run -di -p $port:$containerport --name $project_name \
